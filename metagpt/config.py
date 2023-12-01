@@ -139,4 +139,11 @@ class Config(metaclass=Singleton):
         # This is a hack to see if it is imported correctly in Action classes
         CONST.WORKSPACE_ROOT = self._product_root
 
+    def set_product_config(self, config_dict):
+        self._product_config = config_dict
+
+    @property
+    def product_config(self):
+        return self._product_config
+    
 CONFIG = Config()
