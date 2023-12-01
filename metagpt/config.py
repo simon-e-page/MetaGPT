@@ -125,10 +125,16 @@ class Config(metaclass=Singleton):
     @property
     def product_root(self):
         return self._product_root
-    
+
+    @property
+    def product_name(self):
+        return self._product_name
+
     @product_root.setter
-    def product_root(self, value):
-        self._product_root = self.workspace_root / value
+    def product_name(self, value):
+        self._product_root: str = self.workspace_root / value
+        self._product_name: str = value
+        
         # This is a hack to see if it is imported correctly in Action classes
         CONST.WORKSPACE_ROOT = self._product_root
 

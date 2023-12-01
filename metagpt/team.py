@@ -44,8 +44,7 @@ class Team(BaseModel):
 
     def start_project(self, product_name: str, stage: str = None, send_to: str = ""):
         """Start a project from publishing boss requirement."""
-        self.product_name: str = product_name
-        CONFIG.product_root = product_name
+        CONFIG.product_name = product_name
 
         if not os.path.exists(CONFIG.product_root):
             raise FileNotFoundError(f"Need following directory with product config to start: {CONFIG.product_root}")
@@ -58,8 +57,8 @@ class Team(BaseModel):
         
         stage = self.environment.stage
 
+        self.environment.publish_message(Message(role="Human", content=f'For product {product_name} we are commencing stage: {stage}', cause_by=BossRequirement, send_to=send_to))
         self.environment.publish_message(Message(role="Human", content=idea, cause_by=BossRequirement, send_to=send_to))
-        self.environment.publish_message(Message(role="Human", content=f'Commencing stage: {stage}', cause_by=BossRequirement, send_to=send_to))
 
     def _save(self):
         logger.info(self.json())
