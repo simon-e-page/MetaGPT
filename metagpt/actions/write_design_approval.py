@@ -48,5 +48,12 @@ class WriteDesignApproval(Action):
         #logger.debug(prompt)
         # prd = await self._aask_v1(prompt, "prd", OUTPUT_MAPPING)
         prompt = "Do you approve the System Design? (yes/no)"
-        prd = await self._aask_v1(prompt, "prd", OUTPUT_MAPPING, format=format)
-        return prd
+        design_approval = await self._aask_v1(prompt, "prd", OUTPUT_MAPPING, format=format)
+
+        if design_approval == 'yes':
+            logger.debug("Got approval for System Design!")
+        else:
+            logger.warning("No approval - stop project!")
+            #TODO: how to stop project?
+
+        return design_approval

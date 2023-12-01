@@ -48,5 +48,12 @@ class WriteProductApproval(Action):
         #logger.debug(prompt)
         # prd = await self._aask_v1(prompt, "prd", OUTPUT_MAPPING)
         prompt = "Do you approve the Product Requirements? (yes/no)"
-        prd = await self._aask_v1(prompt, "prd", OUTPUT_MAPPING, format=format)
-        return prd
+        prd_approval = await self._aask_v1(prompt, "prd", OUTPUT_MAPPING, format=format)
+
+        if prd_approval == 'yes':
+            logger.debug("Got approval for Product Requirements!")
+        else:
+            logger.warning("No approval - stop project!")
+            #TODO: how to stop project?
+
+        return prd_approval
