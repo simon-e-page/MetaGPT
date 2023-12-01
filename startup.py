@@ -65,7 +65,9 @@ def main(
     """
     We are a software startup comprised of AI. By investing in us,
     you are empowering a future filled with limitless possibilities.
-    :param product_name: The name of your product and key directory name in the workspace
+    :param product_name: The name of your product and key directory name in the workspace. 
+    Make sure the directory WORKSPACE_ROOT/PRODUCT_NAME exists.
+    Make sure that there is a file product.yaml in that directory with at least the IDEA and STAGE defined
     :param investment: As an investor, you have the opportunity to contribute
     a certain dollar amount to this AI company.
     :param n_round:
