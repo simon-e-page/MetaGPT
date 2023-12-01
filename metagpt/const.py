@@ -7,7 +7,6 @@
 """
 from pathlib import Path
 from loguru import logger
-from metagpt.config import CONFIG
 from collections import OrderedDict
 
 def get_project_root():
