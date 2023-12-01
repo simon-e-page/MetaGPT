@@ -122,10 +122,14 @@ class Config(metaclass=Singleton):
             raise ValueError(f"Key '{key}' not found in environment variables or in the YAML file")
         return value
 
-    @property.setter
+    @property
+    def product_root(self):
+        return self._product_root
+    
+    @product_root.setter
     def product_root(self, value):
-        self.product_root = self.workspace_root / value
+        self._product_root = self.workspace_root / value
         # This is a hack to see if it is imported correctly in Action classes
-        CONST.WORKSPACE_ROOT = self.product_root
+        CONST.WORKSPACE_ROOT = self._product_root
 
 CONFIG = Config()
