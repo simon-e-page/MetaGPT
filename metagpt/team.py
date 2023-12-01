@@ -49,7 +49,7 @@ class Team(BaseModel):
         if not os.path.exists(CONFIG.product_root):
             raise FileNotFoundError(f"Need following directory with product config to start: {CONFIG.product_root}")
 
-        self.environment.get_product_config(CONFIG.product_root)
+        self.environment.get_product_config()
 
         idea: str = self.environment.idea
         if stage is not None:
