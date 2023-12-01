@@ -13,6 +13,7 @@ from metagpt.logs import logger
 from metagpt.tools import SearchEngineType, WebBrowserEngineType
 from metagpt.utils.singleton import Singleton
 import metagpt.const as CONST
+from pathlib import Path
 
 class NotConfiguredException(Exception):
     """Exception raised for errors in the configuration.
@@ -132,9 +133,9 @@ class Config(metaclass=Singleton):
 
     @product_root.setter
     def product_name(self, value):
-        self._product_root: str = self.workspace_root / value
+        self._product_root: Path = Path(self.workspace_root) / value
         self._product_name: str = value
-        
+
         # This is a hack to see if it is imported correctly in Action classes
         CONST.WORKSPACE_ROOT = self._product_root
 
