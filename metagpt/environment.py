@@ -75,7 +75,7 @@ class Environment(BaseModel):
             if stage not in stages:
                 stage = stages[0]
         
-        self._product_config['STAGE'] = stage
+        CONFIG.product_config['STAGE'] = stage
 
     def save_product_config(self):
         _yaml_file: Path = CONFIG.product_root / "product.yaml"
