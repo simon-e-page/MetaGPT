@@ -27,7 +27,6 @@ class Environment(BaseModel):
     roles: dict[str, Role] = Field(default_factory=dict)
     memory: Memory = Field(default_factory=Memory)
     history: str = Field(default='')
-    _yaml_file: Path = Field(default_factory=Path)
 
     class Config:
         arbitrary_types_allowed = True
@@ -79,18 +78,19 @@ class Environment(BaseModel):
         self._product_config['STAGE'] = stage
 
     def save_product_config(self):
-        with open(self._yaml_file, "w", encoding="utf-8") as file:
+        _yaml_file: Path = CONFIG.product_root / "product.yaml"
+        with open(_yaml_file, "w", encoding="utf-8") as file:
             yaml.safe_dump(CONFIG.product_config, file)
 
-    def get_product_config(self, path) -> None:
+    def get_product_config(self) -> None:
         _product_config: dict = {
             'IDEA': 'Make a simple web application that displays Hello World',
             'STAGE': 'Requirements'
         }
         
-        self._yaml_file = path / "product.yaml"
+        _yaml_file: Path = CONFIG.product_root / "product.yaml"
 
-        with open(self._yaml_file, "r", encoding="utf-8") as file:
+        with open(_yaml_file, "r", encoding="utf-8") as file:
             yaml_data = yaml.safe_load(file)
             if yaml_data:               
                 _product_config.update(yaml_data)
