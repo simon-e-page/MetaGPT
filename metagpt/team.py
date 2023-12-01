@@ -6,6 +6,7 @@
 @File    : software_company.py
 """
 from pydantic import BaseModel, Field
+import os
 
 from metagpt.actions import BossRequirement
 from metagpt.config import CONFIG
@@ -14,7 +15,6 @@ from metagpt.logs import logger
 from metagpt.roles import Role
 from metagpt.schema import Message
 from metagpt.utils.common import NoMoneyException
-
 
 class Team(BaseModel):
     """
@@ -42,10 +42,24 @@ class Team(BaseModel):
         if CONFIG.total_cost > CONFIG.max_budget:
             raise NoMoneyException(CONFIG.total_cost, f'Insufficient funds: {CONFIG.max_budget}')
 
-    def start_project(self, idea, send_to: str = ""):
+    def start_project(self, product_name: str, stage: str = None, send_to: str = ""):
         """Start a project from publishing boss requirement."""
-        self.idea = idea
+        self.product_name: str = product_name
+        CONFIG.product_root = product_name
+
+        if not os.path.exists(CONFIG.product_root):
+            raise FileNotFoundError(f"Need following directory with product config to start: {CONFIG.product_root}")
+
+        self.environment.get_product_config(CONFIG.product_root)
+
+        idea: str = self.environment.idea
+        if stage is not None:
+            self.environment.set_stage(stage)
+        
+        stage = self.environment.stage
+
         self.environment.publish_message(Message(role="Human", content=idea, cause_by=BossRequirement, send_to=send_to))
+        self.environment.publish_message(Message(role="Human", content=f'Commencing stage: {stage}', cause_by=BossRequirement, send_to=send_to))
 
     def _save(self):
         logger.info(self.json())

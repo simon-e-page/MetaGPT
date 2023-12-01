@@ -12,7 +12,7 @@ from metagpt.const import PROJECT_ROOT
 from metagpt.logs import logger
 from metagpt.tools import SearchEngineType, WebBrowserEngineType
 from metagpt.utils.singleton import Singleton
-
+import metagpt.const as CONST
 
 class NotConfiguredException(Exception):
     """Exception raised for errors in the configuration.
@@ -94,6 +94,7 @@ class Config(metaclass=Singleton):
         self.pyppeteer_executable_path = self._get("PYPPETEER_EXECUTABLE_PATH", "")
 
         self.prompt_format = self._get("PROMPT_FORMAT", "markdown")
+        self.workspace_root: str = self._get("WORKSPACE_ROOT", f"{PROJECT_ROOT}/workspace")
 
     def _init_with_config_files_and_env(self, configs: dict, yaml_file):
         """Load from config/key.yaml, config/config.yaml, and env in decreasing order of priority"""
@@ -121,5 +122,10 @@ class Config(metaclass=Singleton):
             raise ValueError(f"Key '{key}' not found in environment variables or in the YAML file")
         return value
 
+    @property.setter
+    def product_root(self, value):
+        self.product_root = self.workspace_root / value
+        # This is a hack to see if it is imported correctly in Action classes
+        CONST.WORKSPACE_ROOT = self.product_root
 
 CONFIG = Config()

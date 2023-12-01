@@ -7,6 +7,8 @@
 """
 from pathlib import Path
 from loguru import logger
+from metagpt.config import CONFIG
+from collections import OrderedDict
 
 def get_project_root():
     """Search upwards to find the project root directory."""
@@ -31,7 +33,7 @@ def get_project_root():
 
 PROJECT_ROOT = get_project_root()
 DATA_PATH = PROJECT_ROOT / "data"
-WORKSPACE_ROOT = PROJECT_ROOT / "workspace"
+#WORKSPACE_ROOT = PROJECT_ROOT / "workspace"
 PROMPT_PATH = PROJECT_ROOT / "metagpt/prompts"
 UT_PATH = PROJECT_ROOT / "data/ut"
 SWAGGER_PATH = UT_PATH / "files/api/"
@@ -46,3 +48,10 @@ INVOICE_OCR_TABLE_PATH = DATA_PATH / "invoice_table"
 SKILL_DIRECTORY = PROJECT_ROOT / "metagpt/skills"
 
 MEM_TTL = 24 * 30 * 3600
+
+STAGES: OrderedDict = OrderedDict()
+STAGES['Requirements'] = ['BossRequirement']
+STAGES['Design'] = ['BossRequirement', 'PRD']
+STAGES['Build'] = []
+STAGES['Test'] = []
+
