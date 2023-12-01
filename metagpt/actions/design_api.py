@@ -11,7 +11,9 @@ from typing import List
 
 from metagpt.actions import Action, ActionOutput
 from metagpt.config import CONFIG
-from metagpt.const import WORKSPACE_ROOT
+#from metagpt.const import WORKSPACE_ROOT
+import metagpt.const as CONST
+
 from metagpt.logs import logger
 from metagpt.utils.common import CodeParser
 from metagpt.utils.get_template import get_template
@@ -193,7 +195,7 @@ class WriteDesign(Action):
             ws_name = system_design.instruct_content.dict()["Python package name"]
         else:
             ws_name = CodeParser.parse_str(block="Python package name", text=system_design)
-        workspace = WORKSPACE_ROOT / ws_name
+        workspace = CONST.WORKSPACE_ROOT / ws_name
         self.recreate_workspace(workspace)
         docs_path = workspace / "docs"
         resources_path = workspace / "resources"
