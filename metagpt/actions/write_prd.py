@@ -217,6 +217,7 @@ OUTPUT_MAPPING = {
     "Anything UNCLEAR": (str, ...),
 }
 
+#TODO: save PRD to file (as per code in design_api.py)
 
 class WritePRD(Action):
     def __init__(self, name="", context=None, llm=None):

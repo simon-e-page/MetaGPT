@@ -43,7 +43,12 @@ class OutputParser:
             # 如果block不为空，则继续处理
             if block.strip() != "":
                 # 将block的标题和内容分开，并分别去掉前后的空白字符
-                block_title, block_content = block.split("\n", 1)
+                try:
+                    block_title, block_content = block.split("\n", 1)
+                except ValueError:
+                    block_title = block
+                    block_content = ''
+                    
                 # LLM可能出错，在这里做一下修正
                 if block_title[-1] == ":":
                     block_title = block_title[:-1]
