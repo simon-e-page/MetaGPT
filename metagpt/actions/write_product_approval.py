@@ -31,7 +31,7 @@ class WriteProductApproval(Action):
     def __init__(self, name="", context=None, llm=None):
         super().__init__(name, context, llm)
 
-    async def run(self, design, *args, **kwargs) -> ActionOutput:
+    async def run(self, prd, *args, **kwargs) -> ActionOutput:
         """ Wait for a Human Approval """
         #sas = SearchAndSummarize()
         # rsp = await sas.run(context=requirements, system_text=SEARCH_AND_SUMMARIZE_SYSTEM_EN_US)
@@ -51,9 +51,9 @@ class WriteProductApproval(Action):
         prd_approval = await self._aask_v1(prompt, "prd", OUTPUT_MAPPING, format=format)
 
         if prd_approval == 'yes':
-            logger.debug("Got approval for Product Requirements!")
+            logger.info("Got approval for Product Requirements!")
         else:
             logger.warning("No approval - stop project!")
             #TODO: how to stop project?
 
-        return prd_approval
+        return prd
