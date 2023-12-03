@@ -37,6 +37,10 @@ async def startup(
         ]
     )
 
+    logger.info("Including Product Team for Requirements Stage")
+    logger.info("Including Design Team for System Design Stage")
+    logger.info("Including Project Manager for Task Breakdown")
+
     # if implement or code_review
     if implement or code_review:
         # developing features: implement the idea
