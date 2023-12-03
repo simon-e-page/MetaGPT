@@ -9,6 +9,7 @@ from metagpt.actions import WriteDesign
 from metagpt.actions.action import Action
 #from metagpt.const import WORKSPACE_ROOT
 import metagpt.const as CONST
+from metagpt.config import CONFIG
 from metagpt.logs import logger
 from metagpt.schema import Message
 from metagpt.utils.common import CodeParser
@@ -58,10 +59,11 @@ class WriteCode(Action):
 
         design = [i for i in context if i.cause_by == WriteDesign][0]
 
-        ws_name = CodeParser.parse_str(block="Python package name", text=design.content)
+        #ws_name = CodeParser.parse_str(block="Python package name", text=design.content)
+        ws_name = CONFIG.product_name
         ws_path = CONST.WORKSPACE_ROOT / ws_name
-        if f"{ws_name}/" not in filename and all(i not in filename for i in ["requirements.txt", ".md"]):
-            ws_path = ws_path / ws_name
+        #if f"{ws_name}/" not in filename and all(i not in filename for i in ["requirements.txt", ".md"]):
+        #    ws_path = ws_path / ws_name
         code_path = ws_path / filename
         code_path.parent.mkdir(parents=True, exist_ok=True)
         code_path.write_text(code)

@@ -168,11 +168,11 @@ class WriteTasks(Action):
         super().__init__(name, context, llm)
 
     def _save(self, context, rsp):
-        if context[-1].instruct_content:
-            ws_name = context[-1].instruct_content.dict()["Python package name"]
-        else:
-            ws_name = CodeParser.parse_str(block="Python package name", text=context[-1].content)
-        file_path = CONST.WORKSPACE_ROOT / ws_name / "docs/api_spec_and_tasks.md"
+        #if context[-1].instruct_content:
+        #    ws_name = context[-1].instruct_content.dict()["Python package name"]
+        #else:
+        #    ws_name = CodeParser.parse_str(block="Python package name", text=context[-1].content)
+        file_path = CONST.WORKSPACE_ROOT / "docs/api_spec_and_tasks.md"
         file_path.write_text(json_to_markdown(rsp.instruct_content.dict()))
 
         # Write requirements.txt
