@@ -36,21 +36,15 @@ async def startup(
         ]
     )
 
-    logger.info("Including Product Team for Requirements Stage")
-    logger.info("Including Design Team for System Design Stage")
-    logger.info("Including Project Manager for Task Breakdown")
-
     # if implement or code_review
     if implement or code_review:
         # developing features: implement the idea
         company.hire([Engineer(n_borg=5, use_code_review=code_review)])
-        logger.info("Including Engineers for Build Stage")
 
     if run_tests:
         # developing features: run tests on the spot and identify bugs
         # (bug fixing capability comes soon!)
         company.hire([QaEngineer()])
-        logger.info("Including QA Engineers for Test Stage")
 
     company.invest(investment)
     company.start_project(product_name, stage)
