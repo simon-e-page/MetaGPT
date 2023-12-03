@@ -5,6 +5,8 @@
 @Author  : alexanderwu
 @File    : write_prd.py
 """
+import shutil
+from pathlib import Path
 from typing import List
 
 from metagpt.actions import Action, ActionOutput
@@ -12,6 +14,10 @@ from metagpt.actions.search_and_summarize import SearchAndSummarize
 from metagpt.config import CONFIG
 from metagpt.logs import logger
 from metagpt.utils.get_template import get_template
+
+import metagpt.const as CONST
+from metagpt.utils.json_to_markdown import json_to_markdown
+
 
 templates = {
     "json": {
@@ -223,6 +229,36 @@ class WritePRD(Action):
     def __init__(self, name="", context=None, llm=None):
         super().__init__(name, context, llm)
 
+    def recreate_workspace(self, workspace: Path):
+        try:
+            shutil.rmtree(workspace)
+        except FileNotFoundError:
+            pass  # Folder does not exist, but we don't care
+        workspace.mkdir(parents=True, exist_ok=True)
+
+    async def _save_prd(self, docs_path, resources_path, prd):
+        prd_file = docs_path / "prd.md"
+        #if context[-1].instruct_content and context[-1].instruct_content.dict()["Competitive Quadrant Chart"]:
+        #    quadrant_chart = context[-1].instruct_content.dict()["Competitive Quadrant Chart"]
+        #    await mermaid_to_file(quadrant_chart, resources_path / "competitive_analysis")
+
+        if prd.instruct_content:
+            logger.info(f"Saving PRD to {prd_file}")
+            prd_file.write_text(json_to_markdown(prd.instruct_content.dict()))
+
+    async def _save(self, prd):
+        #if isinstance(system_design, ActionOutput):
+        #    ws_name = system_design.instruct_content.dict()["Python package name"]
+        #else:
+        #    ws_name = CodeParser.parse_str(block="Python package name", text=system_design)
+        workspace = CONST.WORKSPACE_ROOT
+        self.recreate_workspace(workspace)
+        docs_path = workspace / "docs"
+        resources_path = workspace / "resources"
+        docs_path.mkdir(parents=True, exist_ok=True)
+        resources_path.mkdir(parents=True, exist_ok=True)
+        await self._save_prd(docs_path, resources_path, prd)
+
     async def run(self, requirements, format=CONFIG.prompt_format, *args, **kwargs) -> ActionOutput:
         sas = SearchAndSummarize()
         # rsp = await sas.run(context=requirements, system_text=SEARCH_AND_SUMMARIZE_SYSTEM_EN_US)
@@ -239,4 +275,7 @@ class WritePRD(Action):
         logger.debug(prompt)
         # prd = await self._aask_v1(prompt, "prd", OUTPUT_MAPPING)
         prd = await self._aask_v1(prompt, "prd", OUTPUT_MAPPING, format=format)
+
+        await self._save(prd)
+
         return prd

@@ -56,4 +56,4 @@ class WriteDesignApproval(Action):
             logger.warning("No approval - stop project!")
             #TODO: how to stop project?
 
-        return design_approval
+        return design
