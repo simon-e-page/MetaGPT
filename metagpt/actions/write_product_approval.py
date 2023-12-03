@@ -16,15 +16,6 @@ from metagpt.utils.get_template import get_template
 
 OUTPUT_MAPPING = {
     "Approval Response": (str, ...),
-#    "Original Requirements": (str, ...),
-#    "Product Goals": (List[str], ...),
-#    "User Stories": (List[str], ...),
-#    "Competitive Analysis": (List[str], ...),
-#    "Competitive Quadrant Chart": (str, ...),
-#    "Requirement Analysis": (str, ...),
-#    "Requirement Pool": (List[List[str]], ...),
-#    "UI Design draft": (str, ...),
-#    "Anything UNCLEAR": (str, ...),
 }
 
 

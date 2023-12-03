@@ -18,12 +18,12 @@ class HumanProvider(BaseGPTAPI):
         if rsp in ["exit", "quit"]:
             exit()
         elif rsp in['yes', 'y']:
-            logger.info("Received an approval")
+            logger.debug("Received an approval")
             rsp = '[CONTENT]{ "Approval Response": "yes" }[/CONTENT]'
         elif rsp in ['no', 'n']:
-            logger.warning('This stage is NOT approved')
+            logger.debug('This stage is NOT approved')
             rsp = '[CONTENT]{ "Approval Response": "no" }[/CONTENT]'
-            exit()
+            #exit()
         return rsp
 
     async def aask(self, msg: str, system_msgs: Optional[list[str]] = None) -> str:
