@@ -172,6 +172,7 @@ class WriteTasks(Action):
         #    ws_name = context[-1].instruct_content.dict()["Python package name"]
         #else:
         #    ws_name = CodeParser.parse_str(block="Python package name", text=context[-1].content)
+        ws_name = CONFIG.product_name
         file_path = CONST.WORKSPACE_ROOT / "docs/api_spec_and_tasks.md"
         file_path.write_text(json_to_markdown(rsp.instruct_content.dict()))
 
