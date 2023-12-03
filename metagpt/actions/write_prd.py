@@ -229,12 +229,14 @@ class WritePRD(Action):
     def __init__(self, name="", context=None, llm=None):
         super().__init__(name, context, llm)
 
-    def recreate_workspace(self, workspace: Path):
-        try:
-            shutil.rmtree(workspace)
-        except FileNotFoundError:
-            pass  # Folder does not exist, but we don't care
-        workspace.mkdir(parents=True, exist_ok=True)
+    def recreate_workspace(self, dirs: list):
+        for path in dirs:
+            try:
+                shutil.rmtree(path)
+                path.mkdir(parents=True, exist_ok=True)
+            except FileNotFoundError:
+                pass  # Folder does not exist, but we don't care
+        
 
     async def _save_prd(self, docs_path, resources_path, prd):
         prd_file = docs_path / "prd.md"
@@ -252,11 +254,11 @@ class WritePRD(Action):
         #else:
         #    ws_name = CodeParser.parse_str(block="Python package name", text=system_design)
         workspace = CONST.WORKSPACE_ROOT
-        self.recreate_workspace(workspace)
         docs_path = workspace / "docs"
         resources_path = workspace / "resources"
-        docs_path.mkdir(parents=True, exist_ok=True)
-        resources_path.mkdir(parents=True, exist_ok=True)
+        self.recreate_workspace([docs_path, resources_path])
+        #docs_path.mkdir(parents=True, exist_ok=True)
+        #resources_path.mkdir(parents=True, exist_ok=True)
         await self._save_prd(docs_path, resources_path, prd)
 
     async def run(self, requirements, format=CONFIG.prompt_format, *args, **kwargs) -> ActionOutput:

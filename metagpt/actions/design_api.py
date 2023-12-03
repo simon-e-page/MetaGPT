@@ -196,11 +196,11 @@ class WriteDesign(Action):
         #else:
         #    ws_name = CodeParser.parse_str(block="Python package name", text=system_design)
         workspace = CONST.WORKSPACE_ROOT
-        self.recreate_workspace(workspace)
+        #self.recreate_workspace(workspace)
         docs_path = workspace / "docs"
         resources_path = workspace / "resources"
-        docs_path.mkdir(parents=True, exist_ok=True)
-        resources_path.mkdir(parents=True, exist_ok=True)
+        #docs_path.mkdir(parents=True, exist_ok=True)
+        #resources_path.mkdir(parents=True, exist_ok=True)
         #await self._save_prd(docs_path, resources_path, context)
         await self._save_system_design(docs_path, resources_path, system_design)
 
