@@ -13,9 +13,14 @@ class HumanProvider(BaseGPTAPI):
     """
 
     def ask(self, msg: str) -> str:
-        logger.info("It's your turn, please type in your response. You may also refer to the context below")
+        logger.info("It's your turn, please type in your response. You may also refer to the context below\n")
         rsp = input(msg)
         if rsp in ["exit", "quit"]:
+            exit()
+        elif rsp in['yes', 'y']:
+            logger.info("Received an approval")
+        elif rsp in ['no', 'n']:
+            logger.warning('This stage is NOT approved')
             exit()
         return rsp
 

@@ -7,6 +7,7 @@
 """
 
 from metagpt.actions import WritePRD
+from metagpt.actions.write_product_approval import WriteProductApproval
 from metagpt.actions.design_api import WriteDesign
 from metagpt.roles import Role
 
@@ -36,4 +37,4 @@ class Architect(Role):
         self._init_actions([WriteDesign])
 
         # Set events or actions the Architect should watch or be aware of
-        self._watch({WritePRD})
+        self._watch({WriteProductApproval})
