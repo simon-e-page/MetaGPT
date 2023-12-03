@@ -19,10 +19,10 @@ class HumanProvider(BaseGPTAPI):
             exit()
         elif rsp in['yes', 'y']:
             logger.info("Received an approval")
-            rsp = "[CONTENT]{ 'Approval Response': 'yes' }[/CONTENT]"
+            rsp = '[CONTENT]{ "Approval Response": "yes" }[/CONTENT]'
         elif rsp in ['no', 'n']:
             logger.warning('This stage is NOT approved')
-            rsp ="[CONTENT]{ 'Approval Response': 'no' }[/CONTENT]"
+            rsp = '[CONTENT]{ "Approval Response": "no" }[/CONTENT]'
             exit()
         return rsp
 
