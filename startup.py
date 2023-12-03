@@ -14,7 +14,7 @@ from metagpt.roles import (
 from metagpt.roles.design_approver import DesignApprover
 from metagpt.roles.product_approver import ProductApprover
 from metagpt.team import Team
-
+from metagpt.logs import logger
 
 async def startup(
     product_name: str,
@@ -41,11 +41,13 @@ async def startup(
     if implement or code_review:
         # developing features: implement the idea
         company.hire([Engineer(n_borg=5, use_code_review=code_review)])
+        logger.info("Including Engineers for Build Stage")
 
     if run_tests:
         # developing features: run tests on the spot and identify bugs
         # (bug fixing capability comes soon!)
         company.hire([QaEngineer()])
+        logger.info("Including QA Engineers for Test Stage")
 
     company.invest(investment)
     company.start_project(product_name, stage)
@@ -72,10 +74,11 @@ def main(
     a certain dollar amount to this AI company.
     :param n_round:
     :param code_review: Whether to use code review.
+    :param implement: Whether to write the code
     :param stage: The project stage to start or resume [Design, Build, Test, Deploy]
     :return:
     """
-    asyncio.run(startup(product_name, investment, n_round, code_review, run_tests, implement, stage))
+    asyncio.run(startup(product_name, investment=investment, n_round=n_round, code_review=code_review, run_tests=run_tests, implement=implement, stage=stage))
 
 
 if __name__ == "__main__":
