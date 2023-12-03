@@ -51,4 +51,4 @@ class WriteProductApproval(Action):
             logger.warning("No approval - stop project!")
             #TODO: how to stop project?
 
-        return prd
+        return prd_approval

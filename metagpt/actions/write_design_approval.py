@@ -35,4 +35,4 @@ class WriteDesignApproval(Action):
             exit()
             #TODO: how best to stop project?
 
-        return design
+        return design_approval
