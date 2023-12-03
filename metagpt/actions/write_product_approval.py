@@ -49,7 +49,7 @@ class WriteProductApproval(Action):
         #logger.debug(prompt)
         # prd = await self._aask_v1(prompt, "prd", OUTPUT_MAPPING)
         prompt = "Do you approve the Product Requirements? (yes/no)"
-        prd_approval = await self._aask_v1(prompt, "prd_approval", OUTPUT_MAPPING, format=format)
+        prd_approval = await self._aask_v1(prompt, "prd_approval", OUTPUT_MAPPING, format='json')
 
         print(prd_approval.content)
         print(prd_approval.instruct_content)
