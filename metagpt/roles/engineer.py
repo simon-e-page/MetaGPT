@@ -13,6 +13,7 @@ from pathlib import Path
 from metagpt.actions import WriteCode, WriteCodeReview, WriteDesign, WriteTasks
 #from metagpt.const import WORKSPACE_ROOT
 import metagpt.const as CONST
+from metagpt.config import CONFIG
 from metagpt.logs import logger
 from metagpt.roles import Role
 from metagpt.schema import Message
@@ -97,12 +98,13 @@ class Engineer(Role):
         return CodeParser.parse_str(block="Python package name", text=system_design_msg.content)
 
     def get_workspace(self) -> Path:
-        msg = self._rc.memory.get_by_action(WriteDesign)[-1]
-        if not msg:
-            return CONST.WORKSPACE_ROOT / "src"
-        workspace = self.parse_workspace(msg)
+        return CONST.WORKSPACE_ROOT / CONFIG.product_name
+        #msg = self._rc.memory.get_by_action(WriteDesign)[-1]
+        #if not msg:
+        #    return CONST.WORKSPACE_ROOT / "src"
+        #workspace = self.parse_workspace(msg)
         # Codes are written in workspace/{package_name}/{package_name}
-        return CONST.WORKSPACE_ROOT / workspace / workspace
+        #return CONST.WORKSPACE_ROOT / workspace / workspace
 
     def recreate_workspace(self):
         workspace = self.get_workspace()
