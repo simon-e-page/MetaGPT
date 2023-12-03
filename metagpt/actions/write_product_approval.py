@@ -15,15 +15,16 @@ from metagpt.utils.get_template import get_template
 
 
 OUTPUT_MAPPING = {
-    "Original Requirements": (str, ...),
-    "Product Goals": (List[str], ...),
-    "User Stories": (List[str], ...),
-    "Competitive Analysis": (List[str], ...),
-    "Competitive Quadrant Chart": (str, ...),
-    "Requirement Analysis": (str, ...),
-    "Requirement Pool": (List[List[str]], ...),
-    "UI Design draft": (str, ...),
-    "Anything UNCLEAR": (str, ...),
+    "Approval Response": (str, ...),
+#    "Original Requirements": (str, ...),
+#    "Product Goals": (List[str], ...),
+#    "User Stories": (List[str], ...),
+#    "Competitive Analysis": (List[str], ...),
+#    "Competitive Quadrant Chart": (str, ...),
+#    "Requirement Analysis": (str, ...),
+#    "Requirement Pool": (List[List[str]], ...),
+#    "UI Design draft": (str, ...),
+#    "Anything UNCLEAR": (str, ...),
 }
 
 
@@ -48,9 +49,12 @@ class WriteProductApproval(Action):
         #logger.debug(prompt)
         # prd = await self._aask_v1(prompt, "prd", OUTPUT_MAPPING)
         prompt = "Do you approve the Product Requirements? (yes/no)"
-        prd_approval = await self._aask_v1(prompt, "prd", OUTPUT_MAPPING, format=format)
+        prd_approval = await self._aask_v1(prompt, "prd_approval", OUTPUT_MAPPING, format=format)
 
-        if prd_approval == 'yes':
+        print(prd_approval.content)
+        print(prd_approval.instruct_content)
+
+        if prd_approval.content == 'yes':
             logger.info("Got approval for Product Requirements!")
         else:
             logger.warning("No approval - stop project!")
