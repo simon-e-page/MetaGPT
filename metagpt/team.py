@@ -30,7 +30,7 @@ class Team(BaseModel):
 
     def hire(self, roles: list[Role]):
         """Hire roles to cooperate"""
-        logger.info(f"Including the following roles: {roles.join(',')}")
+        logger.info(f"Including the following roles: {','.join(roles)}")
         self.environment.add_roles(roles)
 
     def invest(self, investment: float):
