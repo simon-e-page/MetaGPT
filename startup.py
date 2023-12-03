@@ -14,7 +14,6 @@ from metagpt.roles import (
 from metagpt.roles.design_approver import DesignApprover
 from metagpt.roles.product_approver import ProductApprover
 from metagpt.team import Team
-from metagpt.logs import logger
 
 async def startup(
     product_name: str,
