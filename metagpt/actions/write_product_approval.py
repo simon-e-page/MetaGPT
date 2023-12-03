@@ -51,10 +51,10 @@ class WriteProductApproval(Action):
         prompt = "Do you approve the Product Requirements? (yes/no)"
         prd_approval = await self._aask_v1(prompt, "prd_approval", OUTPUT_MAPPING, format='json')
 
-        print(prd_approval.content)
-        print(prd_approval.instruct_content)
+        #print(prd_approval.content)
+        logger.debug(prd_approval.instruct_content.dict())
 
-        if prd_approval.content == 'yes':
+        if prd_approval.instruct_content.dict()['Approval Response'] == 'yes':
             logger.info("Got approval for Product Requirements!")
         else:
             logger.warning("No approval - stop project!")
