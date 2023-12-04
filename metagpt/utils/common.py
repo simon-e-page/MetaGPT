@@ -67,6 +67,13 @@ class OutputParser:
         return code
 
     @classmethod
+    def parse_simple_str(cls, text: str):
+        text = text.strip('\n').strip()
+        #text = text.split("=")[-1]
+        #text = text.strip().strip("'").strip('"')
+        return text
+
+    @classmethod
     def parse_str(cls, text: str):
         text = text.split("=")[-1]
         text = text.strip().strip("'").strip('"')
@@ -134,7 +141,7 @@ class OutputParser:
                 pass
 
             #try:
-            content = cls.parse_simple_list(text=content)
+            #content = cls.parse_simple_list(text=content)
             #except Exception:
             #    pass
 
@@ -164,16 +171,17 @@ class OutputParser:
             if typing == List[str] or typing == List[Tuple[str, str]] or typing == List[List[str]]:
                 # 尝试解析list
                 try:
-                    content = cls.parse_file_list(text=content)
+                    content = cls.parse_simple_list(text=content)
+                    #content = cls.parse_file_list(text=content)
                 except Exception:
                     pass
             # TODO: 多余的引号去除有风险，后期再解决
-            # elif typing == str:
+            elif typing == str:
             #     # 尝试去除多余的引号
-            #     try:
-            #         content = cls.parse_str(text=content)
-            #     except Exception:
-            #         pass
+                 try:
+                     content = cls.parse_simple_str(text=content)
+                 except Exception:
+                     pass
             parsed_data[block] = content
         return parsed_data
 
