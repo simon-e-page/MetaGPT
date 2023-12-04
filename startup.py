@@ -48,7 +48,7 @@ async def startup(
 
     company.invest(investment)
     company.start_project(product_name, stage)
-    await company.run(n_round=n_round)
+
 
 
 def main(

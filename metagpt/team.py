@@ -10,8 +10,9 @@ import os
 
 from metagpt.actions import BossRequirement
 from metagpt.config import CONFIG
+import metagpt.const as CONST
 from metagpt.environment import Environment
-from metagpt.logs import logger
+from metagpt.logs import logger, add_project_log
 from metagpt.roles import Role
 from metagpt.schema import Message
 from metagpt.utils.common import NoMoneyException
@@ -58,6 +59,10 @@ class Team(BaseModel):
             self.environment.set_stage(stage)
         
         stage = self.environment.stage
+        add_project_log(CONST.WORKSPACE_ROOT / CONFIG.product_name, replace=True)
+
+        #TODO:
+        # Load History into the evironment if option to restart is provided?
 
         self.environment.publish_message(Message(role="Human", content=f'For product {product_name} we are commencing stage: {stage}', cause_by=BossRequirement, send_to=send_to))
         self.environment.publish_message(Message(role="Human", content=idea, cause_by=BossRequirement, send_to=send_to))
@@ -69,6 +74,7 @@ class Team(BaseModel):
         """Run company until target round or no money"""
         max_round: int = n_round
         logger.info(f"Team will execute {max_round} rounds of Tasks unless they run out of Investment funds!")
+
         while n_round > 0:
             # self._save()
             n_round -= 1
@@ -77,5 +83,9 @@ class Team(BaseModel):
             logger.debug(f"{n_round=}")
             self._check_balance()
             await self.environment.run()
+
+        history_file = CONFIG.product_root / "history.txt"
+        with open(history_file, 'w') as file:
+            file.write(self.environment.history)
         return self.environment.history
     
