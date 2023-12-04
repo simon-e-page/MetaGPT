@@ -45,7 +45,6 @@ class WriteProductApproval(Action):
         llm (LanguageModel): The language model being used.
 
     Methods:
-        get_prd_from_disk(): Retrieves the PRD from disk and parses it into an ActionOutput object.
         run(prd, *args, **kwargs): Executes the action, asking for approval and acting based on the response.
     """
     def __init__(self, name="", context=None, llm=None):
