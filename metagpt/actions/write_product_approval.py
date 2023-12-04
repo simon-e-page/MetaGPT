@@ -51,7 +51,7 @@ class WriteProductApproval(Action):
     def __init__(self, name="", context=None, llm=None):
         super().__init__(name, context, llm)
 
-    def get_prd_from_disk(self):
+    def _get_prd_from_disk(self):
         path = CONFIG.product_root / "docs" / "prd.md"
         prd_content = path.read_text()
         logger.debug(prd_content)
@@ -68,7 +68,7 @@ class WriteProductApproval(Action):
         
         if prd_approval.instruct_content.dict()['Approval Response'] == 'yes':
             logger.info("Got approval for Product Requirements!")
-            output = self.get_prd_from_disk()
+            output = self._get_prd_from_disk()
             logger.debug(output.content)
             logger.debug(output.instruct_content)
         else:
