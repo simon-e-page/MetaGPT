@@ -107,7 +107,7 @@ class OutputParser:
 
 
     @classmethod
-    def parse_simple_list(cls, text: str) -> list[str]
+    def parse_simple_list(cls, text: str) -> list[str]:
         # Regular expression pattern for simple markdown lists
         pattern = r"^-\s(\[.*\])"
         match = re.search(pattern, text, re.DOTALL)
