@@ -48,7 +48,7 @@ class OutputParser:
                 except ValueError:
                     block_title = block
                     block_content = ''
-                    
+
                 # LLM可能出错，在这里做一下修正
                 if block_title[-1] == ":":
                     block_title = block_title[:-1]
@@ -105,6 +105,23 @@ class OutputParser:
                 return code
         raise ValueError("Invalid python code")
 
+
+    @classmethod
+    def parse_simple_list(cls, text: str) -> list[str]
+        # Regular expression pattern for simple markdown lists
+        pattern = r"^-\s(\[.*\])"
+        match = re.search(pattern, text, re.DOTALL)
+        lines = text.split('\n')
+        items = []
+        for line in lines:
+            match = re.search(pattern, line)
+            if match:
+                items.append(ast.literal_eval(match.group(1)))
+            else:
+                items.append(line)
+        return items
+
+
     @classmethod
     def parse_data(cls, data):
         block_dict = cls.parse_blocks(data)
@@ -113,6 +130,11 @@ class OutputParser:
             # 尝试去除code标记
             try:
                 content = cls.parse_code(text=content)
+            except Exception:
+                pass
+
+            try:
+                content = cls.parse_simple_list(text=content)
             except Exception:
                 pass
 
