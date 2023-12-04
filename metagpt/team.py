@@ -67,9 +67,13 @@ class Team(BaseModel):
 
     async def run(self, n_round=3):
         """Run company until target round or no money"""
+        max_round: int = n_round
+        logger.info(f"Team will execute {max_round} rounds of Tasks unless they run out of Investment funds!")
         while n_round > 0:
             # self._save()
             n_round -= 1
+            count: int = max_round - n_round
+            logger.info(f"Entering round {count} of {max_round}")
             logger.debug(f"{n_round=}")
             self._check_balance()
             await self.environment.run()
