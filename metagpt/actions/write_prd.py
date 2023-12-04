@@ -17,7 +17,7 @@ from metagpt.utils.get_template import get_template
 
 import metagpt.const as CONST
 from metagpt.utils.json_to_markdown import json_to_markdown
-
+import json
 
 templates = {
     "json": {
@@ -240,13 +240,16 @@ class WritePRD(Action):
 
     async def _save_prd(self, docs_path, resources_path, prd):
         prd_file = docs_path / "prd.md"
+        prd_json = docs_path / "prd.json"
+
         #if context[-1].instruct_content and context[-1].instruct_content.dict()["Competitive Quadrant Chart"]:
         #    quadrant_chart = context[-1].instruct_content.dict()["Competitive Quadrant Chart"]
         #    await mermaid_to_file(quadrant_chart, resources_path / "competitive_analysis")
 
         if prd.instruct_content:
-            logger.info(f"Saving PRD to {prd_file}")
+            logger.info(f"Saving PRD to {prd_file} and {prd_json}")
             prd_file.write_text(json_to_markdown(prd.instruct_content.dict()))
+            prd_json.write_text(json.dumps(prd.instruct_content.dict()))
 
     async def _save(self, prd):
         #if isinstance(system_design, ActionOutput):
