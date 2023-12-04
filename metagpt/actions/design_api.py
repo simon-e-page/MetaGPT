@@ -160,24 +160,26 @@ class WriteDesign(Action):
             "clearly and in detail."
         )
 
-    def recreate_workspace(self, workspace: Path):
+    def recreate_workspace(self, workspace: Path) -> None:
+        """ Delete and recreate directories - unused?"""
         try:
             shutil.rmtree(workspace)
         except FileNotFoundError:
             pass  # Folder does not exist, but we don't care
         workspace.mkdir(parents=True, exist_ok=True)
 
-    async def _save_prd(self, docs_path, resources_path, context):
-        prd_file = docs_path / "prd.md"
-        if context[-1].instruct_content and context[-1].instruct_content.dict()["Competitive Quadrant Chart"]:
-            quadrant_chart = context[-1].instruct_content.dict()["Competitive Quadrant Chart"]
-            await mermaid_to_file(quadrant_chart, resources_path / "competitive_analysis")
+    #async def _save_prd(self, docs_path, resources_path, context):
+    #    prd_file = docs_path / "prd.md"
+    #    if context[-1].instruct_content and context[-1].instruct_content.dict()["Competitive Quadrant Chart"]:
+    #        quadrant_chart = context[-1].instruct_content.dict()["Competitive Quadrant Chart"]
+    #        await mermaid_to_file(quadrant_chart, resources_path / "competitive_analysis")
 
-        if context[-1].instruct_content:
-            logger.info(f"Saving PRD to {prd_file}")
-            prd_file.write_text(json_to_markdown(context[-1].instruct_content.dict()))
+    #    if context[-1].instruct_content:
+    #        logger.info(f"Saving PRD to {prd_file}")
+    #        prd_file.write_text(json_to_markdown(context[-1].instruct_content.dict()))
 
     async def _save_system_design(self, docs_path, resources_path, system_design):
+        """ Save system design to output workspace """
         data_api_design = system_design.instruct_content.dict()[
             "Data structures and interface definitions"
         ]  # CodeParser.parse_code(block="Data structures and interface definitions", text=content)
@@ -191,6 +193,7 @@ class WriteDesign(Action):
         system_design_file.write_text((json_to_markdown(system_design.instruct_content.dict())))
 
     async def _save(self, context, system_design):
+        """ Save system design to output workspace """
         #if isinstance(system_design, ActionOutput):
         #    ws_name = system_design.instruct_content.dict()["Python package name"]
         #else:

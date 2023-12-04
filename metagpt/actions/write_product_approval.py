@@ -6,19 +6,20 @@
 @File    : write_prd.py
 """
 from typing import List
+#import json
 
 from metagpt.actions import Action, ActionOutput
-from metagpt.actions.search_and_summarize import SearchAndSummarize
+#from metagpt.actions.search_and_summarize import SearchAndSummarize
 from metagpt.config import CONFIG
 from metagpt.logs import logger
-from metagpt.utils.get_template import get_template
-import json
+#from metagpt.utils.get_template import get_template
 from metagpt.utils.common import OutputParser
 
 OUTPUT_MAPPING = {
     "Approval Response": (str, ...),
 }
 
+# Schema for PRD Deliverable
 PRD_OUTPUT_MAPPING = {
     "Original Requirements": (str, ...),
     "Product Goals": (List[str], ...),
@@ -58,6 +59,6 @@ class WriteProductApproval(Action):
         else:
             logger.warning("No approval - stop project!")
             output = prd_approval
-            #TODO: how to stop project?
+            exit()
 
         return output
