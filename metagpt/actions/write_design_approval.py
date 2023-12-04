@@ -29,7 +29,7 @@ class WriteDesignApproval(Action):
         design_approval = await self._aask_v1(prompt, "design_approval", OUTPUT_MAPPING, format='json')
 
         if design_approval.instruct_content.dict()['Approval Response'] == 'yes':
-            logger.info("Got approval for Product Requirements!")
+            logger.info("Got approval for System Design!")
         else:
             logger.warning("No approval - stop project!")
             exit()
