@@ -68,7 +68,7 @@ class Team(BaseModel):
 
         self.environment.publish_message(Message(role="Human", content=f'For product {product_name} we are commencing stage: {stage}', cause_by=BossRequirement, send_to=send_to))
         self.environment.publish_message(Message(role="Human", content=idea, cause_by=BossRequirement, send_to=send_to))
-        logger.info('For product {product_name} we are commencing stage: {stage}')
+        logger.info(f'For product {product_name} we are commencing stage: {stage}')
 
     def _save(self):
         logger.info(self.json())
