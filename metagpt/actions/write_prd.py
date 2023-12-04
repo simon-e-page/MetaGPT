@@ -253,7 +253,7 @@ class WritePRD(Action):
         #    ws_name = system_design.instruct_content.dict()["Python package name"]
         #else:
         #    ws_name = CodeParser.parse_str(block="Python package name", text=system_design)
-        workspace = CONST.WORKSPACE_ROOT
+        workspace = CONFIG.product_root
         docs_path = workspace / "docs"
         resources_path = workspace / "resources"
         self.recreate_workspace([docs_path, resources_path])
