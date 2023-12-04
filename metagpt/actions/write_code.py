@@ -80,6 +80,6 @@ class WriteCode(Action):
         logger.info(f'Writing {filename}..')
         code = await self.write_code(prompt)
         # code_rsp = await self._aask_v1(prompt, "code_rsp", OUTPUT_MAPPING)
-        self._save(context, filename, code)
+        #self._save(context, filename, code)
         return code
     
