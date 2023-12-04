@@ -98,7 +98,9 @@ class Engineer(Role):
         return CodeParser.parse_str(block="Python package name", text=system_design_msg.content)
 
     def get_workspace(self) -> Path:
-        return CONST.WORKSPACE_ROOT / CONFIG.product_name
+        ws_path = CONST.WORKSPACE_ROOT / CONFIG.product_name
+        logger.info(f"Engineer writing code to {ws_path}")
+        return ws_path
         #msg = self._rc.memory.get_by_action(WriteDesign)[-1]
         #if not msg:
         #    return CONST.WORKSPACE_ROOT / "src"
