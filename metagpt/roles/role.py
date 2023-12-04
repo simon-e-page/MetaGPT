@@ -11,6 +11,7 @@ from typing import Iterable, Type, Union
 from enum import Enum
 
 from pydantic import BaseModel, Field
+from tenacity import retry, stop_after_attempt, wait_random_exponential
 
 # from metagpt.environment import Environment
 from metagpt.config import CONFIG
@@ -182,6 +183,10 @@ class Role:
             return self._setting.desc
         return PREFIX_TEMPLATE.format(**self._setting.dict())
 
+    @retry(stop=stop_after_attempt(3), wait=wait_random_exponential(min=30, max=180))
+    async def _get_next_state(self, prompt):
+        return await self._llm.aask(prompt)
+    
     async def _think(self) -> None:
         """Think about what to do and decide on the next action"""
         if len(self._actions) == 1:
@@ -192,7 +197,9 @@ class Role:
         prompt += STATE_TEMPLATE.format(history=self._rc.history, states="\n".join(self._states),
                                         n_states=len(self._states) - 1, previous_state=self._rc.state)
         # print(prompt)
-        next_state = await self._llm.aask(prompt)
+        #next_state = await self._llm.aask(prompt)
+        next_state = self._get_next_state(prompt)
+        
         logger.debug(f"{prompt=}")
         if (not next_state.isdigit() and next_state != "-1") \
             or int(next_state) not in range(-1, len(self._states)):
