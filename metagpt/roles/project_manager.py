@@ -6,7 +6,7 @@
 @File    : project_manager.py
 """
 from metagpt.actions import WriteTasks
-#from metagpt.actions.design_api import WriteDesign
+from metagpt.actions.design_api import WriteDesign
 from metagpt.actions.write_design_approval import WriteDesignApproval
 from metagpt.roles import Role
 
@@ -40,5 +40,5 @@ class ProjectManager(Role):
         """
         super().__init__(name, profile, goal, constraints)
         self._init_actions([WriteTasks])
-        self._watch([WriteDesignApproval])
+        self._watch([WriteDesignApproval, WriteDesign])
         #self._watch([WriteDesign])

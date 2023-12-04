@@ -37,4 +37,4 @@ class Architect(Role):
         self._init_actions([WriteDesign])
 
         # Set events or actions the Architect should watch or be aware of
-        self._watch({WriteProductApproval})
+        self._watch({WriteProductApproval, WritePRD})
