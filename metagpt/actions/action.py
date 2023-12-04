@@ -42,7 +42,7 @@ class Action(ABC):
     def __repr__(self):
         return self.__str__()
     
-    @retry(stop=stop_after_attempt(3), wait=wait_random_exponential(min=30, max=180))
+    @retry(stop=stop_after_attempt(3), wait=wait_random_exponential(min=60, max=180))
     async def _aask(self, prompt: str, system_msgs: Optional[list[str]] = None) -> str:
         """Append default prefix"""
         if not system_msgs:
@@ -50,7 +50,7 @@ class Action(ABC):
         system_msgs.append(self.prefix)
         return await self.llm.aask(prompt, system_msgs)
 
-    @retry(stop=stop_after_attempt(3), wait=wait_random_exponential(min=30, max=180))
+    @retry(stop=stop_after_attempt(3), wait=wait_random_exponential(min=60, max=180))
     async def _aask_v1(
         self,
         prompt: str,
