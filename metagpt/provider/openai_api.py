@@ -16,6 +16,7 @@ from tenacity import (
     retry_if_exception_type,
     stop_after_attempt,
     wait_fixed,
+    wait_random_exponential
 )
 
 from metagpt.config import CONFIG
@@ -230,7 +231,7 @@ class OpenAIGPTAPI(BaseGPTAPI, RateLimiter):
 
     @retry(
         stop=stop_after_attempt(3),
-        wait=wait_fixed(1),
+        wait=wait_random_exponential(min=30, max=180),
         after=after_log(logger, logger.level("WARNING").name),
         retry=retry_if_exception_type(APIConnectionError),
         retry_error_callback=log_and_reraise,

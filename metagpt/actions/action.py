@@ -9,7 +9,7 @@ import re
 from abc import ABC
 from typing import Optional
 
-from tenacity import retry, stop_after_attempt, wait_fixed
+from tenacity import retry, stop_after_attempt, wait_fixed, wait_random_exponential
 
 from metagpt.actions.action_output import ActionOutput
 from metagpt.llm import LLM
@@ -41,7 +41,8 @@ class Action(ABC):
 
     def __repr__(self):
         return self.__str__()
-
+    
+    @retry(stop=stop_after_attempt(3), wait=wait_random_exponential(min=30, max=180))
     async def _aask(self, prompt: str, system_msgs: Optional[list[str]] = None) -> str:
         """Append default prefix"""
         if not system_msgs:
@@ -49,7 +50,7 @@ class Action(ABC):
         system_msgs.append(self.prefix)
         return await self.llm.aask(prompt, system_msgs)
 
-    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
+    @retry(stop=stop_after_attempt(3), wait=wait_random_exponential(min=30, max=180))
     async def _aask_v1(
         self,
         prompt: str,
