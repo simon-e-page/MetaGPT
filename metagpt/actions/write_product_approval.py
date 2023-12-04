@@ -33,6 +33,21 @@ PRD_OUTPUT_MAPPING = {
 }
 
 class WriteProductApproval(Action):
+    """
+    This class represents the action of writing a product approval.
+
+    It extends the Action class and overrides the run method to implement the product approval process. 
+    The process involves asking for approval and based on the response, either proceeding with getting the product requirements document (PRD) from disk or stopping the project.
+
+    Attributes:
+        name (str): The name of the action.
+        context (dict): The context in which the action is being performed.
+        llm (LanguageModel): The language model being used.
+
+    Methods:
+        get_prd_from_disk(): Retrieves the PRD from disk and parses it into an ActionOutput object.
+        run(prd, *args, **kwargs): Executes the action, asking for approval and acting based on the response.
+    """
     def __init__(self, name="", context=None, llm=None):
         super().__init__(name, context, llm)
 
