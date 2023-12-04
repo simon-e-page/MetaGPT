@@ -198,8 +198,8 @@ class Role:
                                         n_states=len(self._states) - 1, previous_state=self._rc.state)
         # print(prompt)
         #next_state = await self._llm.aask(prompt)
-        next_state = self._get_next_state(prompt)
-        
+        next_state = await self._get_next_state(prompt)
+
         logger.debug(f"{prompt=}")
         if (not next_state.isdigit() and next_state != "-1") \
             or int(next_state) not in range(-1, len(self._states)):
