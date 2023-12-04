@@ -233,10 +233,10 @@ class WritePRD(Action):
         for path in dirs:
             try:
                 shutil.rmtree(path)
-                path.mkdir(parents=True, exist_ok=True)
             except FileNotFoundError:
                 pass  # Folder does not exist, but we don't care
-        
+            path.mkdir(parents=True, exist_ok=True)
+
 
     async def _save_prd(self, docs_path, resources_path, prd):
         prd_file = docs_path / "prd.md"
