@@ -25,7 +25,7 @@ class Environment(BaseModel):
     """
 
     roles: dict[str, Role] = Field(default_factory=dict)
-    memory: Memory = Field(default_factory=LongTermMemory)
+    memory: Memory = Field(default_factory=Memory)
     history: str = Field(default='')
 
     class Config:
