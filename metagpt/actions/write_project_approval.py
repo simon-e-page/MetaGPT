@@ -22,11 +22,12 @@ OUTPUT_MAPPING = {
 
 # Schema for System Design Deliverable
 DESIGN_OUTPUT_MAPPING = {
-    "Implementation approach": (str, ...),
-    "Python package name": (str, ...),
-    "File list": (List[str], ...),
-    "Data structures and interface definitions": (str, ...),
-    "Program call flow": (str, ...),
+    "Required Python third-party packages": (List[str], ...),
+    "Required Other language third-party packages": (List[str], ...),
+    "Full API spec": (str, ...),
+    "Logic Analysis": (List[List[str]], ...),
+    "Task list": (List[str], ...),
+    "Shared Knowledge": (str, ...),
     "Anything UNCLEAR": (str, ...),
 }
 
