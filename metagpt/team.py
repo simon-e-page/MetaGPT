@@ -66,8 +66,8 @@ class Team(BaseModel):
         #TODO:
         # Load History into the evironment if option to restart is provided?
 
-        self.environment.publish_message(Message(role="Human", content=f'For product {product_name} we are commencing stage: {stage}', cause_by=BossRequirement, send_to=send_to))
-        self.environment.publish_message(Message(role="Human", content=idea, cause_by=BossRequirement, send_to=send_to))
+        #self.environment.publish_message(Message(role="Human", content=f'For product {product_name} we are commencing stage: {stage}', cause_by=BossRequirement, send_to=send_to))
+        #self.environment.publish_message(Message(role="Human", content=idea, cause_by=BossRequirement, send_to=send_to))
         logger.info(f'For product {product_name} we are commencing stage: {stage}')
 
     def _save(self):
