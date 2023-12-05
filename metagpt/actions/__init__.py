@@ -52,6 +52,14 @@ class ActionType(Enum):
     WRITE_PRODUCT_APPROVAL = WriteProductApproval
     WRITE_TASK_APPROVAL = WriteTaskApproval
 
+STAGES = {
+    'Requirements': [BossRequirement],
+    'Design': [BossRequirement, WritePRD, WriteProductApproval],
+    'Plan': [BossRequirement, WritePRD, WritePRDReview, WriteDesign, WriteDesignApproval],
+    'Build': [BossRequirement, WritePRD, WritePRDReview, WriteDesign, WriteDesignApproval, WriteTasks, WriteTaskApproval],
+    'Test': [BossRequirement, WritePRD, WritePRDReview, WriteDesign, WriteDesignApproval, WriteTasks, WriteTaskApproval, WriteCode, WriteCodeReview],
+}
+
 __all__ = [
     "ActionType",
     "Action",

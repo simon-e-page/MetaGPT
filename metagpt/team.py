@@ -10,7 +10,7 @@ import os
 import traceback
 import json
 
-from metagpt.actions import BossRequirement
+from metagpt.actions import BossRequirement, STAGES
 from metagpt.config import CONFIG
 import metagpt.const as CONST
 from metagpt.environment import Environment
@@ -68,28 +68,43 @@ class Team(BaseModel):
         stage = self.environment.stage
         add_project_log(CONST.WORKSPACE_ROOT / CONFIG.product_name, replace=True)
 
-        #TODO:
-        # Load History into the evironment if option to restart is provided?
-
         #self.environment.publish_message(Message(role="Human", content=f'For product {product_name} we are commencing stage: {stage}', cause_by=BossRequirement, send_to=send_to))
         logger.info(f'For product {product_name} we are commencing stage: {stage}')
 
     def _save(self):
         logger.info(self.json())
 
-    async def run(self, n_round=3):
-        """Run company until target round or no money"""
-        max_round: int = n_round
-        logger.info(f"Team will execute {max_round} rounds of Tasks unless they run out of Investment funds!")
+
+    def filter_messages(messages, keep: list):
+        """ Strips all messages that are not in the list of specific actions"""
+        return messages
+
+
+    def set_memory(self, stage: str=None):
+        """ Resets Memory of Roles and Environment to a specific stage. 
+            If None then restores to last run 
+        """
 
         history_file = CONFIG.product_root / "history.pickle"
         if history_file.exists():
             logger.warning("Loading messages from a previous execution and replaying!")
             messages = deserialize_batch(history_file.read_bytes())
+            messages =self.filter_messages(stage)
             self.environment.memory.add_batch(messages)
         else:
             logger.info("Commencing project with Boss Requirement")
             self.environment.publish_message(Message(role="Human", content=self.environment.idea, cause_by=BossRequirement, send_to=""))
+
+        for role in self.environment.get_roles():
+            role.set_memory(stage)
+
+
+
+    async def run(self, n_round=3):
+        """Run company until target round or no money"""
+        max_round: int = n_round
+        logger.info(f"Team will execute {max_round} rounds of Tasks unless they run out of Investment funds!")
+
         
         while n_round > 0:
             # self._save()
