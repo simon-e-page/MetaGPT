@@ -17,6 +17,7 @@ from metagpt.roles.sales import Sales
 from metagpt.roles.customer_service import CustomerService
 from metagpt.roles.product_approver import ProductApprover
 from metagpt.roles.design_approver import DesignApprover
+from metagpt.roles.task_approver import TaskApprover
 
 
 __all__ = [
@@ -30,5 +31,6 @@ __all__ = [
     "Sales",
     "CustomerService",
     "ProductApprover",
-    "DesignApprover"
+    "DesignApprover",
+    "TaskApprover"
 ]
