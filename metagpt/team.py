@@ -84,9 +84,11 @@ class Team(BaseModel):
 
         history_file = CONFIG.product_root / "history.pickle"
         if history_file.exists():
+            logger.warning("Loading messages from a previous execution and replaying!")
             messages = deserialize_batch(history_file.read_bytes())
             self.environment.memory.add_batch(messages)
         else:
+            logger.info("Commencing project with Boss Requirement")
             self.environment.publish_message(Message(role="Human", content=self.environment.idea, cause_by=BossRequirement, send_to=""))
         
         while n_round > 0:
@@ -103,7 +105,7 @@ class Team(BaseModel):
                 logger.error(traceback.format_exc())
                 n_round = 0
             
-        with open(history_file, 'w', encoding='utf-8') as file:
+        with open(history_file, 'wb', encoding='utf-8') as file:
             file.write(serialize_batch(self.environment.memory.get()))
         return self.environment.history
     
