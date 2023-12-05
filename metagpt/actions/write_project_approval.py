@@ -6,7 +6,7 @@
 @File    : write_project_approval.py
 """
 from typing import List
-import markdown_to_json
+#import markdown_to_json
 
 from metagpt.actions import Action, ActionOutput
 #from metagpt.actions.search_and_summarize import SearchAndSummarize
@@ -61,9 +61,9 @@ class WriteTaskApproval(Action):
             logger.debug(output.instruct_content)
         else:
             logger.warning("No approval - stop project!")
-            output = design_approval
+            output = task_approval
             # TODO: Update with proper Exception class
-            raise ApprovalError("Approval Error - Design not approved", approver="Design Approver")
+            raise ApprovalError("Approval Error - API Spec not approved", approver="Task Approver")
 
 
         return output

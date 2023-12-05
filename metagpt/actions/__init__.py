@@ -25,7 +25,7 @@ from metagpt.actions.write_prd_review import WritePRDReview
 from metagpt.actions.write_test import WriteTest
 from metagpt.actions.write_product_approval import WriteProductApproval
 from metagpt.actions.write_design_approval import WriteDesignApproval
-
+from metagpt.actions.write_project_approval import WriteTaskApproval
 
 
 class ActionType(Enum):
@@ -50,6 +50,7 @@ class ActionType(Enum):
     CONDUCT_RESEARCH = ConductResearch
     WRITE_DESIGN_APPROVAL = WriteDesignApproval
     WRITE_PRODUCT_APPROVAL = WriteProductApproval
+    WRITE_TASK_APPROVAL = WriteTaskApproval
 
 __all__ = [
     "ActionType",
