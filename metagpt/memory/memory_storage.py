@@ -7,12 +7,13 @@ from pathlib import Path
 
 from langchain.vectorstores.faiss import FAISS
 
-from metagpt.const import DATA_PATH, MEM_TTL
+#from metagpt.const import DATA_PATH, MEM_TTL
+from metagpt.const import MEM_TTL
 from metagpt.logs import logger
 from metagpt.schema import Message
 from metagpt.utils.serialize import serialize_message, deserialize_message
 from metagpt.document_store.faiss_store import FaissStore
-
+from metagpt.config import CONFIG
 
 class MemoryStorage(FaissStore):
     """
@@ -34,6 +35,7 @@ class MemoryStorage(FaissStore):
 
     def recover_memory(self, role_id: str) -> List[Message]:
         self.role_id = role_id
+        DATA_PATH = CONFIG.product_root / "memory"
         self.role_mem_path = Path(DATA_PATH / f'role_mem/{self.role_id}/')
         self.role_mem_path.mkdir(parents=True, exist_ok=True)
 

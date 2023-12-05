@@ -26,6 +26,10 @@ async def startup(
 ):
     """Run a startup. Be a boss."""
     company = Team()
+
+    company.invest(investment)
+    company.start_project(product_name, stage)
+
     company.hire(
         [
             ProductManager(),
@@ -45,9 +49,6 @@ async def startup(
         # developing features: run tests on the spot and identify bugs
         # (bug fixing capability comes soon!)
         company.hire([QaEngineer()])
-
-    company.invest(investment)
-    company.start_project(product_name, stage)
 
     await company.run(n_round=n_round)
 

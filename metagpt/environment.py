@@ -11,7 +11,7 @@ import yaml
 
 from pydantic import BaseModel, Field
 
-from metagpt.memory import Memory
+from metagpt.memory import Memory, LongTermMemory
 from metagpt.roles import Role
 from metagpt.schema import Message
 from metagpt.config import CONFIG
@@ -25,7 +25,7 @@ class Environment(BaseModel):
     """
 
     roles: dict[str, Role] = Field(default_factory=dict)
-    memory: Memory = Field(default_factory=Memory)
+    memory: Memory = Field(default_factory=LongTermMemory)
     history: str = Field(default='')
 
     class Config:
