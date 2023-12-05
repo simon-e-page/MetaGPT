@@ -56,7 +56,7 @@ class WriteProductApproval(Action):
         prd_content = path.read_text()
         logger.debug(prd_content)
         output_class = ActionOutput.create_model_class("approved_prd", PRD_OUTPUT_MAPPING)
-        parsed_data = markdown_to_json.dictify(prd_content)
+        parsed_data = markdown_to_json.jsonify(prd_content)
         #parsed_data = OutputParser.parse_data_with_mapping(prd_content, PRD_OUTPUT_MAPPING)
         logger.debug(parsed_data)
         instruct_content = output_class(**parsed_data)
