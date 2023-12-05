@@ -5,8 +5,7 @@
 @Author  : alexanderwu
 @File    : product_manager.py
 """
-from metagpt.actions.write_product_approval import WriteProductApproval
-from metagpt.actions import WritePRD
+from metagpt.actions import WritePRD, WriteProductApproval
 from metagpt.roles import Role
 
 

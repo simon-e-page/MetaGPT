@@ -5,8 +5,7 @@
 @Author  : alexanderwu
 @File    : product_manager.py
 """
-from metagpt.actions.write_design_approval import WriteDesignApproval
-from metagpt.actions.design_api import WriteDesign
+from metagpt.actions import WriteDesign, WriteDesignApproval
 from metagpt.roles import Role
 
 
