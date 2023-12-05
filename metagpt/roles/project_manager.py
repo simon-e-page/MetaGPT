@@ -40,5 +40,5 @@ class ProjectManager(Role):
         """
         super().__init__(name, profile, goal, constraints)
         self._init_actions([WriteTasks])
-        self._watch([WriteDesignApproval, WriteDesign])
+        self._watch([WriteDesignApproval])
         #self._watch([WriteDesign])
