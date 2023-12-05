@@ -103,7 +103,11 @@ class Team(BaseModel):
             except ApprovalError as e:
                 logger.error(f"Approval not given by {e.approver}")
                 role = self.environment.get_role(e.approver)
-                role._rc.memory.clear()
+                if role is not None:
+                    logger.warning(f"Clearing memory for {e.approver}")
+                    role._rc.memory.clear()
+                else:
+                    logger.error(f"Could not find an active role with profile={e.approver}. Should not happen!")
                 n_round = 0
             except Exception as e:
                 logger.error("Uncaught Exception!")

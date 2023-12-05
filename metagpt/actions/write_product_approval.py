@@ -77,6 +77,6 @@ class WriteProductApproval(Action):
             output = prd_approval
             # TODO: Update with proper Exception class
 
-            raise ApprovalError("Approval Error - Product not approved", approver="ProductApprover")
+            raise ApprovalError("Approval Error - Product not approved", approver="Product Approver")
 
         return output
