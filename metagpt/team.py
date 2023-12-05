@@ -56,7 +56,7 @@ class Team(BaseModel):
 
         self.environment.get_product_config()
 
-        idea: str = self.environment.idea
+        #idea: str = self.environment.idea
         if stage is not None:
             self.environment.set_stage(stage)
         
@@ -67,7 +67,6 @@ class Team(BaseModel):
         # Load History into the evironment if option to restart is provided?
 
         #self.environment.publish_message(Message(role="Human", content=f'For product {product_name} we are commencing stage: {stage}', cause_by=BossRequirement, send_to=send_to))
-        #self.environment.publish_message(Message(role="Human", content=idea, cause_by=BossRequirement, send_to=send_to))
         logger.info(f'For product {product_name} we are commencing stage: {stage}')
 
     def _save(self):
@@ -78,8 +77,8 @@ class Team(BaseModel):
         max_round: int = n_round
         logger.info(f"Team will execute {max_round} rounds of Tasks unless they run out of Investment funds!")
 
-        # Do we need to do something like this?
-        #self.environment.recover_memory()
+        # Do we need to test if we have recovered memory?
+        self.environment.publish_message(Message(role="Human", content=self.environment.idea, cause_by=BossRequirement, send_to=""))
         
         while n_round > 0:
             # self._save()
