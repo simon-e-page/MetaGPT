@@ -43,6 +43,22 @@ def actionoutout_schema_to_mapping(schema: Dict) -> Dict:
 
 
 def serialize_message(message: Message):
+    return pickle.dumps(deconstruct(message))
+
+
+def deserialize_message(message_ser: str) -> Message:
+    message_cp = pickle.loads(message_ser)
+    return reconstruct(message_cp)
+
+def reconstruct(message_cp):
+    if message_cp.instruct_content:
+        ic = message_cp.instruct_content
+        ic_obj = ActionOutput.create_model_class(class_name=ic["class"], mapping=ic["mapping"])
+        ic_new = ic_obj(**ic["value"])
+        message_cp.instruct_content = ic_new
+    return message_cp
+    
+def deconstruct(message: Message):
     message_cp = copy.deepcopy(message)  # avoid `instruct_content` value update by reference
     ic = message_cp.instruct_content
     if ic:
@@ -51,17 +67,15 @@ def serialize_message(message: Message):
         mapping = actionoutout_schema_to_mapping(schema)
 
         message_cp.instruct_content = {"class": schema["title"], "mapping": mapping, "value": ic.dict()}
-    msg_ser = pickle.dumps(message_cp)
+    return message_cp
 
-    return msg_ser
+def serialize_batch(messages: list):
+    msg_ser = [ deconstruct(x) for x in messages ]
+    return pickle.dumps(msg_ser)
+
+def deserialize_batch(message_set: str) -> list:
+    msg_cps = pickle.loads(message_set)
+    messages = [ reconstruct(m) for m in msg_cps ] 
+    return messages
 
 
-def deserialize_message(message_ser: str) -> Message:
-    message = pickle.loads(message_ser)
-    if message.instruct_content:
-        ic = message.instruct_content
-        ic_obj = ActionOutput.create_model_class(class_name=ic["class"], mapping=ic["mapping"])
-        ic_new = ic_obj(**ic["value"])
-        message.instruct_content = ic_new
-
-    return message

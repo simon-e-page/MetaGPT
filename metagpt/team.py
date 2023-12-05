@@ -19,6 +19,9 @@ from metagpt.roles import Role
 from metagpt.schema import Message
 from metagpt.utils.common import NoMoneyException
 
+from metagpt.utils.serialize import serialize_batch, deserialize_batch
+
+
 class Team(BaseModel):
     """
     Team: Possesses one or more roles (agents), SOP (Standard Operating Procedures), and a platform for instant messaging,
@@ -79,9 +82,9 @@ class Team(BaseModel):
         max_round: int = n_round
         logger.info(f"Team will execute {max_round} rounds of Tasks unless they run out of Investment funds!")
 
-        history_file = CONFIG.product_root / "history.json"
+        history_file = CONFIG.product_root / "history.pickle"
         if history_file.exists():
-            messages = json.loads(history_file.read_text())
+            messages = deserialize_batch(history_file.read_bytes())
             self.environment.memory.add_batch(messages)
         else:
             self.environment.publish_message(Message(role="Human", content=self.environment.idea, cause_by=BossRequirement, send_to=""))
@@ -101,6 +104,6 @@ class Team(BaseModel):
                 n_round = 0
             
         with open(history_file, 'w', encoding='utf-8') as file:
-            file.write(json.dumps(self.environment.memory.get()))
+            file.write(serialize_batch(self.environment.memory.get()))
         return self.environment.history
     

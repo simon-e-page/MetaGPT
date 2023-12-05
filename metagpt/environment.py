@@ -8,6 +8,7 @@
 import asyncio
 from typing import Iterable
 import yaml
+from pathlib import Path
 
 from pydantic import BaseModel, Field
 
@@ -16,7 +17,6 @@ from metagpt.roles import Role
 from metagpt.schema import Message
 from metagpt.config import CONFIG
 from metagpt.const import STAGES
-from pathlib import Path
 
 class Environment(BaseModel):
     """环境，承载一批角色，角色可以向环境发布消息，可以被其他角色观察到
@@ -105,7 +105,7 @@ class Environment(BaseModel):
     @property
     def stage(self) -> str:
         return CONFIG.product_config.get('STAGE', None)
-    
+            
 
     async def run(self, k=1):
         """处理一次所有信息的运行
