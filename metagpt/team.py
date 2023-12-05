@@ -7,6 +7,8 @@
 """
 from pydantic import BaseModel, Field
 import os
+import traceback
+import json
 
 from metagpt.actions import BossRequirement
 from metagpt.config import CONFIG
@@ -77,8 +79,12 @@ class Team(BaseModel):
         max_round: int = n_round
         logger.info(f"Team will execute {max_round} rounds of Tasks unless they run out of Investment funds!")
 
-        # Do we need to test if we have recovered memory?
-        self.environment.publish_message(Message(role="Human", content=self.environment.idea, cause_by=BossRequirement, send_to=""))
+        history_file = CONFIG.product_root / "history.json"
+        if history_file.exists():
+            messages = json.loads(history_file.read_text())
+            self.environment.memory.add_batch(messages)
+        else:
+            self.environment.publish_message(Message(role="Human", content=self.environment.idea, cause_by=BossRequirement, send_to=""))
         
         while n_round > 0:
             # self._save()
@@ -87,10 +93,14 @@ class Team(BaseModel):
             logger.info(f"Entering round {count} of {max_round}")
             logger.debug(f"{n_round=}")
             self._check_balance()
-            await self.environment.run()
-
-        history_file = CONFIG.product_root / "history.txt"
+            try:
+                await self.environment.run()
+            except Exception as e:
+                logger.error("Caught Exception!")
+                logger.error(traceback.format_exc())
+                n_round = 0
+            
         with open(history_file, 'w', encoding='utf-8') as file:
-            file.write(self.environment.history)
+            file.write(json.dumps(self.environment.memory.get()))
         return self.environment.history
     
