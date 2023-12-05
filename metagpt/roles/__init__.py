@@ -15,6 +15,8 @@ from metagpt.roles.qa_engineer import QaEngineer
 from metagpt.roles.seacher import Searcher
 from metagpt.roles.sales import Sales
 from metagpt.roles.customer_service import CustomerService
+from metagpt.roles.product_approver import ProductApprover
+from metagpt.roles.design_approver import DesignApprover
 
 
 __all__ = [
@@ -27,4 +29,6 @@ __all__ = [
     "Searcher",
     "Sales",
     "CustomerService",
+    "ProductApprover",
+    "DesignApprover"
 ]
