@@ -14,7 +14,7 @@ from metagpt.actions import Action, ActionOutput
 from metagpt.config import CONFIG
 from metagpt.logs import logger
 #from metagpt.utils.get_template import get_template
-from metagpt.utils.common import ApprovalError
+from metagpt.utils.common import OutputParser, ApprovalError
 
 OUTPUT_MAPPING = {
     "Approval Response": (str, ...),
@@ -56,8 +56,8 @@ class WriteProductApproval(Action):
         prd_content = path.read_text()
         logger.debug(prd_content)
         output_class = ActionOutput.create_model_class("approved_prd", PRD_OUTPUT_MAPPING)
-        parsed_data = markdown_to_json.jsonify(prd_content)
-        #parsed_data = OutputParser.parse_data_with_mapping(prd_content, PRD_OUTPUT_MAPPING)
+        #parsed_data = markdown_to_json.jsonify(prd_content)
+        parsed_data = OutputParser.parse_markdown_deliverable(prd_content, PRD_OUTPUT_MAPPING)
         logger.debug(parsed_data)
         instruct_content = output_class(**parsed_data)
         return ActionOutput(prd_content, instruct_content)
