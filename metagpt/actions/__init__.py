@@ -23,6 +23,9 @@ from metagpt.actions.write_code_review import WriteCodeReview
 from metagpt.actions.write_prd import WritePRD
 from metagpt.actions.write_prd_review import WritePRDReview
 from metagpt.actions.write_test import WriteTest
+from metagpt.actions.write_product_approval import WriteProductApproval
+from metagpt.actions.write_design_approval import WriteDesignApproval
+
 
 
 class ActionType(Enum):
@@ -45,7 +48,8 @@ class ActionType(Enum):
     COLLECT_LINKS = CollectLinks
     WEB_BROWSE_AND_SUMMARIZE = WebBrowseAndSummarize
     CONDUCT_RESEARCH = ConductResearch
-
+    WRITE_DESIGN_APPROVAL = WriteDesignApproval
+    WRITE_PRODUCT_APPROVAL = WriteProductApproval
 
 __all__ = [
     "ActionType",
