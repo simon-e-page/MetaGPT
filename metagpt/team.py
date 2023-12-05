@@ -17,7 +17,7 @@ from metagpt.environment import Environment
 from metagpt.logs import logger, add_project_log
 from metagpt.roles import Role
 from metagpt.schema import Message
-from metagpt.utils.common import NoMoneyException
+from metagpt.utils.common import NoMoneyException, ApprovalError
 
 from metagpt.utils.serialize import serialize_batch, deserialize_batch
 
@@ -100,8 +100,13 @@ class Team(BaseModel):
             self._check_balance()
             try:
                 await self.environment.run()
+            except ApprovalError as e:
+                logger.error(f"Approval not given by {e.approver}")
+                role = self.environment.get_role(e.approver)
+                role._rc.memory.clear()
+                n_round = 0
             except Exception as e:
-                logger.error("Caught Exception!")
+                logger.error("Uncaught Exception!")
                 logger.error(traceback.format_exc())
                 n_round = 0
             

@@ -14,7 +14,7 @@ from metagpt.actions import Action, ActionOutput
 from metagpt.config import CONFIG
 from metagpt.logs import logger
 #from metagpt.utils.get_template import get_template
-from metagpt.utils.common import OutputParser
+from metagpt.utils.common import OutputParser, ApprovalError
 
 OUTPUT_MAPPING = {
     "Approval Response": (str, ...),
@@ -62,7 +62,7 @@ class WriteProductApproval(Action):
         instruct_content = output_class(**parsed_data)
         return ActionOutput(prd_content, instruct_content)
     
-    async def run(self, prd, *args, **kwargs) -> ActionOutput:
+    async def run(self, context, *args, **kwargs) -> ActionOutput:
         """ Wait for a Human Approval """
         prompt = "Do you approve the Product Requirements? (yes/no)"
         prd_approval = await self._aask_v1(prompt, "prd_approval", OUTPUT_MAPPING, format='json')
@@ -76,6 +76,7 @@ class WriteProductApproval(Action):
             logger.warning("No approval - stop project!")
             output = prd_approval
             # TODO: Update with proper Exception class
-            raise NotImplementedError("Approval Error - Product not approved")
+
+            raise ApprovalError("Approval Error - Product not approved", approver="ProductApprover")
 
         return output
