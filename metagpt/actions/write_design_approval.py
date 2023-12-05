@@ -61,6 +61,8 @@ class WriteDesignApproval(Action):
         else:
             logger.warning("No approval - stop project!")
             output = design_approval
-            exit()
+            # TODO: Update with proper Exception class
+            raise NotImplementedError("Approval Error - Product not approved")
+
 
         return output
