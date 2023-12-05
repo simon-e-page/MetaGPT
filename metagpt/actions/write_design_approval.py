@@ -12,7 +12,8 @@ from metagpt.actions import Action, ActionOutput
 #from metagpt.actions.search_and_summarize import SearchAndSummarize
 from metagpt.config import CONFIG
 from metagpt.logs import logger
-from metagpt.utils.common import OutputParser
+#from metagpt.utils.common import OutputParser
+from metagpt.utils.common import ApprovalError
 
 #from metagpt.utils.get_template import get_template
 
@@ -62,7 +63,7 @@ class WriteDesignApproval(Action):
             logger.warning("No approval - stop project!")
             output = design_approval
             # TODO: Update with proper Exception class
-            raise NotImplementedError("Approval Error - Product not approved")
+            raise ApprovalError("Approval Error - Design not approved", approver="Design Approver")
 
 
         return output

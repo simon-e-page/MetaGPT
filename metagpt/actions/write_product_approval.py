@@ -14,7 +14,7 @@ from metagpt.actions import Action, ActionOutput
 from metagpt.config import CONFIG
 from metagpt.logs import logger
 #from metagpt.utils.get_template import get_template
-from metagpt.utils.common import OutputParser, ApprovalError
+from metagpt.utils.common import ApprovalError
 
 OUTPUT_MAPPING = {
     "Approval Response": (str, ...),
@@ -75,8 +75,6 @@ class WriteProductApproval(Action):
         else:
             logger.warning("No approval - stop project!")
             output = prd_approval
-            # TODO: Update with proper Exception class
-
             raise ApprovalError("Approval Error - Product not approved", approver="Product Approver")
 
         return output
