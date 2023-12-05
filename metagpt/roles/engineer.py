@@ -10,7 +10,7 @@ import shutil
 from collections import OrderedDict
 from pathlib import Path
 
-from metagpt.actions import WriteCode, WriteCodeReview, WriteDesign, WriteTasks
+from metagpt.actions import WriteCode, WriteCodeReview, WriteDesign, WriteTaskApproval
 #from metagpt.const import WORKSPACE_ROOT
 import metagpt.const as CONST
 from metagpt.config import CONFIG
@@ -77,7 +77,7 @@ class Engineer(Role):
         self.use_code_review = use_code_review
         if self.use_code_review:
             self._init_actions([WriteCode, WriteCodeReview])
-        self._watch([WriteTasks])
+        self._watch([WriteTaskApproval])
         self.todos = []
         self.n_borg = n_borg
 
@@ -98,7 +98,7 @@ class Engineer(Role):
         return CodeParser.parse_str(block="Python package name", text=system_design_msg.content)
 
     def get_workspace(self) -> Path:
-        ws_path = CONST.WORKSPACE_ROOT / CONFIG.product_name / CONFIG.product_name
+        ws_path = CONFIG.product_root / CONFIG.product_name
         logger.info(f"Engineer writing code to {ws_path}")
         return ws_path
         #msg = self._rc.memory.get_by_action(WriteDesign)[-1]
@@ -134,7 +134,7 @@ class Engineer(Role):
         todo_coros = []
         for todo in self.todos:
             todo_coro = WriteCode().run(
-                context=self._rc.memory.get_by_actions([WriteTasks, WriteDesign]), filename=todo
+                context=self._rc.memory.get_by_actions([WriteTaskApproval, WriteDesign]), filename=todo
             )
             todo_coros.append(todo_coro)
 
@@ -183,7 +183,7 @@ class Engineer(Role):
             TODO: The goal is not to need it. After clear task decomposition, based on the design idea, you should be able to write a single file without needing other codes. If you can't, it means you need a clearer definition. This is the key to writing longer code.
             """
             context = []
-            msg = self._rc.memory.get_by_actions([WriteDesign, WriteTasks, WriteCode])
+            msg = self._rc.memory.get_by_actions([WriteDesign, WriteTaskApproval, WriteCode])
             for m in msg:
                 context.append(m.content)
             context_str = "\n".join(context)
