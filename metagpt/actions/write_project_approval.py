@@ -21,7 +21,7 @@ OUTPUT_MAPPING = {
 }
 
 # Schema for System Design Deliverable
-DESIGN_OUTPUT_MAPPING = {
+TASK_OUTPUT_MAPPING = {
     "Required Python third-party packages": (List[str], ...),
     "Required Other language third-party packages": (List[str], ...),
     "Full API spec": (str, ...),
@@ -32,31 +32,31 @@ DESIGN_OUTPUT_MAPPING = {
 }
 
 
-class WriteDesignApproval(Action):
+class WriteTaskApproval(Action):
     def __init__(self, name="", context=None, llm=None):
         super().__init__(name, context, llm)
 
-    def get_design_from_disk(self):
+    def get_tasks_from_disk(self):
         docs_path = CONFIG.product_root / "docs"
-        system_design_file = docs_path / "system_design.md"
+        system_design_file = docs_path / "api_spec_and_tasks.md"
 
         design_content = system_design_file.read_text()
         logger.debug(design_content)
-        output_class = ActionOutput.create_model_class("approved_design", DESIGN_OUTPUT_MAPPING)
+        output_class = ActionOutput.create_model_class("approved_tasks", TASK_OUTPUT_MAPPING)
         #parsed_data = markdown_to_json.dictify(design_content)
-        parsed_data = OutputParser.parse_markdown_deliverable(design_content, DESIGN_OUTPUT_MAPPING)
+        parsed_data = OutputParser.parse_markdown_deliverable(design_content, TASK_OUTPUT_MAPPING)
         logger.debug(parsed_data)
         instruct_content = output_class(**parsed_data)
         return ActionOutput(design_content, instruct_content)
 
-    async def run(self, design, *args, **kwargs) -> ActionOutput:
+    async def run(self, context, *args, **kwargs) -> ActionOutput:
         """ Wait for a Human Approval """
-        prompt = "Do you approve the System Design? (yes/no)"
-        design_approval = await self._aask_v1(prompt, "design_approval", OUTPUT_MAPPING, format='json')
+        prompt = "Do you approve the Tasks and API Spec? (yes/no)"
+        task_approval = await self._aask_v1(prompt, "task_approval", OUTPUT_MAPPING, format='json')
 
-        if design_approval.instruct_content.dict()['Approval Response'] == 'yes':
-            logger.info("Got approval for System Design!")
-            output = self.get_design_from_disk()
+        if task_approval.instruct_content.dict()['Approval Response'] == 'yes':
+            logger.info("Got approval for Tasks and API Spec!")
+            output = self.get_tasks_from_disk()
             logger.debug(output.content)
             logger.debug(output.instruct_content)
         else:
