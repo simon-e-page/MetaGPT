@@ -105,7 +105,7 @@ class Team(BaseModel):
                 logger.error(traceback.format_exc())
                 n_round = 0
             
-        with open(history_file, 'wb', encoding='utf-8') as file:
+        with open(history_file, 'wb') as file:
             file.write(serialize_batch(self.environment.memory.get()))
         return self.environment.history
     
