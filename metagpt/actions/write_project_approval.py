@@ -36,7 +36,7 @@ class WriteTaskApproval(Action):
     def __init__(self, name="", context=None, llm=None):
         super().__init__(name, context, llm)
 
-    def get_tasks_from_disk(self):
+    def _get_tasks_from_disk(self):
         docs_path = CONFIG.product_root / "docs"
         system_design_file = docs_path / "api_spec_and_tasks.md"
 
@@ -56,7 +56,7 @@ class WriteTaskApproval(Action):
 
         if task_approval.instruct_content.dict()['Approval Response'] == 'yes':
             logger.info("Got approval for Tasks and API Spec!")
-            output = self.get_tasks_from_disk()
+            output = self._get_tasks_from_disk()
             logger.debug(output.content)
             logger.debug(output.instruct_content)
         else:
