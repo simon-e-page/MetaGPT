@@ -78,6 +78,9 @@ class Team(BaseModel):
         max_round: int = n_round
         logger.info(f"Team will execute {max_round} rounds of Tasks unless they run out of Investment funds!")
 
+        # Do we need to do something like this?
+        #self.environment.recover_memory()
+        
         while n_round > 0:
             # self._save()
             n_round -= 1
@@ -88,7 +91,7 @@ class Team(BaseModel):
             await self.environment.run()
 
         history_file = CONFIG.product_root / "history.txt"
-        with open(history_file, 'w') as file:
+        with open(history_file, 'w', encoding='utf-8') as file:
             file.write(self.environment.history)
         return self.environment.history
     
