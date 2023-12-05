@@ -12,8 +12,7 @@ from metagpt.actions import Action, ActionOutput
 #from metagpt.actions.search_and_summarize import SearchAndSummarize
 from metagpt.config import CONFIG
 from metagpt.logs import logger
-#from metagpt.utils.common import OutputParser
-from metagpt.utils.common import ApprovalError
+from metagpt.utils.common import OutputParser, ApprovalError
 
 #from metagpt.utils.get_template import get_template
 
@@ -43,8 +42,8 @@ class WriteDesignApproval(Action):
         design_content = system_design_file.read_text()
         logger.debug(design_content)
         output_class = ActionOutput.create_model_class("approved_design", DESIGN_OUTPUT_MAPPING)
-        parsed_data = markdown_to_json.dictify(design_content)
-        #parsed_data = OutputParser.parse_data_with_mapping(design_content, DESIGN_OUTPUT_MAPPING)
+        #parsed_data = markdown_to_json.dictify(design_content)
+        parsed_data = OutputParser.parse_markdown_deliverable(design_content, DESIGN_OUTPUT_MAPPING)
         logger.debug(parsed_data)
         instruct_content = output_class(**parsed_data)
         return ActionOutput(design_content, instruct_content)
