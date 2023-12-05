@@ -13,7 +13,7 @@ from metagpt.actions import (
     RunCode,
     WriteCode,
     WriteCodeReview,
-    WriteDesign,
+    WriteDesignApproval,
     WriteTest,
 )
 #from metagpt.const import WORKSPACE_ROOT
@@ -23,7 +23,7 @@ from metagpt.roles import Role
 from metagpt.schema import Message
 from metagpt.utils.common import CodeParser, parse_recipient
 from metagpt.utils.special_tokens import FILENAME_CODE_SEP, MSG_SEP
-
+from metagpt.config import CONFIG
 
 class QaEngineer(Role):
     def __init__(
@@ -45,19 +45,30 @@ class QaEngineer(Role):
     @classmethod
     def parse_workspace(cls, system_design_msg: Message) -> str:
         if system_design_msg.instruct_content:
-            return system_design_msg.instruct_content.dict().get("Python package name")
-        return CodeParser.parse_str(block="Python package name", text=system_design_msg.content)
+            package_name = system_design_msg.instruct_content.dict().get("Python package name").strip().strip("'").strip('"')
+        else:
+            package_name = CodeParser.parse_str(block="Python package name", text=system_design_msg.content)
+
+        if len(package_name) == 0:
+            package_name = CONFIG.product_name
+        return package_name
 
     def get_workspace(self, return_proj_dir=True) -> Path:
-        msg = self._rc.memory.get_by_action(WriteDesign)[-1]
-        if not msg:
-            return CONST.WORKSPACE_ROOT / "src"
-        workspace = self.parse_workspace(msg)
-        # project directory: workspace/{package_name}, which contains package source code folder, tests folder, resources folder, etc.
+        #TODO: cache answer rather than work out each time
+        msg = self._rc.memory.get_by_action(WriteDesignApproval)[-1]
+
         if return_proj_dir:
-            return CONST.WORKSPACE_ROOT / workspace
-        # development codes directory: workspace/{package_name}/{package_name}
-        return CONST.WORKSPACE_ROOT / workspace / workspace
+            ret_path = CONFIG.product_root
+        else:
+            if not msg:
+                ws_path = CONFIG.product_root / CONFIG.product_name
+            else:
+                package_name = self.parse_workspace(msg)
+                # Codes are written in workspace/{product_name}/{package_name}
+                ret_path = CONFIG.product_root / package_name
+
+        return ret_path
+
 
     def write_file(self, filename: str, code: str):
         workspace = self.get_workspace() / "tests"
