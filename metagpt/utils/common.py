@@ -171,8 +171,8 @@ class OutputParser:
             if typing == List[str] or typing == List[Tuple[str, str]] or typing == List[List[str]]:
                 # 尝试解析list
                 try:
-                    content = cls.parse_simple_list(text=content)
-                    #content = cls.parse_file_list(text=content)
+                    #content = cls.parse_simple_list(text=content)
+                    content = cls.parse_file_list(text=content)
                 except Exception:
                     pass
             # TODO: 多余的引号去除有风险，后期再解决

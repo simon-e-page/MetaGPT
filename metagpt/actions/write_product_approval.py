@@ -7,6 +7,7 @@
 """
 from typing import List
 #import json
+import markdown_to_json
 
 from metagpt.actions import Action, ActionOutput
 #from metagpt.actions.search_and_summarize import SearchAndSummarize
@@ -55,7 +56,8 @@ class WriteProductApproval(Action):
         prd_content = path.read_text()
         logger.debug(prd_content)
         output_class = ActionOutput.create_model_class("approved_prd", PRD_OUTPUT_MAPPING)
-        parsed_data = OutputParser.parse_data_with_mapping(prd_content, PRD_OUTPUT_MAPPING)
+        parsed_data = markdown_to_json.dictify(prd_content)
+        #parsed_data = OutputParser.parse_data_with_mapping(prd_content, PRD_OUTPUT_MAPPING)
         logger.debug(parsed_data)
         instruct_content = output_class(**parsed_data)
         return ActionOutput(prd_content, instruct_content)

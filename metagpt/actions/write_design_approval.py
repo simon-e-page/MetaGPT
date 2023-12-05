@@ -6,6 +6,7 @@
 @File    : write_prd.py
 """
 from typing import List
+import markdown_to_json
 
 from metagpt.actions import Action, ActionOutput
 #from metagpt.actions.search_and_summarize import SearchAndSummarize
@@ -41,7 +42,8 @@ class WriteDesignApproval(Action):
         design_content = system_design_file.read_text()
         logger.debug(design_content)
         output_class = ActionOutput.create_model_class("approved_design", DESIGN_OUTPUT_MAPPING)
-        parsed_data = OutputParser.parse_data_with_mapping(design_content, DESIGN_OUTPUT_MAPPING)
+        parsed_data = markdown_to_json.dictify(design_content)
+        #parsed_data = OutputParser.parse_data_with_mapping(design_content, DESIGN_OUTPUT_MAPPING)
         logger.debug(parsed_data)
         instruct_content = output_class(**parsed_data)
         return ActionOutput(design_content, instruct_content)
