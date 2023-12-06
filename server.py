@@ -82,4 +82,4 @@ def status():
 
 if __name__ == "__main__":
     anvil.server.connect("your-anvil-app-id")
-    result = future.result()
+    anvil.wait_forever()
