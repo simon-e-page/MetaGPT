@@ -90,7 +90,7 @@ class Team(BaseModel):
         if history_file.exists():
             logger.warning("Loading messages from a previous execution and replaying!")
             messages = deserialize_batch(history_file.read_bytes())
-            messages =self.filter_messages(messages, STAGE_ACTIONS[stage])
+            messages = self.filter_messages(messages, STAGE_ACTIONS[stage])
             self.environment.memory.add_batch(messages)
         else:
             logger.info("Commencing project with Boss Requirement")
