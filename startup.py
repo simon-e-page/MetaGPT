@@ -15,7 +15,7 @@ from metagpt.roles.design_approver import DesignApprover
 from metagpt.roles.product_approver import ProductApprover
 from metagpt.team import Team
 
-async def startup(
+def startup(
     product_name: str,
     investment: float = 3.0,
     n_round: int = 5,
@@ -50,9 +50,11 @@ async def startup(
         # (bug fixing capability comes soon!)
         company.hire([QaEngineer()])
 
-    await company.run(n_round=n_round)
+    #await company.run(n_round=n_round)
+    
+    return company
 
-
+# Main entry for direct CLI
 def main(
     #idea: str,
     investment: float = 3.0,
@@ -77,8 +79,9 @@ def main(
     :param stage: The project stage to start or resume [Design, Build, Test, Deploy]
     :return:
     """
-    asyncio.run(startup(product_name, investment=investment, n_round=n_round, code_review=code_review, run_tests=run_tests, implement=implement, stage=stage))
-
+    company = startup(product_name, investment=investment, n_round=n_round, code_review=code_review, run_tests=run_tests, implement=implement, stage=stage)
+    future = asyncio.run(company.run(n_round=n_round))
+    result = future.result()
 
 if __name__ == "__main__":
     fire.Fire(main)
