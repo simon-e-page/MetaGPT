@@ -50,6 +50,12 @@ class Team(BaseModel):
         if CONFIG.total_cost > CONFIG.max_budget:
             raise NoMoneyException(CONFIG.total_cost, f'Insufficient funds: {CONFIG.max_budget}')
 
+    def create_project(self, product_name: str, idea: str):
+        stage = "Requirements"
+        CONFIG.product_name = product_name
+        os.makedirs(CONFIG.product_root, exist_ok=True)
+        self.environment.create_product_config(idea, stage)
+
     def start_project(self, product_name: str, stage: str = None, send_to: str = ""):
         """Start a project from publishing boss requirement."""
         logger.info(f'Starting project: {product_name}')

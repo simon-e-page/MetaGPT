@@ -77,6 +77,15 @@ class Environment(BaseModel):
         
         CONFIG.product_config['STAGE'] = stage
 
+    def create_product_config(self, product_name, idea, stage):
+        data = {
+            'IDEA': idea,
+            'STAGE': stage
+        }
+
+        CONFIG.product_config = yaml.dump(data)
+        self.save_product_config()
+        
     def save_product_config(self):
         _yaml_file: Path = CONFIG.product_root / "product.yaml"
         with open(_yaml_file, "w", encoding="utf-8") as file:
