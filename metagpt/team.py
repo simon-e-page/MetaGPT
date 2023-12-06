@@ -61,14 +61,12 @@ class Team(BaseModel):
 
         self.environment.get_product_config()
 
-        #idea: str = self.environment.idea
         if stage is not None:
             self.environment.set_stage(stage)
         
         stage = self.environment.stage
         add_project_log(CONST.WORKSPACE_ROOT / CONFIG.product_name, replace=True)
 
-        #self.environment.publish_message(Message(role="Human", content=f'For product {product_name} we are commencing stage: {stage}', cause_by=BossRequirement, send_to=send_to))
         logger.info(f'For product {product_name} we are commencing stage: {stage}')
 
     def _save(self):
@@ -135,5 +133,7 @@ class Team(BaseModel):
         history_file = CONFIG.product_root / "history.pickle"
         with open(history_file, 'wb') as file:
             file.write(serialize_batch(self.environment.memory.get()))
+        
+        self.environment.save_product_config()
         return self.environment.history
     
