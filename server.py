@@ -5,9 +5,11 @@ import asyncio
 
 from startup import startup
 from metagpt.team import Team
+import time as t
 
 company: Team = None
 future = None
+status: str = "Idle"
 
 @anvil.server.callable
 def create_project(product_name: str, idea: str):
@@ -16,6 +18,17 @@ def create_project(product_name: str, idea: str):
     if company is None:
         company = Team()
     company.create_project(product_name, idea)
+
+def check_status():
+    global status
+    if future is not None:
+        # TODO: interrogate running status - Excamples
+        status = "Requirements"
+        status = None
+    else:
+        status = "Idle"
+    return status
+
 
 @anvil.server.callable
 def run_project(
@@ -26,23 +39,30 @@ def run_project(
     run_tests=False, 
     implement=False, 
     stage="Requirements"
-    ):
+    ) -> bool:
     
     # TODO: how to return a handle for the Team object that is created?
     global company, future
-    company.registerAPI(stage, ready_to_approve)
-    company = startup(
-         product_name=product_name,
-         investment=investment, 
-         n_round=n_round,
-         code_review=code_review,
-         run_tests=run_tests,
-         implement=implement,
-         stage=stage
-         )
-    future = asyncio.run(company.run(n_round=n_round))
+    
+    if future is None:
+        company.registerAPI(stage, ready_to_approve)
+        company = startup(
+            product_name=product_name,
+            investment=investment, 
+            n_round=n_round,
+            code_review=code_review,
+            run_tests=run_tests,
+            implement=implement,
+            stage=stage
+            )
+        
+        future = asyncio.run(company.run(n_round=n_round))
+        check_status()
+        ret = True
+    else:
+        ret = False
      
-    return
+    return ret
 
 def ready_to_approve(stage):
     """ Endpoint called to wait for API approval message """
@@ -74,12 +94,13 @@ def update_deliverable(stage: str, deliverable):
     pass
 
 @anvil.server.callable
-def status():
+def get_status():
     """ Retrieve the running status of the main event loop """
-    # TODO: use the Team object to save the file in the correct location with the correct filename
-    pass
+    return check_status()
 
 
 if __name__ == "__main__":
     anvil.server.connect("your-anvil-app-id")
-    anvil.wait_forever()
+    while True:
+        check_status()
+        t.sleep(60)         
