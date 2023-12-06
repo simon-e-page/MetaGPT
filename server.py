@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import asyncio
+import anvil.server
 
 import fire
+from startup import create_project as startup_create_project
 
 from metagpt.roles import (
     Architect,
@@ -80,5 +82,10 @@ def main(
     asyncio.run(startup(product_name, investment=investment, n_round=n_round, code_review=code_review, run_tests=run_tests, implement=implement, stage=stage))
 
 
+@anvil.server.callable
+def create_project(*args, **kwargs):
+    return startup_create_project(*args, **kwargs)
+
 if __name__ == "__main__":
+    anvil.server.connect("your-anvil-app-id")
     fire.Fire(main)
