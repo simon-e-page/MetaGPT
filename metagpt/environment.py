@@ -12,7 +12,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
-from metagpt.memory import Memory, LongTermMemory
+from metagpt.memory import Memory
 from metagpt.roles import Role
 from metagpt.schema import Message
 from metagpt.config import CONFIG

@@ -52,7 +52,7 @@ class ActionType(Enum):
     WRITE_PRODUCT_APPROVAL = WriteProductApproval
     WRITE_TASK_APPROVAL = WriteTaskApproval
 
-STAGES = {
+STAGE_ACTIONS = {
     'Requirements': [BossRequirement],
     'Design': [BossRequirement, WritePRD, WriteProductApproval],
     'Plan': [BossRequirement, WritePRD, WritePRDReview, WriteDesign, WriteDesignApproval],

@@ -10,12 +10,12 @@ import os
 import traceback
 import json
 
-from metagpt.actions import BossRequirement, STAGES
+from metagpt.actions import BossRequirement, STAGE_ACTIONS
 from metagpt.config import CONFIG
 import metagpt.const as CONST
 from metagpt.environment import Environment
 from metagpt.logs import logger, add_project_log
-from metagpt.roles import Role
+from metagpt.roles import Role, STAGE_ROLES
 from metagpt.schema import Message
 from metagpt.utils.common import NoMoneyException, ApprovalError
 
@@ -75,8 +75,9 @@ class Team(BaseModel):
         logger.info(self.json())
 
 
-    def filter_messages(messages, keep: list):
+    def filter_messages(self, messages, keep: list):
         """ Strips all messages that are not in the list of specific actions"""
+        messages = [ m for m in messages if m.cause_by in keep ]
         return messages
 
 
@@ -89,15 +90,16 @@ class Team(BaseModel):
         if history_file.exists():
             logger.warning("Loading messages from a previous execution and replaying!")
             messages = deserialize_batch(history_file.read_bytes())
-            messages =self.filter_messages(stage)
+            messages =self.filter_messages(messages, STAGE_ACTIONS[stage])
             self.environment.memory.add_batch(messages)
         else:
             logger.info("Commencing project with Boss Requirement")
             self.environment.publish_message(Message(role="Human", content=self.environment.idea, cause_by=BossRequirement, send_to=""))
-
+        
         for role in self.environment.get_roles():
-            role.set_memory(stage)
-
+            if type(role) not in STAGE_ROLES:
+                logger.info(f"Clearing memory for {role.name}")
+                role._rc.memory.clear()
 
 
     async def run(self, n_round=3):
@@ -105,6 +107,7 @@ class Team(BaseModel):
         max_round: int = n_round
         logger.info(f"Team will execute {max_round} rounds of Tasks unless they run out of Investment funds!")
 
+        self.set_memory(self.environment.stage)
         
         while n_round > 0:
             # self._save()
@@ -129,6 +132,7 @@ class Team(BaseModel):
                 logger.error(traceback.format_exc())
                 n_round = 0
             
+        history_file = CONFIG.product_root / "history.pickle"
         with open(history_file, 'wb') as file:
             file.write(serialize_batch(self.environment.memory.get()))
         return self.environment.history

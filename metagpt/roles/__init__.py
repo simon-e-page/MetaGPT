@@ -19,6 +19,17 @@ from metagpt.roles.product_approver import ProductApprover
 from metagpt.roles.design_approver import DesignApprover
 from metagpt.roles.task_approver import TaskApprover
 
+# This denotes the roles whose memories should be 'retained'
+# at the commencement of each stage
+# We assume Approval of the prior stage must occur before commencement
+
+STAGE_ROLES = {
+    "Requirements": [],
+    "Design": [ ProductManager ],
+    "Plan": [ ProductManager, ProductApprover, Architect ],
+    "Build": [ ProductManager, ProductApprover, Architect, ProjectManager ],
+    "Test": [ ProductManager, ProductApprover, Architect, ProjectManager, TaskApprover, Engineer ],
+}
 
 __all__ = [
     "Role",
