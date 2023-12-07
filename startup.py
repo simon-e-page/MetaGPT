@@ -9,6 +9,7 @@ from metagpt.roles import (
     Engineer,
     ProductManager,
     ProjectManager,
+    TaskApprover,
     QaEngineer,
 )
 from metagpt.roles.design_approver import DesignApprover
@@ -37,6 +38,7 @@ def startup(
             ProjectManager(),
             DesignApprover(),
             ProductApprover(),
+            TaskApprover()
         ]
     )
 
