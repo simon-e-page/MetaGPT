@@ -100,7 +100,7 @@ class Team(BaseModel):
             logger.info("Commencing project with Boss Requirement")
             self.environment.publish_message(Message(role="Human", content=self.environment.idea, cause_by=BossRequirement, send_to=""))
         
-        for name, role in self.environment.get_roles():
+        for name, role in self.environment.get_roles().items():
             if type(role) not in STAGE_ROLES:
                 logger.info(f"Clearing memory for {name}")
                 role._rc.memory.clear()
