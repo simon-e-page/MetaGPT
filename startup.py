@@ -80,8 +80,8 @@ def main(
     :return:
     """
     company = startup(product_name, investment=investment, n_round=n_round, code_review=code_review, run_tests=run_tests, implement=implement, stage=stage)
-    future = asyncio.run(company.run(n_round=n_round))
-    result = future.result()
+    history = asyncio.run(company.run(n_round=n_round))
+    # TODO: Do something with the environment history?
 
 if __name__ == "__main__":
     fire.Fire(main)

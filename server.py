@@ -8,7 +8,7 @@ from metagpt.team import Team
 import time as t
 
 company: Team = None
-future = None
+task = None
 status: str = "Idle"
 
 @anvil.server.callable
@@ -21,7 +21,7 @@ def create_project(product_name: str, idea: str):
 
 def check_status():
     global status
-    if future is not None:
+    if task is not None:
         # TODO: interrogate running status - Excamples
         status = "Requirements"
         status = None
@@ -44,7 +44,7 @@ def run_project(
     # TODO: how to return a handle for the Team object that is created?
     global company, future
     
-    if future is None:
+    if task is None:
         company.registerAPI(stage, ready_to_approve)
         company = startup(
             product_name=product_name,
@@ -56,7 +56,8 @@ def run_project(
             stage=stage
             )
         
-        future = asyncio.run(company.run(n_round=n_round))
+        #TODO: this needs to be kicked off in a separate thread?
+        history = asyncio.run(company.run(n_round=n_round))
         check_status()
         ret = True
     else:
