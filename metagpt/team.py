@@ -94,7 +94,7 @@ class Team(BaseModel):
         path: Path = Path(CONFIG.workspace_root)
         for i in path.iterdir():
             if i.is_dir():
-                projects.append(i)
+                projects.append(i.name)
         return projects
 
     def get_project(self, product_name: str) -> str:
