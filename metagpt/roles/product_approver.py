@@ -43,7 +43,7 @@ class ProductApprover(Role):
         """
         super().__init__(name, profile, goal, constraints, is_human=True)
         self._init_actions([WriteProductApproval])
-        if self._rc.env.callback is not None:
+        if callback is not None:
             # Using API to receive approval
             self._actions[0].set_callback(callback)
         self._watch([WritePRD])
