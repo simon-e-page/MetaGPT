@@ -28,7 +28,6 @@ class Environment(BaseModel):
     roles: dict[str, Role] = Field(default_factory=dict)
     memory: Memory = Field(default_factory=Memory)
     history: str = Field(default='')
-    callback: Callable = Field(default=None)
 
     class Config:
         arbitrary_types_allowed = True

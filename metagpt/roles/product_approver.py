@@ -5,8 +5,12 @@
 @Author  : alexanderwu
 @File    : product_manager.py
 """
+
+from typing import Callable
+
 from metagpt.actions import WritePRD, WriteProductApproval
 from metagpt.roles import Role
+
 
 
 class ProductApprover(Role):
@@ -26,6 +30,7 @@ class ProductApprover(Role):
         profile: str = "Product Approver",
         goal: str = "Review and Approve the Requirements Stage Gate",
         constraints: str = "",
+        callback: Callable = None 
     ) -> None:
         """
         Initializes the ProductApprover role with given attributes.
@@ -40,5 +45,5 @@ class ProductApprover(Role):
         self._init_actions([WriteProductApproval])
         if self._rc.env.callback is not None:
             # Using API to receive approval
-            self._actions[0].set_callback(self._rc.env.callback)
+            self._actions[0].set_callback(callback)
         self._watch([WritePRD])

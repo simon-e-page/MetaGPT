@@ -3,6 +3,7 @@
 import asyncio
 
 import fire
+from typing import Callable
 
 from metagpt.roles import (
     Architect,
@@ -23,7 +24,8 @@ def startup(
     code_review: bool = False,
     run_tests: bool = False,
     implement: bool = True,
-    stage: str = "Requirements"
+    stage: str = "Requirements",
+    api_callback: Callable = None
 ):
     """Run a startup. Be a boss."""
     company = Team()
@@ -37,7 +39,7 @@ def startup(
             Architect(),
             ProjectManager(),
             DesignApprover(),
-            ProductApprover(),
+            ProductApprover(callback = api_callback),
             TaskApprover()
         ]
     )
