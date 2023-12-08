@@ -33,6 +33,10 @@ class ApprovalError(Exception):
         super().__init__(message)
         self.approver = approver
 
+class ProductConfigError(Exception):
+    def __init__(self, message, approver=""):
+        super().__init__(message)
+
 class OutputParser:
     @classmethod
     def parse_blocks(cls, text: str):

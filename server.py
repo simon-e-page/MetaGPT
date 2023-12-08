@@ -16,12 +16,27 @@ status: str = "Idle"
 authenticated_callable = anvil.server.callable(require_user=True)
 
 @authenticated_callable
+def get_project(product_name: str) -> str:
+    """ Retrieve an existing project and return the Idea, or None if it doesnt exist"""
+    global company
+    if company is None:
+        company = Team()
+    try:
+        idea: str = company.get_project(product_name)
+    except Exception:
+        traceback.print_exc()
+        idea = None
+    return idea
+    
+
+@authenticated_callable
 def create_project(product_name: str, idea: str):
     # TODO: take this out of the Team structure..
     global company
     if company is None:
         company = Team()
     company.create_project(product_name, idea)
+
 
 def check_status():
     global status, error
@@ -58,8 +73,11 @@ def run_project(
     ) -> str:
     
     # TODO: how to return a handle for the Team object that is created?
-    global company, future
+    global company, task
     
+    if company is None:
+        return "Error! Company not initiated!"
+
     if task is None:
         try:
             company = startup(

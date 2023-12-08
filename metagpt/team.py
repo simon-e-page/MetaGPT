@@ -17,7 +17,7 @@ from metagpt.environment import Environment
 from metagpt.logs import logger, add_project_log
 from metagpt.roles import Role, STAGE_ROLES
 from metagpt.schema import Message
-from metagpt.utils.common import NoMoneyException, ApprovalError
+from metagpt.utils.common import NoMoneyException, ApprovalError, ProductConfigError
 
 from metagpt.utils.serialize import serialize_batch, deserialize_batch
 
@@ -89,6 +89,16 @@ class Team(BaseModel):
             ret = "Error"
         return ret
 
+    def get_project(self, product_name: str) -> str:
+        CONFIG.product_name = product_name
+
+        if not os.path.exists(CONFIG.product_root):
+            raise FileNotFoundError(f"Need following directory with product config to start: {CONFIG.product_root}")
+
+        if self.environment.get_product_config():
+            return self.environment.idea
+        else:
+            raise ProductConfigError(f"Cannot load config for {product_name}")
 
     def create_project(self, product_name: str, idea: str):
         stage = "Requirements"
@@ -100,13 +110,7 @@ class Team(BaseModel):
         """Start a project from publishing boss requirement."""
         logger.info(f'Starting project: {product_name}')
 
-        CONFIG.product_name = product_name
-
-        if not os.path.exists(CONFIG.product_root):
-            raise FileNotFoundError(f"Need following directory with product config to start: {CONFIG.product_root}")
-
-        self.environment.get_product_config()
-
+        self.get_project(product_name=product_name)
         if stage is not None:
             self.environment.set_stage(stage)
         
@@ -114,6 +118,7 @@ class Team(BaseModel):
         add_project_log(CONST.WORKSPACE_ROOT / CONFIG.product_name, replace=True)
 
         logger.info(f'For product {product_name} we are commencing stage: {stage}')
+
 
     def _save(self):
         logger.info(self.json())
