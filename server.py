@@ -93,6 +93,8 @@ def prompt_approval(action: str, stage: str):
         anvil.server.task['Waiting'] = False
         anvil.server.task['Stage'] = stage
         anvil.server.task['Approval'] = None
+    elif action == "check":
+        return anvil.server.task['Approval']
     else:
         # Unknown action
         pass

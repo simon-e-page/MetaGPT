@@ -50,10 +50,6 @@ class WriteProductApproval(Action):
     """
     def __init__(self, name="", context=None, llm=None):
         super().__init__(name, context, llm)
-        self.callback = None
-
-    def set_callback(self, callback: callable) -> None:
-        self.callback = callback
 
     def _get_prd_from_disk(self):
         path = CONFIG.product_root / "docs" / "prd.md"
@@ -69,7 +65,7 @@ class WriteProductApproval(Action):
     async def run(self, context, *args, **kwargs) -> ActionOutput:
         """ Wait for a Human Approval """
         prompt = "Do you approve the Product Requirements? (yes/no)"
-        prd_approval = await self._aask_v1(prompt, "prd_approval", OUTPUT_MAPPING, format='json')
+        prd_approval = await self._aask_v1(prompt, "prd_approval", OUTPUT_MAPPING, format='json', system_msgs=['Requirements'])
         
         if prd_approval.instruct_content.dict()['Approval Response'] == 'yes':
             logger.info("Got approval for Product Requirements!")
