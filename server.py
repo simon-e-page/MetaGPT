@@ -9,6 +9,9 @@ import time as t
 import os
 import traceback
 
+# TODO: configure Config from frontend
+# TODO: set git settings on workspaces / projects
+
 company: Team = None
 task = None
 status: str = "Idle"
