@@ -2,7 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import fire
+import time as t
+
+
 import server
+
 
 def main(
     #idea: str,
@@ -29,7 +33,7 @@ def main(
     :return:
     """
     #asyncio.run(startup(product_name, investment=investment, n_round=n_round, code_review=code_review, run_tests=run_tests, implement=implement, stage=stage))
-    server.main(product_name=product_name,
+    server.run_project(product_name=product_name,
                 investment=investment,
                 n_round=n_round,
                 code_review=code_review,
@@ -38,13 +42,17 @@ def main(
                 stage=stage
                 )
 
-    while server.status() == "RUNNING":
-        print(server.get_logs())
+    status = server.get_status()
+    while status != "Waiting":
+        print(f"Stage: {status}")
+        t.sleep(10)
+        status = server.get_status()
+    
+    print("Now waiting for approval..")
+    exit(1)
     
 if __name__ == "__main__":
     l = server.get_projects()
-    print(l)
+    print(f"Current Projects: {l}")
 
-    i = server.get_project(l[0])
-    print(i)
-    #fire.Fire(main)
+    fire.Fire(main)

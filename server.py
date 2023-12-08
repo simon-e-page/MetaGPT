@@ -64,7 +64,10 @@ def check_status():
                 error = task.get_error()
             task = None
         else:
-            status = task.get_state()['stage']
+            if task.get_state()['Waiting']:
+                return "Waiting"
+            else:
+                status = task.get_state()['stage']
     else:
         status = "Idle"
     return status
