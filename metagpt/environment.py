@@ -76,46 +76,7 @@ class Environment(BaseModel):
             if stage not in stages:
                 stage = stages[0]
         
-        CONFIG.product_config['STAGE'] = stage
-
-    def create_product_config(self, product_name, idea, stage):
-        data = {
-            'IDEA': idea,
-            'STAGE': stage
-        }
-
-        CONFIG.product_config = yaml.dump(data)
-        self.save_product_config()
-        
-    def save_product_config(self):
-        _yaml_file: Path = CONFIG.product_root / "product.yaml"
-        with open(_yaml_file, "w", encoding="utf-8") as file:
-            yaml.safe_dump(CONFIG.product_config, file)
-
-    def get_product_config(self) -> None:
-        _product_config: dict = {
-            'IDEA': 'Make a simple web application that displays Hello World',
-            'STAGE': 'Requirements'
-        }
-        
-        _yaml_file: Path = CONFIG.product_root / "product.yaml"
-
-        with open(_yaml_file, "r", encoding="utf-8") as file:
-            yaml_data = yaml.safe_load(file)
-            if yaml_data:               
-                _product_config.update(yaml_data)
-                CONFIG.set_product_config(_product_config)
-            else:
-                raise ProductConfigError(f"No valid product config found at {self._yaml_file}")
-
-    @property
-    def idea(self) -> str:
-        return CONFIG.product_config.get('IDEA', '')
-    
-    @property
-    def stage(self) -> str:
-        return CONFIG.product_config.get('STAGE', None)
-            
+        CONFIG.product_config['STAGE'] = stage            
 
     async def run(self, k=1):
         """处理一次所有信息的运行

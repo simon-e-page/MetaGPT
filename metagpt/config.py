@@ -145,5 +145,13 @@ class Config(metaclass=Singleton):
     @property
     def product_config(self):
         return self._product_config
+
+    @property
+    def idea(self) -> str:
+        return self._product_config.get('IDEA', '')
     
+    @property
+    def stage(self) -> str:
+        return self._product_config.get('STAGE', None)
+
 CONFIG = Config()

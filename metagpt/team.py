@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 import os
 import traceback
 from pathlib import Path
+import yaml
 
 from metagpt.actions import BossRequirement, STAGE_ACTIONS
 from metagpt.config import CONFIG
@@ -89,12 +90,47 @@ class Team(BaseModel):
             ret = "Error"
         return ret
 
+    def get_product_config(product_name: str) -> dict:    
+        _base: dict = {
+            'IDEA': 'Make a simple web application that displays Hello World',
+            'STAGE': 'Requirements'
+        }
+        
+        _yaml_file: Path = CONFIG.workspace_root / product_name / "product.yaml"
+
+        with open(_yaml_file, "r", encoding="utf-8") as file:
+            yaml_data = yaml.safe_load(file)
+            if yaml_data:               
+                _base.update(yaml_data)
+            else:
+                raise ProductConfigError(f"No valid product config found at {_yaml_file}")
+        return _base
+    
+    def create_product_config(self, idea, stage):
+        data = {
+            'IDEA': idea,
+            'STAGE': stage
+        }
+
+        CONFIG.product_config = yaml.dump(data)
+        self.save_product_config()
+        
+    def save_product_config(self):
+        _yaml_file: Path = CONFIG.product_root / "product.yaml"
+        with open(_yaml_file, "w", encoding="utf-8") as file:
+            yaml.safe_dump(CONFIG.product_config, file)
+
     def get_projects(self) -> list:
         projects: list = []
         path: Path = Path(CONFIG.workspace_root)
         for i in path.iterdir():
             if i.is_dir():
-                projects.append(i.name)
+                try:
+                    entry: dict = self.get_product_config(i.name)
+                    entry['NAME'] = i.name
+                    projects.append(entry)
+                except ProductConfigError:
+                    logger.warning(f"Invalid product config: {i.name}")
         return projects
 
     def get_project(self, product_name: str) -> str:
@@ -103,14 +139,14 @@ class Team(BaseModel):
         if not os.path.exists(CONFIG.product_root):
             raise FileNotFoundError(f"Need following directory with product config to start: {CONFIG.product_root}")
 
-        self.environment.get_product_config()
-        return self.environment.idea
+        CONFIG.set_product_config(self.get_product_config(product_name))
+        return CONFIG.idea
 
     def create_project(self, product_name: str, idea: str):
         stage = "Requirements"
         CONFIG.product_name = product_name
         os.makedirs(CONFIG.product_root, exist_ok=True)
-        self.environment.create_product_config(idea, stage)
+        CONFIG.set_product_config(self.create_product_config(idea, stage))
 
     def start_project(self, product_name: str, stage: str = None, send_to: str = ""):
         """Start a project from publishing boss requirement."""
