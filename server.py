@@ -55,28 +55,31 @@ def run_project(
     run_tests=False, 
     implement=False, 
     stage="Requirements"
-    ) -> bool:
+    ) -> str:
     
     # TODO: how to return a handle for the Team object that is created?
     global company, future
     
     if task is None:
-        company = startup(
-            product_name=product_name,
-            investment=investment, 
-            n_round=n_round,
-            code_review=code_review,
-            run_tests=run_tests,
-            implement=implement,
-            stage=stage
-            )
-        
-        #TODO: this needs to be kicked off in a separate thread?
+        try:
+            company = startup(
+                product_name=product_name,
+                investment=investment, 
+                n_round=n_round,
+                code_review=code_review,
+                run_tests=run_tests,
+                implement=implement,
+                stage=stage
+                )
+        except FileNotFoundError:
+            ret = "Error: Call Create Project first!"
+            return ret
+
         task = anvil.server.launch_background_task('run_project_background' , n_round)
         check_status()
-        ret = True
+        ret = "OK"
     else:
-        ret = False
+        ret = "Error: Already running!"
      
     return ret
 
