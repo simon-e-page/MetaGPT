@@ -42,4 +42,9 @@ def main(
         print(server.get_logs())
     
 if __name__ == "__main__":
-    fire.Fire(main)
+    l = server.get_projects()
+    print(l)
+
+    i = server.get_project(l[0])
+    print(i)
+    #fire.Fire(main)
