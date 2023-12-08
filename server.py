@@ -6,6 +6,8 @@ import asyncio
 from startup import startup
 from metagpt.team import Team
 import time as t
+import os
+import traceback
 
 company: Team = None
 task = None
@@ -22,15 +24,19 @@ def create_project(product_name: str, idea: str):
     company.create_project(product_name, idea)
 
 def check_status():
-    global status
+    global status, error
     if task is not None:
         # TODO: interrogate running status - Excamples
-        if task.is_completed():
-            status = "Idle"
+        if not task.is_running():
+            if task.get_termination_status() == 'completed':
+                status = "Idle"
+                error = None
+            else:
+                status = "Error"
+                error = task.get_error()
             task = None
-        elif task.:
-            status = "Running"
-        # TODO: how to get stage from the running process?
+        else:
+            status = task.get_state()['stage']
     else:
         status = "Idle"
     return status
@@ -55,7 +61,6 @@ def run_project(
     global company, future
     
     if task is None:
-        company.registerAPI(stage, ready_to_approve)
         company = startup(
             product_name=product_name,
             investment=investment, 
@@ -75,12 +80,21 @@ def run_project(
      
     return ret
 
-def prompt_approval(stage):
-    """ Endpoint called from the slave task to wait for API approval message """
-    anvil.server.task['Waiting'] = True
-    anvil.server.task['Stage'] = stage
-    anvil.server.task['Approval'] = None
+def prompt_approval(action: str, stage: str):
+    """ Endpoint called from the slave task to wait for API approval message or advance to next stage"""
+    if action == 'approve':
+        anvil.server.task['Waiting'] = True
+        anvil.server.task['Stage'] = stage
+        anvil.server.task['Approval'] = None
+    elif action == 'advance':
+        anvil.server.task['Waiting'] = False
+        anvil.server.task['Stage'] = stage
+        anvil.server.task['Approval'] = None
+    else:
+        # Unknown action
+        pass
     return
+
 
 @authenticated_callable
 def approve_stage(stage, approval=True):
@@ -118,7 +132,18 @@ def get_status():
 
 
 if __name__ == "__main__":
-    anvil.server.connect("your-anvil-app-id")
+    anvil_id = os.environ.get("ANVIL_APP_ID", None)
+    if anvil_id:
+        try:
+            anvil.server.connect(anvil_id)
+        except Exception:
+            print("Could not connect to Anvil!")
+            traceback.print_exc()
+            exit(1)
+    else:
+        print("Please set your Anvil Application ID in the environment variable ANVIL_APP_ID")
+        exit(1)
+
     while True:
         check_status()
         t.sleep(60)         
