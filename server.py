@@ -11,7 +11,9 @@ company: Team = None
 task = None
 status: str = "Idle"
 
-@anvil.server.callable
+authenticated_callable = anvil.server.callable(require_user=True)
+
+@authenticated_callable
 def create_project(product_name: str, idea: str):
     # TODO: take this out of the Team structure..
     global company
@@ -30,7 +32,7 @@ def check_status():
     return status
 
 
-@anvil.server.callable
+@authenticated_callable
 def run_project(
     product_name, 
     investment=5.0, 
@@ -70,31 +72,31 @@ def ready_to_approve(stage):
     # TODO: how to wait until we get approval message from frontend 
     pass
 
-@anvil.server.callable
+@authenticated_callable
 def approve_stage(stage):
     """ Approve the Stage Deliverable """
     # TODO: how to get a handle on an APIProvider class and related Action?
     pass
 
-@anvil.server.callable
+@authenticated_callable
 def get_logs(max=100):
     """ Retrieve new log messages since the last call """
     # TODO: how to get a handle on the log output
     pass
 
-@anvil.server.callable
+@authenticated_callable
 def get_deliverable(stage: str):
     """ Retrieve new deliverable document for the specified stage"""
     # TODO: use the Team object to get the required ActionOutput and file
     pass
 
-@anvil.server.callable
+@authenticated_callable
 def update_deliverable(stage: str, deliverable):
     """ Retrieve new deliverable document for the specified stage"""
     # TODO: use the Team object to save the file in the correct location with the correct filename
     pass
 
-@anvil.server.callable
+@authenticated_callable
 def get_status():
     """ Retrieve the running status of the main event loop """
     return check_status()
