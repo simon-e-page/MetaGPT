@@ -6,7 +6,7 @@
 @File    : environment.py
 """
 import asyncio
-from typing import Iterable
+from typing import Iterable, Callable
 import yaml
 from pathlib import Path
 
@@ -27,7 +27,7 @@ class Environment(BaseModel):
     roles: dict[str, Role] = Field(default_factory=dict)
     memory: Memory = Field(default_factory=Memory)
     history: str = Field(default='')
-    callback: function = Field(default=None)
+    callback: Callable = Field(default=None)
 
     class Config:
         arbitrary_types_allowed = True
