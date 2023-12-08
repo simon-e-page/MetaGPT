@@ -96,7 +96,7 @@ class Team(BaseModel):
             'STAGE': 'Requirements'
         }
         
-        _yaml_file: Path = CONFIG.workspace_root / product_name / "product.yaml"
+        _yaml_file: Path = Path(CONFIG.workspace_root) / product_name / "product.yaml"
 
         with open(_yaml_file, "r", encoding="utf-8") as file:
             yaml_data = yaml.safe_load(file)
