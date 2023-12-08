@@ -25,12 +25,20 @@ def check_status():
     global status
     if task is not None:
         # TODO: interrogate running status - Excamples
-        status = "Requirements"
-        status = None
+        if task.is_completed():
+            status = "Idle"
+            task = None
+        elif task.:
+            status = "Running"
+        # TODO: how to get stage from the running process?
     else:
         status = "Idle"
     return status
 
+@anvil.server.background_task
+def run_project_background(n_round: int = 5) -> str:
+    history: str = asyncio.run(company.run(n_round=n_round, callback=prompt_approval))
+    return history
 
 @authenticated_callable
 def run_project(
@@ -59,7 +67,7 @@ def run_project(
             )
         
         #TODO: this needs to be kicked off in a separate thread?
-        history = asyncio.run(company.run(n_round=n_round))
+        task = anvil.server.launch_background_task('run_project_background' , n_round)
         check_status()
         ret = True
     else:
@@ -67,16 +75,23 @@ def run_project(
      
     return ret
 
-def ready_to_approve(stage):
-    """ Endpoint called to wait for API approval message """
-    # TODO: how to wait until we get approval message from frontend 
-    pass
+def prompt_approval(stage):
+    """ Endpoint called from the slave task to wait for API approval message """
+    anvil.server.task['Waiting'] = True
+    anvil.server.task['Stage'] = stage
+    anvil.server.task['Approval'] = None
+    return
 
 @authenticated_callable
-def approve_stage(stage):
+def approve_stage(stage, approval=True):
     """ Approve the Stage Deliverable """
-    # TODO: how to get a handle on an APIProvider class and related Action?
-    pass
+    ret: str = "OK"
+    if  anvil.server.task['Waiting'] and stage == anvil.server.task['stage']:
+        anvil.server.task['Approval'] = approval
+    else:
+        # Do nothing!
+        ret = f"Error: task is not waiting for {stage} approval"
+    return ret
 
 @authenticated_callable
 def get_logs(max=100):
