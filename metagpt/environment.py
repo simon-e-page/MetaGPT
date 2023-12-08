@@ -17,6 +17,7 @@ from metagpt.roles import Role
 from metagpt.schema import Message
 from metagpt.config import CONFIG
 from metagpt.const import STAGES
+from metagpt.utils.common import ProductConfigError
 
 class Environment(BaseModel):
     """环境，承载一批角色，角色可以向环境发布消息，可以被其他角色观察到
@@ -106,7 +107,7 @@ class Environment(BaseModel):
                 _product_config.update(yaml_data)
                 CONFIG.set_product_config(_product_config)
             else:
-                raise FileNotFoundError(f"No valid product config found at {self._yaml_file}")
+                raise ProductConfigError(f"No valid product config found at {self._yaml_file}")
 
     @property
     def idea(self) -> str:

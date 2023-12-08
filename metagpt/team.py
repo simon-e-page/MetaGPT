@@ -103,10 +103,8 @@ class Team(BaseModel):
         if not os.path.exists(CONFIG.product_root):
             raise FileNotFoundError(f"Need following directory with product config to start: {CONFIG.product_root}")
 
-        if self.environment.get_product_config():
-            return self.environment.idea
-        else:
-            raise ProductConfigError(f"Cannot load config for {product_name}")
+        self.environment.get_product_config()
+        return self.environment.idea
 
     def create_project(self, product_name: str, idea: str):
         stage = "Requirements"
