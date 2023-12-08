@@ -8,7 +8,7 @@
 from pydantic import BaseModel, Field
 import os
 import traceback
-import json
+from pathlib import Path
 
 from metagpt.actions import BossRequirement, STAGE_ACTIONS
 from metagpt.config import CONFIG
@@ -49,6 +49,46 @@ class Team(BaseModel):
     def _check_balance(self):
         if CONFIG.total_cost > CONFIG.max_budget:
             raise NoMoneyException(CONFIG.total_cost, f'Insufficient funds: {CONFIG.max_budget}')
+
+
+    def _map_stage_to_deliverable(self, stage: str) -> Path:
+        if stage == "Requirements":
+            path: Path = CONFIG.product_root / "docs" / "prd.md"
+        elif stage == "Design":
+            path = CONFIG.product_root / "docs" / "system_design.md"
+        elif stage == "Plan":
+            path = CONFIG.product_root / "docs" / "api_spec_and_tasks.md"
+        else:
+            path = None
+        return path
+    
+    def get_deliverable(self, stage: str) -> str:
+        path: Path = self._map_stage_to_deliverable(stage)
+        content: str = ""
+        if path is not None:
+            try:
+                content = path.read_text()
+            except FileNotFoundError:
+                logger.warning(f"Can't find deliverable: {path}")
+        else:
+            logger.warning(f"No deliverable defined for stage {stage}")
+        
+        return content
+
+    def update_deliverable(self, stage: str, content: str) -> str:
+        path: Path = self._map_stage_to_deliverable(stage)
+        if path is not None:
+            try:
+                content = path.write_text(content, encoding='utf-8')
+                ret = "OK"
+            except FileNotFoundError:
+                logger.warning(f"Can't find deliverable: {path}")
+                ret = "Error"
+        else:
+            logger.warning(f"No deliverable defined for stage {stage}")
+            ret = "Error"
+        return ret
+
 
     def create_project(self, product_name: str, idea: str):
         stage = "Requirements"

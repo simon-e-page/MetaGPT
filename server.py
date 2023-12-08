@@ -102,7 +102,7 @@ def prompt_approval(action: str, stage: str):
 
 
 @authenticated_callable
-def approve_stage(stage, approval=True):
+def approve_stage(stage, approval=True) -> str:
     """ Approve the Stage Deliverable """
     ret: str = "OK"
     if  anvil.server.task['Waiting'] and stage == anvil.server.task['stage']:
@@ -119,16 +119,22 @@ def get_logs(max=100):
     pass
 
 @authenticated_callable
-def get_deliverable(stage: str):
+def get_deliverable(stage: str) -> str:
     """ Retrieve new deliverable document for the specified stage"""
-    # TODO: use the Team object to get the required ActionOutput and file
-    pass
+    if  anvil.server.task['Waiting'] and stage == anvil.server.task['stage']:
+        content = company.get_deliverable(stage)
+    else:
+        content = "Error: No content for this stage available!"
+    return content
 
 @authenticated_callable
-def update_deliverable(stage: str, deliverable):
+def update_deliverable(stage: str, content: str) -> str:
     """ Retrieve new deliverable document for the specified stage"""
-    # TODO: use the Team object to save the file in the correct location with the correct filename
-    pass
+    if  anvil.server.task['Waiting'] and stage == anvil.server.task['stage']:
+        ret: str = company.update_deliverable(stage, content)
+    else:
+        ret = f"Error: Cannot update content for {stage} right now!"
+    return ret
 
 @authenticated_callable
 def get_status():
