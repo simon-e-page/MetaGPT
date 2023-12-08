@@ -43,11 +43,12 @@ def get_project(product_name: str) -> str:
     
 
 @authenticated_callable
-def create_project(product_name: str, idea: str):
+def create_project(product_name: str, project_data: dict):
     # TODO: take this out of the Team structure..
     global company
     if company is None:
         company = Team()
+    idea: str = project_data['idea']
     company.create_project(product_name, idea)
 
 
