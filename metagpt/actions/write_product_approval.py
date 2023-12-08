@@ -50,6 +50,10 @@ class WriteProductApproval(Action):
     """
     def __init__(self, name="", context=None, llm=None):
         super().__init__(name, context, llm)
+        self.callback = None
+
+    def set_callback(self, callback: callable) -> None:
+        self.callback = callback
 
     def _get_prd_from_disk(self):
         path = CONFIG.product_root / "docs" / "prd.md"
