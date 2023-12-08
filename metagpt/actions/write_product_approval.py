@@ -15,6 +15,7 @@ from metagpt.config import CONFIG
 from metagpt.logs import logger
 #from metagpt.utils.get_template import get_template
 from metagpt.utils.common import OutputParser, ApprovalError
+from metagpt.provider.human_provider import HumanProvider
 
 OUTPUT_MAPPING = {
     "Approval Response": (str, ...),
@@ -70,8 +71,11 @@ class WriteProductApproval(Action):
         if prd_approval.instruct_content.dict()['Approval Response'] == 'yes':
             logger.info("Got approval for Product Requirements!")
             output = self._get_prd_from_disk()
-            logger.debug(output.content)
-            logger.debug(output.instruct_content)
+            #logger.debug(output.content)
+            #logger.debug(output.instruct_content)
+
+            if isinstance(self.llm, HumanProvider) and self.llm.callback is not None:
+                self.llm.callback(action="advance", stage="Requirements")
         else:
             logger.warning("No approval - stop project!")
             output = prd_approval
