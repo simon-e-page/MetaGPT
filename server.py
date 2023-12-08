@@ -19,6 +19,16 @@ status: str = "Idle"
 authenticated_callable = anvil.server.callable(require_user=True)
 
 @authenticated_callable
+def get_projects() -> list:
+    """ Retrieve existing projects and return a list of names"""
+    global company
+    if company is None:
+        company = Team()
+    projects: str = company.get_projects()
+    return projects
+
+
+@authenticated_callable
 def get_project(product_name: str) -> str:
     """ Retrieve an existing project and return the Idea, or None if it doesnt exist"""
     global company

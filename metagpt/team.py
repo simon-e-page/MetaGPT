@@ -89,6 +89,14 @@ class Team(BaseModel):
             ret = "Error"
         return ret
 
+    def get_projects(self) -> list:
+        projects: list = []
+        path: Path = CONST.WORKSPACE_ROOT
+        for i in path.iterdir():
+            if i.is_dir():
+                projects.append(i)
+        return projects
+
     def get_project(self, product_name: str) -> str:
         CONFIG.product_name = product_name
 
