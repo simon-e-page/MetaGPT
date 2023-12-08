@@ -115,8 +115,11 @@ class Team(BaseModel):
         CONFIG.product_config = yaml.dump(data)
         self.save_product_config()
         
-    def save_product_config(self):
-        _yaml_file: Path = CONFIG.product_root / "product.yaml"
+    def save_product_config(self, product_name=None):
+        if product_name is not None:
+            _yaml_file: Path = Path(CONFIG.workspace_root) / product_name / "product.yaml"
+        else:
+            _yaml_file: Path = CONFIG.product_root / "product.yaml"
         with open(_yaml_file, "w", encoding="utf-8") as file:
             yaml.safe_dump(CONFIG.product_config, file)
 
@@ -133,6 +136,11 @@ class Team(BaseModel):
                     logger.warning(f"Invalid product config: {i.name}")
         return projects
 
+    def update_project(self, product_name: str, idea: str):
+        self.get_project(product_name)
+        CONFIG.idea = idea
+        self.save_product_config()
+        
     def get_project(self, product_name: str) -> str:
         CONFIG.product_name = product_name
 

@@ -43,6 +43,15 @@ def get_project(product_name: str) -> str:
         idea = None
     return idea
     
+@authenticated_callable
+def update_project(product_name: str, project_data: dict):
+    # TODO: take this out of the Team structure..
+    global company
+    if company is None:
+        company = Team()
+    idea: str = project_data['IDEA']
+    company.update_project(product_name, idea)
+
 
 @authenticated_callable
 def create_project(product_name: str, project_data: dict):
@@ -50,7 +59,7 @@ def create_project(product_name: str, project_data: dict):
     global company
     if company is None:
         company = Team()
-    idea: str = project_data['idea']
+    idea: str = project_data['IDEA']
     company.create_project(product_name, idea)
 
 

@@ -149,7 +149,11 @@ class Config(metaclass=Singleton):
     @property
     def idea(self) -> str:
         return self._product_config.get('IDEA', '')
-    
+
+    @idea.setter
+    def set_idea(self, idea: str) -> None:
+        self._product_config['IDEA'] = idea
+
     @property
     def stage(self) -> str:
         return self._product_config.get('STAGE', None)
