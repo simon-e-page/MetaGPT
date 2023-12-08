@@ -90,7 +90,7 @@ class Team(BaseModel):
             ret = "Error"
         return ret
 
-    def get_product_config(product_name: str) -> dict:    
+    def get_product_config(self, product_name: str) -> dict:    
         _base: dict = {
             'IDEA': 'Make a simple web application that displays Hello World',
             'STAGE': 'Requirements'
