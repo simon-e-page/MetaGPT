@@ -53,7 +53,7 @@ def create_project(product_name: str, project_data: dict):
 
 
 def check_status():
-    global status, error
+    global task, status, error
     if task is not None:
         # TODO: interrogate running status - Excamples
         if not task.is_running():
