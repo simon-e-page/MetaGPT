@@ -16,7 +16,9 @@ company: Team = None
 task = None
 status: str = "Idle"
 
-authenticated_callable = anvil.server.callable(require_user=True)
+# TODO: add auth to the frontend
+#authenticated_callable = anvil.server.callable(require_user=True)
+authenticated_callable = anvil.server.callable()
 
 @authenticated_callable
 def get_projects() -> list:
