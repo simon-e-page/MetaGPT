@@ -91,7 +91,7 @@ class Team(BaseModel):
 
     def get_projects(self) -> list:
         projects: list = []
-        path: Path = CONST.WORKSPACE_ROOT
+        path: Path = CONFIG.workspace_root
         for i in path.iterdir():
             if i.is_dir():
                 projects.append(i)
