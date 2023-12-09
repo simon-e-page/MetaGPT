@@ -70,7 +70,12 @@ def download_project(product_name: str) -> bytes:
     if company is None:
         company = Team()
 
-    zipfile: bytes = company.download_project(product_name)
+    zipfile = None
+    try:
+        zipfile: bytes = company.download_project(product_name)
+    except Exception:
+        traceback.print_exc()
+
     if zipfile is not None:
         media_obj = BlobMedia('application/zip', zipfile, f"{product_name}.zip")
     else:
