@@ -26,7 +26,6 @@ from metagpt.roles import (
 
 company: Team = None
 task = None
-status: str = "Idle"
 
 # TODO: add auth to the frontend
 #authenticated_callable = anvil.server.callable(require_user=True)
@@ -95,7 +94,7 @@ def download_project(product_name: str) -> bytes:
 
 
 def check_status() -> tuple:
-    global task, status, error
+    global task
     if task is not None:
         # TODO: interrogate running status - Examples
         stage: str = ""
