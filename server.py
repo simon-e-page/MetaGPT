@@ -3,12 +3,23 @@
 import anvil.server
 from anvil import BlobMedia
 import asyncio
-
-from startup import startup
-from metagpt.team import Team
 import time as t
 import os
 import traceback
+from typing import Callable
+
+from metagpt.team import Team
+from metagpt.roles import (
+    Architect,
+    Engineer,
+    ProductManager,
+    ProjectManager,
+    DesignApprover,
+    ProductApprover,
+    TaskApprover,
+    QaEngineer,
+)
+
 
 # TODO: configure Config from frontend
 # TODO: set git settings on workspaces / projects
@@ -113,10 +124,6 @@ def run_project_background(n_round: int = 5) -> str:
 def run_project(
     product_name, 
     investment=5.0, 
-    n_round=5, 
-    code_review=False, 
-    run_tests=False, 
-    implement=False, 
     stage="Requirements"
     ) -> str:
     
@@ -128,13 +135,9 @@ def run_project(
 
     if task is None:
         try:
-            company = startup(
+            n_round = startup(
                 product_name=product_name,
                 investment=investment, 
-                n_round=n_round,
-                code_review=code_review,
-                run_tests=run_tests,
-                implement=implement,
                 stage=stage
                 )
         except FileNotFoundError:
@@ -148,6 +151,51 @@ def run_project(
         ret = "Error: Already running!"
      
     return ret
+
+def startup(
+    product_name, 
+    investment=5.0, 
+    stage="Requirements"        
+) -> int:
+    
+    global company
+
+    api_callback: Callable = prompt_approval
+
+    company = Team()
+    company.invest(investment)
+    company.start_project(product_name, stage)
+
+    company.hire(
+        [
+            ProductManager(),
+            Architect(),
+            ProjectManager(),
+            DesignApprover(),
+            ProductApprover(callback = api_callback),
+            TaskApprover()
+        ]
+    )
+
+    n_round = 2
+
+    if stage == "Design":
+        n_round = 4
+
+    # if implement or code_review
+    if stage == 'Build':
+        # developing features: implement the idea
+        company.hire([Engineer(n_borg=5, use_code_review=True)])
+        n_round = 6
+
+    if stage == 'Test':
+        # developing features: run tests on the spot and identify bugs
+        # (bug fixing capability comes soon!)
+        company.hire([Engineer(n_borg=5, use_code_review=True), QaEngineer()])
+        n_round = 7
+    
+    return n_round
+
 
 def prompt_approval(action: str, stage: str):
     """ Endpoint called from the slave task to wait for API approval message or advance to next stage"""
