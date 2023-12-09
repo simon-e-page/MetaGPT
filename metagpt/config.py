@@ -151,7 +151,7 @@ class Config(metaclass=Singleton):
         return self._product_config.get('IDEA', '')
 
     @idea.setter
-    def set_idea(self, idea: str) -> None:
+    def idea(self, idea: str) -> None:
         self._product_config['IDEA'] = idea
 
     @property
