@@ -205,14 +205,17 @@ def startup(
 def prompt_approval(action: str, stage: str):
     """ Endpoint called from the slave task to wait for API approval message or advance to next stage"""
     if action == 'approve':
+        print(f"Got approval request for {stage}")
         anvil.server.task['Waiting'] = True
         anvil.server.task['Stage'] = stage
         anvil.server.task['Approval'] = None
     elif action == 'advance':
+        print(f"Advancing to {stage}")
         anvil.server.task['Waiting'] = False
         anvil.server.task['Stage'] = stage
         anvil.server.task['Approval'] = None
     elif action == "check":
+        print("Looking for approval..")
         return anvil.server.task['Approval']
     else:
         # Unknown action
@@ -224,8 +227,11 @@ def prompt_approval(action: str, stage: str):
 def approve_stage(stage, approval=True) -> str:
     """ Approve the Stage Deliverable """
     ret: str = "OK"
-    if  anvil.server.task['Waiting'] and stage == anvil.server.task['stage']:
-        anvil.server.task['Approval'] = approval
+    waiting = task.get_state().get('Waiting', False)
+    child_stage = task.get_state().get('stage', None)
+    if waiting and stage == child_stage:
+        print(f"Got approval message for {stage}")
+        task.get_state()['Approval'] = approval
     else:
         # Do nothing!
         ret = f"Error: task is not waiting for {stage} approval"
