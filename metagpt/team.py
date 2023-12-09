@@ -155,9 +155,16 @@ class Team(BaseModel):
     def create_project(self, product_name: str, idea: str):
         stage = "Requirements"
         CONFIG.product_name = product_name
-        os.makedirs(CONFIG.product_root, exist_ok=True)
-        CONFIG.set_product_config(self.create_product_config(idea, stage))
-        self.save_product_config()
+        ret = True
+        try:
+            os.makedirs(CONFIG.product_root)
+        except OSError:
+            logger.warning("Project already exists!")
+            ret = False
+        if ret:
+            CONFIG.set_product_config(self.create_product_config(idea, stage))
+            self.save_product_config()
+        return ret
 
     def start_project(self, product_name: str, stage: str = None, send_to: str = ""):
         """Start a project from publishing boss requirement."""
