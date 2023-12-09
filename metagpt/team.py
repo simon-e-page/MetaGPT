@@ -172,8 +172,9 @@ class Team(BaseModel):
         logger.info(f'For product {product_name} we are commencing stage: {stage}')
 
     
-    def download_project(self) -> bytes:
+    def download_project(self, product_name) -> bytes:
         """Create a zip file of the project directory into a bytes object and return it."""
+        self.get_project(product_name)
         zip_file_bytes = io.BytesIO()
         with zipfile.ZipFile(zip_file_bytes, 'w', zipfile.ZIP_DEFLATED) as zipf:
             for root, dirs, files in os.walk(CONFIG.product_root):
