@@ -230,7 +230,7 @@ class Team(BaseModel):
         max_round: int = n_round
         logger.info(f"Team will execute {max_round} rounds of Tasks unless they run out of Investment funds!")
 
-        self.set_memory(self.environment.stage)
+        self.set_memory(CONFIG.stage)
         
         while n_round > 0:
             # self._save()
@@ -259,6 +259,6 @@ class Team(BaseModel):
         with open(history_file, 'wb') as file:
             file.write(serialize_batch(self.environment.memory.get()))
         
-        self.environment.save_product_config()
+        self.save_product_config()
         return self.environment.history
     
