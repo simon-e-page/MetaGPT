@@ -120,7 +120,7 @@ def check_status() -> tuple:
 
 @anvil.server.background_task
 def run_project_background(n_round: int = 5) -> str:
-    history: str = asyncio.run(company.run(n_round=n_round, callback=prompt_approval))
+    history: str = asyncio.run(company.run(n_round=n_round))
     return history
 
 @authenticated_callable

@@ -224,11 +224,10 @@ class Team(BaseModel):
                 role._rc.memory.clear()
 
 
-    async def run(self, n_round=3, callback=None):
+    async def run(self, n_round=3):
         """Run company until target round or no money"""
+
         max_round: int = n_round
-        if callback is not None:
-            self.environment.callback = callback
         logger.info(f"Team will execute {max_round} rounds of Tasks unless they run out of Investment funds!")
 
         self.set_memory(self.environment.stage)
