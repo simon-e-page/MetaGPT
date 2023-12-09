@@ -94,26 +94,29 @@ def download_project(product_name: str) -> bytes:
     return media_obj
 
 
-def check_status():
+def check_status() -> tuple:
     global task, status, error
     if task is not None:
-        # TODO: interrogate running status - Excamples
+        # TODO: interrogate running status - Examples
+        stage: str = ""
+        error: str = ""
         if not task.is_running():
             if task.get_termination_status() == 'completed':
                 status = "Idle"
-                error = None
             else:
                 status = "Error"
                 error = task.get_error()
+                print(error)
             task = None
         else:
+            stage = task.get_state()['stage']
             if task.get_state()['Waiting']:
-                return "Waiting"
+                status = "Waiting"
             else:
-                status = task.get_state()['stage']
+                status = "Runnimg"
     else:
         status = "Idle"
-    return status
+    return (status, stage, error)
 
 @anvil.server.background_task
 def run_project_background(n_round: int = 5) -> str:
@@ -270,5 +273,5 @@ if __name__ == "__main__":
         exit(1)
 
     while True:
-        check_status()
+        print(check_status())
         t.sleep(60)         
