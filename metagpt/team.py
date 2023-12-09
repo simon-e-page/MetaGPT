@@ -11,7 +11,6 @@ import traceback
 from pathlib import Path
 import yaml
 import zipfile
-import shutil
 
 from metagpt.actions import BossRequirement, STAGE_ACTIONS
 from metagpt.config import CONFIG
@@ -174,7 +173,11 @@ class Team(BaseModel):
     
     def download_project(self) -> str:
         """Create a zip file of the project directory and return the path to the zip file."""
-        zip_file_path = shutil.make_archive(CONFIG.product_root, 'zip', CONFIG.product_root)
+        zip_file_path = CONFIG.product_root + '.zip'
+        with zipfile.ZipFile(zip_file_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for root, dirs, files in os.walk(CONFIG.product_root):
+                for file in files:
+                    zipf.write(os.path.join(root, file))
         return zip_file_path
 
     def _save(self):
