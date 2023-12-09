@@ -157,6 +157,7 @@ class Team(BaseModel):
         CONFIG.product_name = product_name
         os.makedirs(CONFIG.product_root, exist_ok=True)
         CONFIG.set_product_config(self.create_product_config(idea, stage))
+        self.save_product_config()
 
     def start_project(self, product_name: str, stage: str = None, send_to: str = ""):
         """Start a project from publishing boss requirement."""
