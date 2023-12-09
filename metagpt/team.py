@@ -176,13 +176,13 @@ class Team(BaseModel):
         """Create a zip file of the project directory into a bytes object and return it."""
         self.get_project(product_name)
         zip_file_bytes = io.BytesIO()
-        cwd = os.curdir
+        cwd = os.getcwd()
         with zipfile.ZipFile(zip_file_bytes, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            os.curdir = CONFIG.product_root
+            os.chdir(CONFIG.product_root)
             for root, dirs, files in os.walk():
                 for file in files:
                     zipf.write(os.path.join(root, file))
-        os.curdir = cwd        
+        os.chdir(cwd)        
         return zip_file_bytes.getvalue()
 
     def _save(self):
