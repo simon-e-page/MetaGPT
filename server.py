@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import anvil.server
-from anvil.media import BlobMedia
+from anvil import BlobMedia
 import asyncio
 
 from startup import startup
