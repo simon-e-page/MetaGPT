@@ -174,8 +174,8 @@ class Team(BaseModel):
         if stage is not None:
             self.environment.set_stage(stage)
         
-        stage = self.environment.stage
-        add_project_log(CONST.WORKSPACE_ROOT / CONFIG.product_name, replace=True)
+        stage = CONFIG.stage
+        add_project_log(CONFIG.product_root, replace=True)
 
         logger.info(f'For product {product_name} we are commencing stage: {stage}')
 
