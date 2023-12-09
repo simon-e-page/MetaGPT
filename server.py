@@ -109,8 +109,8 @@ def check_status() -> tuple:
                 print(error)
             task = None
         else:
-            stage = task.get_state()['stage']
-            if task.get_state()['Waiting']:
+            stage = task.get_state().get('stage', "Unknown")
+            if task.get_state().get('Waiting', 'Unknown'):
                 status = "Waiting"
             else:
                 status = "Runnimg"
@@ -148,6 +148,7 @@ def run_project(
             return ret
 
         task = anvil.server.launch_background_task('run_project_background' , n_round)
+        task.get_state()['stage'] =  stage
         check_status()
         ret = "OK"
     else:
@@ -200,6 +201,7 @@ def startup(
     return n_round
 
 
+# This function is called from the background task!
 def prompt_approval(action: str, stage: str):
     """ Endpoint called from the slave task to wait for API approval message or advance to next stage"""
     if action == 'approve':
