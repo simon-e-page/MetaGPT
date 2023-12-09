@@ -62,6 +62,14 @@ def create_project(product_name: str, project_data: dict):
     idea: str = project_data['IDEA']
     company.create_project(product_name, idea)
 
+@authenticated_callable
+def download_project(product_name: str) -> bytes:
+    # TODO: take this out of the Team structure..
+    global company
+    if company is None:
+        company = Team()
+    return company.download_project(product_name)
+
 
 def check_status():
     global task, status, error
