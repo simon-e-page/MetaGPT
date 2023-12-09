@@ -11,6 +11,7 @@ import traceback
 from pathlib import Path
 import yaml
 import zipfile
+import io
 
 from metagpt.actions import BossRequirement, STAGE_ACTIONS
 from metagpt.config import CONFIG
@@ -171,14 +172,14 @@ class Team(BaseModel):
         logger.info(f'For product {product_name} we are commencing stage: {stage}')
 
     
-    def download_project(self) -> str:
-        """Create a zip file of the project directory and return the path to the zip file."""
-        zip_file_path = CONFIG.product_root + '.zip'
-        with zipfile.ZipFile(zip_file_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+    def download_project(self) -> bytes:
+        """Create a zip file of the project directory into a bytes object and return it."""
+        zip_file_bytes = io.BytesIO()
+        with zipfile.ZipFile(zip_file_bytes, 'w', zipfile.ZIP_DEFLATED) as zipf:
             for root, dirs, files in os.walk(CONFIG.product_root):
                 for file in files:
                     zipf.write(os.path.join(root, file))
-        return zip_file_path
+        return zip_file_bytes.getvalue()
 
     def _save(self):
         logger.info(self.json())
