@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import anvil.server
-import anvil.media
+from anvil.media import BlobMedia
 import asyncio
 
 from startup import startup
@@ -72,7 +72,7 @@ def download_project(product_name: str) -> bytes:
 
     zipfile: bytes = company.download_project(product_name)
     if zipfile is not None:
-        media_obj = anvil.media.BlobMedia('application/zip', zipfile, f"{product_name}.zip")
+        media_obj = BlobMedia('application/zip', zipfile, f"{product_name}.zip")
     else:
         media_obj = None
     return media_obj
