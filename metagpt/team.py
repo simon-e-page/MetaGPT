@@ -10,6 +10,7 @@ import os
 import traceback
 from pathlib import Path
 import yaml
+import zipfile
 
 from metagpt.actions import BossRequirement, STAGE_ACTIONS
 from metagpt.config import CONFIG
@@ -140,7 +141,7 @@ class Team(BaseModel):
         self.get_project(product_name)
         CONFIG.idea = idea
         self.save_product_config()
-        
+
     def get_project(self, product_name: str) -> str:
         CONFIG.product_name = product_name
 
