@@ -95,10 +95,11 @@ def download_project(product_name: str) -> bytes:
 
 def check_status() -> tuple:
     global task
+    stage: str = ""
+    error: str = ""
+    stage: str = ""
     if task is not None:
         # TODO: interrogate running status - Examples
-        stage: str = ""
-        error: str = ""
         if not task.is_running():
             if task.get_termination_status() == 'completed':
                 status = "Idle"
