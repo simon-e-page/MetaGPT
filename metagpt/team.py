@@ -11,6 +11,7 @@ import traceback
 from pathlib import Path
 import yaml
 import zipfile
+import shutil
 
 from metagpt.actions import BossRequirement, STAGE_ACTIONS
 from metagpt.config import CONFIG
@@ -170,6 +171,11 @@ class Team(BaseModel):
 
         logger.info(f'For product {product_name} we are commencing stage: {stage}')
 
+    
+    def download_project(self) -> str:
+        """Create a zip file of the project directory and return the path to the zip file."""
+        zip_file_path = shutil.make_archive(CONFIG.product_root, 'zip', CONFIG.product_root)
+        return zip_file_path
 
     def _save(self):
         logger.info(self.json())
