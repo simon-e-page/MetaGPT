@@ -7,11 +7,11 @@
 """
 import os
 import traceback
-from pathlib import Path
-import yaml
 import zipfile
 import io
 from typing import Callable
+from pathlib import Path
+import yaml
 from pydantic import BaseModel, Field
 
 from metagpt.actions import BossRequirement, STAGE_ACTIONS
@@ -191,7 +191,7 @@ class Team(BaseModel):
             for root, dirs, files in os.walk("."):
                 for file in files:
                     zipf.write(os.path.join(root, file))
-        os.chdir(cwd)        
+        os.chdir(cwd)
         return zip_file_bytes.getvalue()
 
     def _save(self):
