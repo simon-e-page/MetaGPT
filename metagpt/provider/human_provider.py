@@ -4,9 +4,11 @@ Created Date: Wednesday, November 8th 2023, 11:55:46 pm
 Author: garylin2099
 '''
 from typing import Optional, Callable
+import time as t
+import asyncio
+
 from metagpt.provider.base_gpt_api import BaseGPTAPI
 from metagpt.logs import logger
-import time as t
 
 class HumanProvider(BaseGPTAPI):
     """Humans provide themselves as a 'model', which actually takes in human input as its response.
@@ -26,7 +28,7 @@ class HumanProvider(BaseGPTAPI):
             rsp: str = self.callback(action="approve", stage=stage)
             # Block until we get a response!
             while self.callback(action="check", stage=stage) is None:
-                t.sleep(10)
+                asyncio.sleep(10)
         else:
             # Direct Human input
             rsp = input(msg)
