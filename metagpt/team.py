@@ -237,11 +237,11 @@ class Team(BaseModel):
         
         current_stage: str = CONFIG.stage
         end_stage: str = CONFIG.end_stage
-        
+
         if self.stage_callback is not None:
             self.stage_callback(stage=current_stage)
 
-        while n_round > 0 and (CONST.STAGES(end_stage) >= CONST.STAGES(current_stage)):
+        while n_round > 0 and (CONST.STAGES[end_stage] >= CONST.STAGES[current_stage]):
             # self._save()
             n_round -= 1
             count: int = max_round - n_round
