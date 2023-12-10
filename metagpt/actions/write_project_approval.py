@@ -6,15 +6,12 @@
 @File    : write_project_approval.py
 """
 from typing import List
-#import markdown_to_json
 
 from metagpt.actions import Action, ActionOutput
-#from metagpt.actions.search_and_summarize import SearchAndSummarize
 from metagpt.config import CONFIG
 from metagpt.logs import logger
 from metagpt.utils.common import OutputParser, ApprovalError
-
-#from metagpt.utils.get_template import get_template
+from metagpt.provider.human_provider import HumanProvider
 
 OUTPUT_MAPPING = {
     "Approval Response": (str, ...),
@@ -52,17 +49,18 @@ class WriteTaskApproval(Action):
     async def run(self, context, *args, **kwargs) -> ActionOutput:
         """ Wait for a Human Approval """
         prompt = "Do you approve the Tasks and API Spec? (yes/no)"
-        task_approval = await self._aask_v1(prompt, "task_approval", OUTPUT_MAPPING, format='json')
+        task_approval = await self._aask_v1(prompt, "task_approval", OUTPUT_MAPPING, format='json', system_msgs=['Plan'])
 
         if task_approval.instruct_content.dict()['Approval Response'] == 'yes':
             logger.info("Got approval for Tasks and API Spec!")
             output = self._get_tasks_from_disk()
-            logger.debug(output.content)
-            logger.debug(output.instruct_content)
+            
+            if isinstance(self.llm, HumanProvider) and self.llm.callback is not None:
+                self.llm.callback(action="advance", stage="Design")
+
         else:
             logger.warning("No approval - stop project!")
             output = task_approval
-            # TODO: Update with proper Exception class
             raise ApprovalError("Approval Error - API Spec not approved", approver="Task Approver")
 
 

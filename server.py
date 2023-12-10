@@ -195,9 +195,9 @@ def startup(
             ProductManager(),
             Architect(),
             ProjectManager(),
-            DesignApprover(),
+            DesignApprover(callback = api_callback),
             ProductApprover(callback = api_callback),
-            TaskApprover()
+            TaskApprover(callback = api_callback)
         ]
     )
 

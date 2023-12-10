@@ -30,7 +30,7 @@ class ProductApprover(Role):
         profile: str = "Product Approver",
         goal: str = "Review and Approve the Requirements Stage Gate",
         constraints: str = "",
-        callback: Callable = None 
+        callback: Callable = None
     ) -> None:
         """
         Initializes the ProductApprover role with given attributes.

@@ -6,15 +6,12 @@
 @File    : write_prd.py
 """
 from typing import List
-#import markdown_to_json
 
 from metagpt.actions import Action, ActionOutput
-#from metagpt.actions.search_and_summarize import SearchAndSummarize
 from metagpt.config import CONFIG
 from metagpt.logs import logger
 from metagpt.utils.common import OutputParser, ApprovalError
-
-#from metagpt.utils.get_template import get_template
+from metagpt.provider.human_provider import HumanProvider
 
 OUTPUT_MAPPING = {
     "Approval Response": (str, ...),
@@ -51,17 +48,17 @@ class WriteDesignApproval(Action):
     async def run(self, design, *args, **kwargs) -> ActionOutput:
         """ Wait for a Human Approval """
         prompt = "Do you approve the System Design? (yes/no)"
-        design_approval = await self._aask_v1(prompt, "design_approval", OUTPUT_MAPPING, format='json')
+        design_approval = await self._aask_v1(prompt, "design_approval", OUTPUT_MAPPING, format='json', system_msgs=['Design'])
 
         if design_approval.instruct_content.dict()['Approval Response'] == 'yes':
             logger.info("Got approval for System Design!")
             output = self.get_design_from_disk()
-            logger.debug(output.content)
-            logger.debug(output.instruct_content)
+            
+            if isinstance(self.llm, HumanProvider) and self.llm.callback is not None:
+                self.llm.callback(action="advance", stage="Design")
         else:
             logger.warning("No approval - stop project!")
             output = design_approval
-            # TODO: Update with proper Exception class
             raise ApprovalError("Approval Error - Design not approved", approver="Design Approver")
 
 

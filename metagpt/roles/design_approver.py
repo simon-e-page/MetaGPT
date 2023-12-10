@@ -5,6 +5,9 @@
 @Author  : alexanderwu
 @File    : product_manager.py
 """
+
+from typing import Callable
+
 from metagpt.actions import WriteDesign, WriteDesignApproval
 from metagpt.roles import Role
 
@@ -26,6 +29,7 @@ class DesignApprover(Role):
         profile: str = "Design Approver",
         goal: str = "Review and Approve the Design Stage Gate",
         constraints: str = "",
+        callback: Callable = None
     ) -> None:
         """
         Initializes the DesignApprover role with given attributes.
@@ -38,4 +42,7 @@ class DesignApprover(Role):
         """
         super().__init__(name, profile, goal, constraints, is_human=True)
         self._init_actions([WriteDesignApproval])
+        if callback is not None:
+            # Using API to receive approval
+            self._actions[0].llm.set_callback(callback)
         self._watch([WriteDesign])

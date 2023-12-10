@@ -5,6 +5,9 @@
 @Author  : alexanderwu
 @File    : product_manager.py
 """
+
+from typing import Callable
+
 from metagpt.actions import WriteTasks, WriteTaskApproval
 from metagpt.roles import Role
 
@@ -27,6 +30,7 @@ class TaskApprover(Role):
         profile: str = "Task Approver",
         goal: str = "Review and Approve the Plan Stage Gate",
         constraints: str = "",
+        callback: Callable = None
     ) -> None:
         """
         Initializes the TaskApprover role with given attributes.
@@ -39,4 +43,7 @@ class TaskApprover(Role):
         """
         super().__init__(name, profile, goal, constraints, is_human=True)
         self._init_actions([WriteTaskApproval])
+        if callback is not None:
+            # Using API to receive approval
+            self._actions[0].llm.set_callback(callback)
         self._watch([WriteTasks])
