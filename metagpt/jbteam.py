@@ -176,7 +176,7 @@ class Team(BaseModel):
         CONFIG.stage = stage
         CONFIG.end_stage = end_stage
 
-        add_project_log(CONFIG.product_root, replace=True)
+        #add_project_log(CONFIG.product_root, replace=True)
 
         logger.info(f'For product {product_name} we are commencing stage: {stage}')
 
@@ -227,6 +227,9 @@ class Team(BaseModel):
     def set_stage_callback(self, callback: Callable):
         self.stage_callback = callback
 
+    def set_log_output(self, stream):
+        logger.add(stream, level=logger.info)
+        
     async def run(self, n_round=3, start_stage="Requirements", end_stage="Requirements"):
         """Run company until target stage or no money"""
 

@@ -21,10 +21,10 @@ def define_log_level(print_level="INFO", logfile_level="DEBUG"):
     _logger.add(PROJECT_ROOT / 'logs/metagpt.log', level=logfile_level)
     return _logger
 
-def add_project_log(path: Path, logfile_level: str = "INFO", replace=False):
-    logfile = path / "logs/project.log"
-    if replace and logfile.exists():
-        logfile.unlink()
-    _logger.add(logfile, level=logfile_level)
+#def add_project_log(path: Path, logfile_level: str = "INFO", replace=False):
+#    logfile = path / "logs/project.log"
+#    if replace and logfile.exists():
+#        logfile.unlink()
+#    _logger.add(logfile, level=logfile_level)
 
 logger = define_log_level()

@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import anvil.server
-from anvil import BlobMedia
 import asyncio
 import time as t
 import os
+from io import StringIO
 import traceback
 from typing import Callable
 from concurrent.futures import ThreadPoolExecutor
+
+import anvil.server
+from anvil import BlobMedia
 
 from metagpt.jbteam import Team
 from metagpt.roles import (
@@ -29,6 +31,8 @@ company: Team = None
 task = None
 executor = ThreadPoolExecutor(max_workers=1)
 task_state = {}
+
+log_stream = StringIO()
 
 # TODO: add auth to the frontend
 #authenticated_callable = anvil.server.callable(require_user=True)
@@ -189,6 +193,7 @@ def startup(
     company.invest(investment)
     company.start_project(product_name, stage=stage, end_stage=end_stage)
     company.set_stage_callback(update_stage)
+    company.set_log_output(log_stream)
 
     company.hire(
         [
@@ -201,6 +206,7 @@ def startup(
         ]
     )
 
+    # n_round is now ignored!
     n_round = 2
 
     if end_stage == "Design":
