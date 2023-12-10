@@ -123,7 +123,7 @@ def check_status() -> tuple:
                     status = "Idle"
                 except Exception:
                     traceback.print_exc()
-                    statue = "Idle"
+                    status = "Idle"
                     error = traceback.format_exc()
                     status = "Idle"
                 task = None
@@ -173,12 +173,13 @@ def run_project(
 def update_stage(stage: str):
     """ Called by child thread with current stage being worked on"""
     task_state['stage'] = stage
-    
+
 
 def startup(
     product_name, 
     investment=5.0, 
-    stage="Requirements"        
+    stage="Requirements",
+    end_stage = "Requirements"        
 ) -> int:
     
     global company
@@ -187,7 +188,7 @@ def startup(
 
     company = Team()
     company.invest(investment)
-    company.start_project(product_name, stage)
+    company.start_project(product_name, stage=stage, end_stage=end_stage)
     company.set_stage_callback(update_stage)
 
     company.hire(
@@ -203,16 +204,16 @@ def startup(
 
     n_round = 2
 
-    if stage == "Design":
+    if end_stage == "Design":
         n_round = 4
 
     # if implement or code_review
-    if stage == 'Build':
+    if end_stage == 'Build':
         # developing features: implement the idea
         company.hire([Engineer(n_borg=5, use_code_review=True)])
         n_round = 6
 
-    if stage == 'Test':
+    if end_stage == 'Test':
         # developing features: run tests on the spot and identify bugs
         # (bug fixing capability comes soon!)
         company.hire([Engineer(n_borg=5, use_code_review=True), QaEngineer()])
