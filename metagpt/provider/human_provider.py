@@ -5,7 +5,7 @@ Author: garylin2099
 '''
 from typing import Optional, Callable
 import time as t
-import asyncio
+#import asyncio
 
 from metagpt.provider.base_gpt_api import BaseGPTAPI
 from metagpt.logs import logger
@@ -21,7 +21,8 @@ class HumanProvider(BaseGPTAPI):
     def set_callback(self, callback: Callable) -> None:
         self.callback = callback
 
-    async def ask(self, msg: str, stage: str) -> str:
+    #async def ask(self, msg: str, stage: str) -> str:
+    def ask(self, msg: str, stage: str ="Requirements") -> str:
         logger.info("It's your turn, please type in your response. You may also refer to the context below\n")
         if self.callback is not None:
             # API Input
@@ -29,7 +30,8 @@ class HumanProvider(BaseGPTAPI):
             # Block until we get a response!
             rsp  = self.callback(action="check", stage=stage)
             while rsp is None:
-                await asyncio.sleep(10)
+                t.sleep(10)
+                #await asyncio.sleep(10)
                 rsp  = self.callback(action="check", stage=stage)
                 logger.info(f"Approval received: {rsp}")
         else:
@@ -50,7 +52,7 @@ class HumanProvider(BaseGPTAPI):
 
     async def aask(self, msg: str, system_msgs: Optional[list[str]] = None) -> str:
         stage = system_msgs[0]
-        return await self.ask(msg, stage)
+        return self.ask(msg, stage=stage)
 
     def completion(self, messages: list[dict]):
         """dummy implementation of abstract method in base"""
