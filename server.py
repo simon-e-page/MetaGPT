@@ -99,10 +99,14 @@ def check_status() -> tuple:
     error: str = ""
     stage: str = ""
     if task is not None:
-        stage = task.get_state().get('stage', "Requirements")
-        if task.get_state().get('Waiting', False):
+        if task.get_state() is None:
+            # This seems to be the case when the child process sleeps..
+            status = "Waiting"
+        elif task.get_state().get('Waiting', False):
+            stage = task.get_state().get('stage', "Requirements")
             status = "Waiting"
         elif task.is_running():
+            stage = task.get_state().get('stage', "Requirements")
             status = "Runnimg"
         else:
             if task.get_termination_status() == 'completed':
