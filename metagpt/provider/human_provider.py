@@ -25,7 +25,7 @@ class HumanProvider(BaseGPTAPI):
             # API Input
             rsp: str = self.callback(action="approve", stage=stage)
             # Block until we get a response!
-            while self.callback(action="check", stage=stage):
+            while self.callback(action="check", stage=stage) is None:
                 t.sleep(10)
         else:
             # Direct Human input
