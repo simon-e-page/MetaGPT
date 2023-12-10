@@ -21,14 +21,14 @@ class HumanProvider(BaseGPTAPI):
     def set_callback(self, callback: Callable) -> None:
         self.callback = callback
 
-    def ask(self, msg: str, stage: str) -> str:
+    async def ask(self, msg: str, stage: str) -> str:
         logger.info("It's your turn, please type in your response. You may also refer to the context below\n")
         if self.callback is not None:
             # API Input
             rsp: str = self.callback(action="approve", stage=stage)
             # Block until we get a response!
             while self.callback(action="check", stage=stage) is None:
-                asyncio.sleep(10)
+                await asyncio.sleep(10)
         else:
             # Direct Human input
             rsp = input(msg)
@@ -47,7 +47,7 @@ class HumanProvider(BaseGPTAPI):
 
     async def aask(self, msg: str, system_msgs: Optional[list[str]] = None) -> str:
         stage = system_msgs[0]
-        return self.ask(msg, stage)
+        return await self.ask(msg, stage)
 
     def completion(self, messages: list[dict]):
         """dummy implementation of abstract method in base"""
