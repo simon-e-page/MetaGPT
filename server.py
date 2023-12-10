@@ -229,9 +229,7 @@ def prompt_approval(action: str, stage: str):
 def approve_stage(stage, approval=True) -> str:
     """ Approve the Stage Deliverable """
     ret: str = "OK"
-    waiting = task.get_state().get('Waiting', False)
-    child_stage = task.get_state().get('stage', None)
-    if waiting and stage == child_stage:
+    if task.get_state() is None or task.get_state().get('Waiting'):
         print(f"Got approval message for {stage}")
         task.get_state()['Approval'] = approval
     else:
