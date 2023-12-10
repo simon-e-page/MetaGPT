@@ -246,7 +246,7 @@ def get_logs(max=100):
 @authenticated_callable
 def get_deliverable(stage: str) -> str:
     """ Retrieve new deliverable document for the specified stage"""
-    if  anvil.server.task['Waiting'] and stage == anvil.server.task['stage']:
+    if  task.get_state().get('Waiting', False) and stage == task.get_state().get('stage', "Requirements"):
         content = company.get_deliverable(stage)
     else:
         content = "Error: No content for this stage available!"
@@ -255,7 +255,7 @@ def get_deliverable(stage: str) -> str:
 @authenticated_callable
 def update_deliverable(stage: str, content: str) -> str:
     """ Retrieve new deliverable document for the specified stage"""
-    if  anvil.server.task['Waiting'] and stage == anvil.server.task['stage']:
+    if  task.get_state().get('Waiting', False) and stage == task.get_state().get('stage', "Requirements"):
         ret: str = company.update_deliverable(stage, content)
     else:
         ret = f"Error: Cannot update content for {stage} right now!"
