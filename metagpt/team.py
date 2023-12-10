@@ -12,6 +12,7 @@ from pathlib import Path
 import yaml
 import zipfile
 import io
+from typing import Callable
 
 from metagpt.actions import BossRequirement, STAGE_ACTIONS
 from metagpt.config import CONFIG
@@ -33,6 +34,7 @@ class Team(BaseModel):
     environment: Environment = Field(default_factory=Environment)
     investment: float = Field(default=10.0)
     idea: str = Field(default="")
+    stage_callback: Callable = Field(default=None)
 
     class Config:
         arbitrary_types_allowed = True
@@ -166,15 +168,14 @@ class Team(BaseModel):
             self.save_product_config()
         return ret
 
-    def start_project(self, product_name: str, stage: str = None, send_to: str = ""):
-        """Start a project from publishing boss requirement."""
+    def start_project(self, product_name: str, stage: str = "Requirements", send_to: str = "", end_stage="Requirements"):
+        """Start a project from the start or a specific stage (assuming prior stages have been run)"""
         logger.info(f'Starting project: {product_name}')
 
         self.get_project(product_name=product_name)
-        if stage is not None:
-            self.environment.set_stage(stage)
-        
-        stage = CONFIG.stage
+        CONFIG.stage = stage
+        CONFIG.end_stage = end_stage
+
         add_project_log(CONFIG.product_root, replace=True)
 
         logger.info(f'For product {product_name} we are commencing stage: {stage}')
@@ -223,6 +224,8 @@ class Team(BaseModel):
                 logger.info(f"Clearing memory for {name}")
                 role._rc.memory.clear()
 
+    def set_stage_callback(self, callback: Callable):
+        self.stage_callback = callback
 
     async def run(self, n_round=3):
         """Run company until target round or no money"""
@@ -232,7 +235,10 @@ class Team(BaseModel):
 
         self.set_memory(CONFIG.stage)
         
-        while n_round > 0:
+        current_stage: str = CONFIG.stage
+        end_stage: str = CONFIG.end_stage
+
+        while n_round > 0 and (CONST.STAGES(end_stage) >= CONST.STAGES(current_stage)):
             # self._save()
             n_round -= 1
             count: int = max_round - n_round
@@ -254,6 +260,10 @@ class Team(BaseModel):
                 logger.error("Uncaught Exception!")
                 logger.error(traceback.format_exc())
                 n_round = 0
+            
+            current_stage = CONFIG.stage
+            if self.stage_callback is not None:
+                self.stage_callback(stage=current_stage)
             
         history_file = CONFIG.product_root / "history.pickle"
         with open(history_file, 'wb') as file:

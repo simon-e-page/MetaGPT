@@ -158,4 +158,16 @@ class Config(metaclass=Singleton):
     def stage(self) -> str:
         return self._product_config.get('STAGE', None)
 
+    @stage.setter
+    def stage(self, stage: str) -> None:
+        self._product_config['STAGE'] = stage
+
+    @property
+    def end_stage(self) -> str:
+        return self._product_config.get('END_STAGE', None)
+
+    @end_stage.setter
+    def stage(self, end_stage: str) -> None:
+        self._product_config['END_STAGE'] = end_stage
+
 CONFIG = Config()

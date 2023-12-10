@@ -6,9 +6,7 @@
 @File    : environment.py
 """
 import asyncio
-from typing import Iterable, Callable
-import yaml
-from pathlib import Path
+from typing import Iterable
 
 from pydantic import BaseModel, Field
 
@@ -16,8 +14,6 @@ from metagpt.memory import Memory
 from metagpt.roles import Role
 from metagpt.schema import Message
 from metagpt.config import CONFIG
-from metagpt.const import STAGES
-from metagpt.utils.common import ProductConfigError
 
 class Environment(BaseModel):
     """环境，承载一批角色，角色可以向环境发布消息，可以被其他角色观察到
@@ -53,30 +49,6 @@ class Environment(BaseModel):
         # self.message_queue.put(message)
         self.memory.add(message)
         self.history += f"\n{message}"
-
-    def set_stage(self, stage: str = "Next"):
-        """ Start execution from a specific stage """
-
-        # Ensure history has been loaded
-        # Test prerequisites:
-        #   If set stage < product config: remove later items from the History
-        # Set stage
-        # Or raise Exception
-
-        stages = list(STAGES.keys())
-        if stage == "Next":
-            try:
-                index: int = stages.index(self.stage)
-                if index < len(stages):
-                    index += 1                
-            except ValueError:
-                index = 0
-            stage = stages[index]
-        else:
-            if stage not in stages:
-                stage = stages[0]
-        
-        CONFIG.product_config['STAGE'] = stage            
 
     async def run(self, k=1):
         """处理一次所有信息的运行

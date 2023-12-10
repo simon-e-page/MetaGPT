@@ -163,13 +163,17 @@ def run_project(
 
         #task = anvil.server.launch_background_task('run_project_background' , n_round)
         task = executor.submit(run_project_background, n_round)
-        task.get_state()['stage'] =  stage
         check_status()
         ret = "OK"
     else:
         ret = "Error: Already running!"
      
     return ret
+
+def update_stage(stage: str):
+    """ Called by child thread with current stage being worked on"""
+    task_state['stage'] = stage
+    
 
 def startup(
     product_name, 
@@ -184,6 +188,7 @@ def startup(
     company = Team()
     company.invest(investment)
     company.start_project(product_name, stage)
+    company.set_stage_callback(update_stage)
 
     company.hire(
         [
