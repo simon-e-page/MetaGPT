@@ -131,7 +131,7 @@ def check_status() -> tuple:
         status = "Idle"
     return (status, stage, error)
 
-@anvil.server.background_task
+#@anvil.server.background_task
 def run_project_background(n_round: int = 5) -> str:
     history: str = asyncio.run(company.run(n_round=n_round))
     return history
@@ -140,7 +140,8 @@ def run_project_background(n_round: int = 5) -> str:
 def run_project(
     product_name, 
     investment=5.0, 
-    stage="Requirements"
+    stage="Requirements",
+    end_stage="Requirements"
     ) -> str:
     
     # TODO: how to return a handle for the Team object that is created?
@@ -154,7 +155,8 @@ def run_project(
             n_round = startup(
                 product_name=product_name,
                 investment=investment, 
-                stage=stage
+                stage=stage,
+                end_stage=end_stage
                 )
         except FileNotFoundError:
             ret = "Error: Call Create Project first!"
