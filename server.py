@@ -100,8 +100,10 @@ def check_status() -> tuple:
     stage: str = ""
     if task is not None:
         # TODO: interrogate running status - Examples
-        print(task.is_running())
-        if not task.is_running():
+        print(f"Running: {task.is_running()}")
+        print(f"Completed: {task.is_completed()}")
+
+        if task.is_completed():
             if task.get_termination_status() == 'completed':
                 status = "Idle"
             else:
