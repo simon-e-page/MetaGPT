@@ -101,14 +101,8 @@ def check_status() -> tuple:
     stage: str = ""
     error: str = ""
     stage: str = ""
-    # anvil version
-    # task_state = task.get_state()
 
     if task is not None:
-        #if task.get_state() is None:
-
-        #    # This seems to be the case when the child process sleeps..
-        #   status = "Waiting"
         if task_state.get('Waiting', False):
             stage = task_state.get('stage', "Requirements")
             status = "Waiting"
@@ -131,9 +125,13 @@ def check_status() -> tuple:
         status = "Idle"
     return (status, stage, error)
 
-#@anvil.server.background_task
-def run_project_background(n_round: int = 5) -> str:
-    history: str = asyncio.run(company.run(n_round=n_round))
+def run_project_background(n_round: int = 5,
+                           start_stage: str = "Requirements",
+                           end_stage:str = "Requirements"
+                           ) -> str:
+
+    """ Child thread main task launcher """
+    history: str = asyncio.run(company.run(n_round=n_round, start_stage=start_stage, end_stage=end_stage))
     return history
 
 @authenticated_callable
@@ -143,9 +141,10 @@ def run_project(
     stage="Requirements",
     end_stage="Requirements"
     ) -> str:
+
+    """ Main execution launcher """
     
-    # TODO: how to return a handle for the Team object that is created?
-    global company, task
+    global task
     
     if company is None:
         return "Error! Company not initiated!"
@@ -162,9 +161,7 @@ def run_project(
             ret = "Error: Call Create Project first!"
             return ret
 
-
-        #task = anvil.server.launch_background_task('run_project_background' , n_round)
-        task = executor.submit(run_project_background, n_round)
+        task = executor.submit(run_project_background, n_round, start_stage=stage, end_stage=end_stage)
         check_status()
         ret = "OK"
     else:
@@ -226,9 +223,7 @@ def startup(
 
 # This function is called from the background task!
 def prompt_approval(action: str, stage: str):
-    """ Endpoint called from the slave task to wait for API approval message or advance to next stage"""
-    # anvil version
-    # task_state = anvil.server.task_state
+    """ Endpoint called from the child task to wait for API approval message or advance to next stage"""
 
     if action == 'approve':
         print(f"Child: Submitting approval request for {stage}")
@@ -259,8 +254,6 @@ def prompt_approval(action: str, stage: str):
 def approve_stage(stage, approval=None) -> str:
     """ Approve the Stage Deliverable """
     ret: str = "OK"
-    # anvil version
-    # task_state = task.get_state()
 
     if task_state is None or task_state.get('Waiting'):
         print(f"Got approval message for {stage}")
@@ -279,8 +272,6 @@ def get_logs(max=100):
 @authenticated_callable
 def get_deliverable(stage: str) -> str:
     """ Retrieve new deliverable document for the specified stage"""
-    # anvil version
-    # task_state = task.get_state()
 
     if  task_state.get('Waiting', False) and stage == task_state.get('stage', "Requirements"):
         print(f"Retrieving deliverable for {stage}")
@@ -292,8 +283,6 @@ def get_deliverable(stage: str) -> str:
 @authenticated_callable
 def update_deliverable(stage: str, content: str) -> str:
     """ Retrieve new deliverable document for the specified stage"""
-    # anvil version
-    # task_state = task.get_state()
 
     if  task_state.get('Waiting', False) and stage == task_state.get('stage', "Requirements"):
         print(f"Updating approved deliverable for {stage}")

@@ -5,7 +5,6 @@
 @Author  : alexanderwu
 @File    : software_company.py
 """
-from pydantic import BaseModel, Field
 import os
 import traceback
 from pathlib import Path
@@ -13,6 +12,7 @@ import yaml
 import zipfile
 import io
 from typing import Callable
+from pydantic import BaseModel, Field
 
 from metagpt.actions import BossRequirement, STAGE_ACTIONS
 from metagpt.config import CONFIG
@@ -227,21 +227,23 @@ class Team(BaseModel):
     def set_stage_callback(self, callback: Callable):
         self.stage_callback = callback
 
-    async def run(self, n_round=3):
-        """Run company until target round or no money"""
+    async def run(self, n_round=3, start_stage="Requirements", end_stage="Requirements"):
+        """Run company until target stage or no money"""
 
         max_round: int = n_round
-        logger.info(f"Team will execute {max_round} rounds of Tasks unless they run out of Investment funds!")
+        #logger.info(f"Team will execute {max_round} rounds of Tasks unless they run out of Investment funds!")
 
-        self.set_memory(CONFIG.stage)
+        self.set_memory(start_stage)
         
-        current_stage: str = CONFIG.stage
-        end_stage: str = CONFIG.end_stage
+        current_stage: str = start_stage
+
+        logger.info(f"Team will execute rounds of Tasks unless they get to the {end_stage} stage or run out of Investment funds!")
 
         if self.stage_callback is not None:
             self.stage_callback(stage=current_stage)
 
-        while n_round > 0 and (CONST.STAGES[end_stage] >= CONST.STAGES[current_stage]):
+        #while n_round > 0 and (CONST.STAGES[end_stage] >= CONST.STAGES[current_stage]):
+        while (CONST.STAGES[end_stage] >= CONST.STAGES[current_stage]):
             # self._save()
             n_round -= 1
             count: int = max_round - n_round
@@ -260,7 +262,7 @@ class Team(BaseModel):
                 else:
                     logger.error(f"Could not find an active role with profile={e.approver}. Should not happen!")
                 n_round = 0
-            except Exception as e:
+            except Exception:
                 logger.error("Uncaught Exception!")
                 logger.error(traceback.format_exc())
                 n_round = 0
