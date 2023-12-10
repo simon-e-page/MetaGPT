@@ -9,7 +9,7 @@ import traceback
 from typing import Callable
 from concurrent.futures import ThreadPoolExecutor
 
-from metagpt.team import Team
+from metagpt.jbteam import Team
 from metagpt.roles import (
     Architect,
     Engineer,
