@@ -188,7 +188,7 @@ class Team(BaseModel):
         cwd = os.getcwd()
         os.chdir(CONFIG.product_root)
         with zipfile.ZipFile(zip_file_bytes, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            for root, dirs, files in os.walk():
+            for root, dirs, files in os.walk("."):
                 for file in files:
                     zipf.write(os.path.join(root, file))
         os.chdir(cwd)        
