@@ -252,7 +252,7 @@ def prompt_approval(action: str, stage: str):
 
 
 @authenticated_callable
-def approve_stage(stage, approval=True) -> str:
+def approve_stage(stage, approval=None) -> str:
     """ Approve the Stage Deliverable """
     ret: str = "OK"
     # anvil version
