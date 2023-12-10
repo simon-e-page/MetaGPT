@@ -247,6 +247,7 @@ def prompt_approval(action: str, stage: str):
         approval = task_state['Approval']
         if approval is not None:
             print(f"Child: Got approval response of: {approval}")
+            task_state['Waiting'] = False
         ret = approval
     else:
         # Unknown action
