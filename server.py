@@ -7,6 +7,7 @@ import time as t
 import os
 import traceback
 from typing import Callable
+from concurrent.futures import ThreadPoolExecutor
 
 from metagpt.team import Team
 from metagpt.roles import (
@@ -26,6 +27,8 @@ from metagpt.roles import (
 
 company: Team = None
 task = None
+executor = ThreadPoolExecutor(max_workers=1)
+task_state = {}
 
 # TODO: add auth to the frontend
 #authenticated_callable = anvil.server.callable(require_user=True)
@@ -98,24 +101,32 @@ def check_status() -> tuple:
     stage: str = ""
     error: str = ""
     stage: str = ""
+    # anvil version
+    # task_state = task.get_state()
+
     if task is not None:
-        if task.get_state() is None:
-            # This seems to be the case when the child process sleeps..
+        #if task.get_state() is None:
+
+        #    # This seems to be the case when the child process sleeps..
+        #   status = "Waiting"
+        if task_state.get('Waiting', False):
+            stage = task_state.get('stage', "Requirements")
             status = "Waiting"
-        elif task.get_state().get('Waiting', False):
-            stage = task.get_state().get('stage', "Requirements")
-            status = "Waiting"
-        elif task.is_running():
-            stage = task.get_state().get('stage', "Requirements")
+        elif task.running():
+            stage = task_state.get('stage', "Requirements")
             status = "Runnimg"
         else:
-            if task.get_termination_status() == 'completed':
-                status = "Idle"
-            else:
-                status = "Error"
-                error = task.get_error()
-                print(f"Found error: {error}")
-            task = None
+            if task.done():
+                try:
+                    result = task.result()
+                    print(result)
+                    status = "Idle"
+                except Exception:
+                    traceback.print_exc()
+                    statue = "Idle"
+                    error = traceback.format_exc()
+                    status = "Idle"
+                task = None
     else:
         status = "Idle"
     return (status, stage, error)
@@ -149,7 +160,9 @@ def run_project(
             ret = "Error: Call Create Project first!"
             return ret
 
-        task = anvil.server.launch_background_task('run_project_background' , n_round)
+
+        #task = anvil.server.launch_background_task('run_project_background' , n_round)
+        task = executor.submit(run_project_background, n_round)
         task.get_state()['stage'] =  stage
         check_status()
         ret = "OK"
@@ -206,19 +219,22 @@ def startup(
 # This function is called from the background task!
 def prompt_approval(action: str, stage: str):
     """ Endpoint called from the slave task to wait for API approval message or advance to next stage"""
+    # anvil version
+    # task_state = anvil.server.task_state
+
     if action == 'approve':
         print(f"Child: Submitting approval request for {stage}")
-        anvil.server.task_state['Waiting'] = True
-        anvil.server.task_state['Stage'] = stage
-        anvil.server.task_state['Approval'] = None
+        task_state['Waiting'] = True
+        task_state['Stage'] = stage
+        task_state['Approval'] = None
     elif action == 'advance':
         print(f"Child: Signalling advance to {stage}")
-        anvil.server.task_state['Waiting'] = False
-        anvil.server.task_state['Stage'] = stage
-        anvil.server.task_state['Approval'] = None
+        task_state['Waiting'] = False
+        task_state['Stage'] = stage
+        task_state['Approval'] = None
     elif action == "check":
         print(f"Child: Looking for approval response for {stage}")
-        approval = anvil.server.task_state['Approval']
+        approval = task_state['Approval']
         if approval is not None:
             print(f"Child: Got approval response of: {approval}")
     else:
@@ -231,9 +247,12 @@ def prompt_approval(action: str, stage: str):
 def approve_stage(stage, approval=True) -> str:
     """ Approve the Stage Deliverable """
     ret: str = "OK"
-    if task.get_state() is None or task.get_state().get('Waiting'):
+    # anvil version
+    # task_state = task.get_state()
+
+    if task_state is None or task_state.get('Waiting'):
         print(f"Got approval message for {stage}")
-        task.get_state()['Approval'] = approval
+        task_state['Approval'] = approval
     else:
         # Do nothing!
         ret = f"Error: task is not waiting for {stage} approval"
@@ -248,7 +267,11 @@ def get_logs(max=100):
 @authenticated_callable
 def get_deliverable(stage: str) -> str:
     """ Retrieve new deliverable document for the specified stage"""
-    if  task.get_state().get('Waiting', False) and stage == task.get_state().get('stage', "Requirements"):
+    # anvil version
+    # task_state = task.get_state()
+
+    if  task_state.get('Waiting', False) and stage == task_state.get('stage', "Requirements"):
+        print(f"Retrieving deliverable for {stage}")
         content = company.get_deliverable(stage)
     else:
         content = "Error: No content for this stage available!"
@@ -257,7 +280,11 @@ def get_deliverable(stage: str) -> str:
 @authenticated_callable
 def update_deliverable(stage: str, content: str) -> str:
     """ Retrieve new deliverable document for the specified stage"""
-    if  task.get_state().get('Waiting', False) and stage == task.get_state().get('stage', "Requirements"):
+    # anvil version
+    # task_state = task.get_state()
+
+    if  task_state.get('Waiting', False) and stage == task_state.get('stage', "Requirements"):
+        print(f"Updating approved deliverable for {stage}")
         ret: str = company.update_deliverable(stage, content)
     else:
         ret = f"Error: Cannot update content for {stage} right now!"
