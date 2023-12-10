@@ -213,7 +213,7 @@ def prompt_approval(action: str, stage: str):
         anvil.server.task_state['Stage'] = stage
         anvil.server.task_state['Approval'] = None
     elif action == "check":
-        print(f"Looking for approval response for {stage}")
+        #print(f"Looking for approval response for {stage}")
         return anvil.server.task_state['Approval']
     else:
         # Unknown action
