@@ -25,12 +25,13 @@ class HumanProvider(BaseGPTAPI):
         logger.info("It's your turn, please type in your response. You may also refer to the context below\n")
         if self.callback is not None:
             # API Input
-            rsp: str = self.callback(action="approve", stage=stage)
+            self.callback(action="approve", stage=stage)
             # Block until we get a response!
-            approval  = self.callback(action="check", stage=stage)
-            while approval is None:
+            rsp  = self.callback(action="check", stage=stage)
+            while rsp is None:
                 await asyncio.sleep(10)
-                approval  = self.callback(action="check", stage=stage)
+                rsp  = self.callback(action="check", stage=stage)
+                logger.info(f"Approval received: {rsp}")
         else:
             # Direct Human input
             rsp = input(msg)

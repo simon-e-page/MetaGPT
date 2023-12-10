@@ -235,20 +235,23 @@ def prompt_approval(action: str, stage: str):
         task_state['Waiting'] = True
         task_state['Stage'] = stage
         task_state['Approval'] = None
+        ret = None
     elif action == 'advance':
         print(f"Child: Signalling advance to {stage}")
         task_state['Waiting'] = False
         task_state['Stage'] = stage
         task_state['Approval'] = None
+        ret = None
     elif action == "check":
         print(f"Child: Looking for approval response for {stage}")
         approval = task_state['Approval']
         if approval is not None:
             print(f"Child: Got approval response of: {approval}")
+        ret = approval
     else:
         # Unknown action
         pass
-    return
+    return ret
 
 
 @authenticated_callable
