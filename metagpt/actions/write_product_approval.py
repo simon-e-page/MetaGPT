@@ -75,7 +75,7 @@ class WriteProductApproval(Action):
             #logger.debug(output.instruct_content)
 
             if isinstance(self.llm, HumanProvider) and self.llm.callback is not None:
-                self.llm.callback(action="advance", stage="Requirements")
+                self.llm.callback(action="advance", stage="Design")
         else:
             logger.warning("No approval - stop project!")
             output = prd_approval

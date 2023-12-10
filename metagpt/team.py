@@ -246,7 +246,8 @@ class Team(BaseModel):
             n_round -= 1
             count: int = max_round - n_round
             logger.info(f"Entering round {count} of {max_round}")
-            logger.debug(f"{n_round=}")
+            logger.info(f"Working on stage: {current_stage}")
+            #logger.debug(f"{n_round=}")
             self._check_balance()
             try:
                 await self.environment.run()
@@ -273,5 +274,6 @@ class Team(BaseModel):
             file.write(serialize_batch(self.environment.memory.get()))
         
         self.save_product_config()
+        logger.info("Team execution completed!")
         return self.environment.history
     
