@@ -257,7 +257,7 @@ class Team(BaseModel):
         
         current_stage: str = start_stage
 
-        logger.info(f"Team will execute rounds of Tasks unless they get to the {end_stage} stage or run out of Investment funds!")
+        logger.info(f"Team will execute rounds of Tasks unless they finish the {end_stage} stage or run out of Investment funds!")
 
         if self.stage_callback is not None:
             self.stage_callback(stage=current_stage)
@@ -267,7 +267,7 @@ class Team(BaseModel):
             # self._save()
             #n_round -= 1
             count: int = max_round - n_round
-            logger.info(f"Entering round {count} of {max_round}")
+            #logger.info(f"Entering round {count} of {max_round}")
             logger.info(f"Working on stage: {current_stage}")
             #logger.debug(f"{n_round=}")
             self._check_balance()

@@ -42,7 +42,7 @@ class AdvanceStage(Action):
         else:
             rsp: str = f'[CONTENT]{{ "Advance Stage": "{new_stage}" }}[/CONTENT]'
             output_class = ActionOutput.create_model_class("stage_advance", OUTPUT_MAPPING)
-            parsed_data: dict = OutputParser.parse_data_with_mapping(rsp, OUTPUT_MAPPING)
+            parsed_data: dict = { "Advance Stage": new_stage }
             instruct_content = output_class(**parsed_data)
             ret: ActionOutput = ActionOutput(rsp, instruct_content=instruct_content)
         return ret
