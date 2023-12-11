@@ -236,7 +236,7 @@ def startup(
             DesignApprover(callback = api_callback),
             ProductApprover(callback = api_callback),
             TaskApprover(callback = api_callback),
-            StageGovernance
+            StageGovernance()
         ]
     )
 
