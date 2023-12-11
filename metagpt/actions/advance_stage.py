@@ -40,7 +40,7 @@ class AdvanceStage(Action):
             logger.warning(context)
             ret = None
         else:
-            rsp: str = '[CONTENT]{ "Advance Stage": "{0}" }[/CONTENT]'.format(new_stage)
+            rsp: str = f'[CONTENT]{{ "Advance Stage": "{new_stage}" }}[/CONTENT]'
             output_class = ActionOutput.create_model_class("stage_advance", OUTPUT_MAPPING)
             parsed_data: dict = OutputParser.parse_data_with_mapping(rsp, OUTPUT_MAPPING)
             instruct_content = output_class(**parsed_data)
