@@ -34,13 +34,15 @@ class AdvanceStage(Action):
             if msg.cause_by in ADVANCE.keys():
                 new_stage = ADVANCE[msg.cause_by]
                 break
+            
         if new_stage is None:
             logger.warning("Could not find the Approval Message in the provided history!")
             logger.warning(context)
-
-        rsp: str = f'[CONTENT]{ "Advance Stage": "{new_stage}" }[/CONTENT]'
-        output_class = ActionOutput.create_model_class("stage_advance", OUTPUT_MAPPING)
-        parsed_data: dict = OutputParser.parse_data_with_mapping(rsp, OUTPUT_MAPPING)
-        instruct_content = output_class(**parsed_data)
-        advance_action: ActionOutput = ActionOutput(rsp, instruct_content=instruct_content)
-        return advance_action
+            ret = None
+        else:
+            rsp: str = f'[CONTENT]{ "Advance Stage": "{new_stage}" }[/CONTENT]'
+            output_class = ActionOutput.create_model_class("stage_advance", OUTPUT_MAPPING)
+            parsed_data: dict = OutputParser.parse_data_with_mapping(rsp, OUTPUT_MAPPING)
+            instruct_content = output_class(**parsed_data)
+            ret: ActionOutput = ActionOutput(rsp, instruct_content=instruct_content)
+        return ret
