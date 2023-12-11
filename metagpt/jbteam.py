@@ -252,11 +252,7 @@ class Team(BaseModel):
     async def run(self, n_round=3, start_stage="Requirements", end_stage="Requirements"):
         """Run company until target stage or no money"""
 
-        max_round: int = n_round
-        #logger.info(f"Team will execute {max_round} rounds of Tasks unless they run out of Investment funds!")
-
         self.set_memory(start_stage)
-        
         current_stage: str = start_stage
 
         logger.info(f"Team will execute rounds of Tasks unless they finish the {end_stage} stage or run out of Investment funds!")
@@ -266,12 +262,7 @@ class Team(BaseModel):
 
         #while n_round > 0 and (CONST.STAGES[end_stage] >= CONST.STAGES[current_stage]):
         while n_round>0 and (CONST.STAGES[end_stage] >= CONST.STAGES[current_stage]):
-            # self._save()
-            #n_round -= 1
-            #count: int = max_round - n_round
-            #logger.info(f"Entering round {count} of {max_round}")
             logger.info(f"Working on stage: {current_stage}")
-            #logger.debug(f"{n_round=}")
             self._check_balance()
             try:
                 await self.environment.run()
