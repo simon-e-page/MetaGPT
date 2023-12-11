@@ -218,11 +218,8 @@ def startup(
     end_stage = "Requirements"        
 ) -> int:
     
-    global company
-
     api_callback: Callable = prompt_approval
 
-    company = Team()
     company.invest(investment)
     company.start_project(product_name, stage=stage, end_stage=end_stage)
     company.set_stage_callback(update_stage)
