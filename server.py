@@ -32,7 +32,39 @@ task = None
 executor = ThreadPoolExecutor(max_workers=1)
 task_state = {}
 
-log_stream = StringIO()
+class LogSink:
+    """ Helper class to act as an internal log sink and replay messages to the client
+        Expect that we pull from the cache in batches until no lines are left.
+        Returns an empty list if there are no new log entries
+    """
+    def __init__(self):
+        self.stream = StringIO()
+        self.position = self.stream.tell()
+        self.cache = []
+
+    def get_lines(self, max=100) -> tuple:
+        """ Returns lines from the stream up to max and a flag True if there is more to retrieve """
+        self._tail()
+        if len(self.cache) <= max:
+            ret = self.cache
+            more = False
+            self.cache = []
+        else:
+            ret = self.cache[0:max]
+            self.cache = self.cache[max:]
+            more = True
+        return ret, more
+            
+    def _tail(self) -> str:
+        """ Returns new text from the stream and adds to the cache"""
+        self.stream.seek(self.position)
+        new_data = self.stream.read()
+        if new_data:
+            self.position = self.stream.tell()
+            self.cache += new_data.splitlines()
+
+        
+log_stream = LogSink()
 
 # TODO: add auth to the frontend
 #authenticated_callable = anvil.server.callable(require_user=True)
@@ -193,7 +225,7 @@ def startup(
     company.invest(investment)
     company.start_project(product_name, stage=stage, end_stage=end_stage)
     company.set_stage_callback(update_stage)
-    company.set_log_output(log_stream)
+    company.set_log_output(log_stream.stream)
 
     company.hire(
         [
@@ -270,10 +302,10 @@ def approve_stage(stage, approval=None) -> str:
     return ret
 
 @authenticated_callable
-def get_logs(max=100):
+def get_logs(max_lines=100) -> tuple:
     """ Retrieve new log messages since the last call """
-    # TODO: how to get a handle on the log output
-    pass
+    return log_stream.get_lines(max_lines)
+
 
 @authenticated_callable
 def get_deliverable(stage: str) -> str:
