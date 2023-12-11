@@ -14,7 +14,7 @@ from pathlib import Path
 import yaml
 from pydantic import BaseModel, Field
 
-from metagpt.actions import BossRequirement, STAGE_ACTIONS
+from metagpt.actions import BossRequirement, AdvanceStage, STAGE_ACTIONS
 from metagpt.config import CONFIG
 import metagpt.const as CONST
 from metagpt.environment import Environment
@@ -234,6 +234,19 @@ class Team(BaseModel):
     def set_log_output(self, stream):
         logger.add(stream, level="INFO")
         
+    def scan_advances(self, current_stage: str) -> str:
+        advances = self.environment.memory.get_by_action(AdvanceStage)
+        stage_num: int = CONST.STAGES[current_stage]
+        new_stage: str = current_stage
+
+        for m in advances:
+            stage: str = m.instruct_content.dict()['Advance Stage']
+            new_stage_num: int = CONST.STAGES[new_stage]
+            if new_stage_num > stage_num:
+                new_stage = stage
+
+        return new_stage         
+
     async def run(self, n_round=3, start_stage="Requirements", end_stage="Requirements"):
         """Run company until target stage or no money"""
 
@@ -250,9 +263,9 @@ class Team(BaseModel):
             self.stage_callback(stage=current_stage)
 
         #while n_round > 0 and (CONST.STAGES[end_stage] >= CONST.STAGES[current_stage]):
-        while (CONST.STAGES[end_stage] >= CONST.STAGES[current_stage]):
+        while n_round>0 and (CONST.STAGES[end_stage] >= CONST.STAGES[current_stage]):
             # self._save()
-            n_round -= 1
+            #n_round -= 1
             count: int = max_round - n_round
             logger.info(f"Entering round {count} of {max_round}")
             logger.info(f"Working on stage: {current_stage}")
@@ -274,9 +287,13 @@ class Team(BaseModel):
                 logger.error(traceback.format_exc())
                 n_round = 0
             
-            current_stage = CONFIG.stage
-            if self.stage_callback is not None:
-                self.stage_callback(stage=current_stage)
+            new_stage: str = self.scan_advances(current_stage)
+            if new_stage != current_stage:
+                logger.info(f"Execution advanced to new {new_stage} stage!")
+
+                if self.stage_callback is not None:
+                    self.stage_callback(stage=new_stage)
+                current_stage = new_stage
             
         history_file = CONFIG.product_root / "history.pickle"
         with open(history_file, 'wb') as file:
