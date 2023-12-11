@@ -26,7 +26,7 @@ from metagpt.actions.write_test import WriteTest
 from metagpt.actions.write_product_approval import WriteProductApproval
 from metagpt.actions.write_design_approval import WriteDesignApproval
 from metagpt.actions.write_project_approval import WriteTaskApproval
-
+from metagpt.actions.advance_stage import AdvanceStage
 
 class ActionType(Enum):
     """All types of Actions, used for indexing."""
@@ -51,6 +51,7 @@ class ActionType(Enum):
     WRITE_DESIGN_APPROVAL = WriteDesignApproval
     WRITE_PRODUCT_APPROVAL = WriteProductApproval
     WRITE_TASK_APPROVAL = WriteTaskApproval
+    ADVANCE_STAGE = AdvanceStage
 
 STAGE_ACTIONS = {
     'Requirements': [BossRequirement],

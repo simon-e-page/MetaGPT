@@ -18,6 +18,7 @@ from metagpt.roles.customer_service import CustomerService
 from metagpt.roles.product_approver import ProductApprover
 from metagpt.roles.design_approver import DesignApprover
 from metagpt.roles.task_approver import TaskApprover
+from metagpt.roles.stage_governance import StageGovernance
 
 # This denotes the roles whose memories should be 'retained'
 # at the commencement of each stage
@@ -43,5 +44,6 @@ __all__ = [
     "CustomerService",
     "ProductApprover",
     "DesignApprover",
-    "TaskApprover"
+    "TaskApprover",
+    "StageGovernance"
 ]

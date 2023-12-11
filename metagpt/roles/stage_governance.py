@@ -3,47 +3,48 @@
 """
 @Time    : 2023/5/11 14:43
 @Author  : alexanderwu
-@File    : product_manager.py
+@File    : stage_governance.py
 """
 
-from typing import Callable
-
-from metagpt.actions import WritePRD, WriteProductApproval
+from metagpt.actions import WriteProductApproval, WriteDesignApproval, WriteTaskApproval, AdvanceStage
 from metagpt.roles import Role
 
+ADVANCE: dict = { 
+            WriteProductApproval: 'Design',
+            WriteDesignApproval: "Plan",
+            WriteTaskApproval: "Build"
+            }
 
-
-class ProductApprover(Role):
+class StageGovernance(Role):
     """
-    Represents a Human Approver role responsible for approving a PRD for to enter the Design Stage.
+    Represents an automated role responsible for advancing the execution to the next Stage
 
     Attributes:
-        name (str): Name of the product approver.
-        profile (str): Role profile, default is 'Product Approver'.
-        goal (str): Goal of the product approver.
-        constraints (str): Constraints or limitations for the product approver.
+        name (str): Name of the role.
+        profile (str): Role profile.
+        goal (str): Goal of the role.
+        constraints (str): Constraints or limitations for the role.
     """
 
     def __init__(
         self,
-        name: str = "Pointy 1",
-        profile: str = "Product Approver",
-        goal: str = "Review and Approve the Requirements Stage Gate",
+        name: str = "Stage Governance Committee",
+        profile: str = "Governance",
+        goal: str = "Publish the advance to the next Stage",
         constraints: str = "",
-        callback: Callable = None
+        watchlist: list = [WriteProductApproval, WriteDesignApproval, WriteTaskApproval]
     ) -> None:
         """
-        Initializes the ProductApprover role with given attributes.
+        Initializes the Stage Governance role with given attributes.
 
-        Args:
-            name (str): Name of the product approver.
+        Attributes:
+            name (str): Name of the role.
             profile (str): Role profile.
-            goal (str): Goal of the product approver.
-            constraints (str): Constraints or limitations for the product approver.
+            goal (str): Goal of the role.
+            constraints (str): Constraints or limitations for the role.
+            watchlist: the specific Actions that can trigger a stage advancement event
         """
-        super().__init__(name, profile, goal, constraints, is_human=True)
-        self._init_actions([WriteProductApproval])
-        if callback is not None:
-            # Using API to receive approval
-            self._actions[0].llm.set_callback(callback)
-        self._watch([WritePRD])
+        super().__init__(name, profile, goal, constraints, is_human=False)
+        self._init_actions([AdvanceStage])
+        self._watch(watchlist)
+

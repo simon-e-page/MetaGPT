@@ -3,63 +3,44 @@
 """
 @Time    : 2023/5/11 17:45
 @Author  : alexanderwu
-@File    : write_prd.py
+@File    : advance_stage.py
 """
 from typing import List
+from metagpt.actions import WriteProductApproval, WriteDesignApproval, WriteTaskApproval
 
 from metagpt.actions import Action, ActionOutput
 from metagpt.config import CONFIG
 from metagpt.logs import logger
 from metagpt.utils.common import OutputParser, ApprovalError
-from metagpt.provider.human_provider import HumanProvider
 
 OUTPUT_MAPPING = {
-    "Approval Response": (str, ...),
+    "Advance Stage": (str, ...),
 }
 
-# Schema for System Design Deliverable
-DESIGN_OUTPUT_MAPPING = {
-    "Implementation approach": (str, ...),
-    "Python package name": (str, ...),
-    "File list": (List[str], ...),
-    "Data structures and interface definitions": (str, ...),
-    "Program call flow": (str, ...),
-    "Anything UNCLEAR": (str, ...),
-}
+ADVANCE: dict = { 
+            WriteProductApproval: 'Design',
+            WriteDesignApproval: "Plan",
+            WriteTaskApproval: "Build"
+            }
 
-
-class WriteDesignApproval(Action):
+class AdvanceStage(Action):
     def __init__(self, name="", context=None, llm=None):
         super().__init__(name, context, llm)
 
-    def get_design_from_disk(self):
-        docs_path = CONFIG.product_root / "docs"
-        system_design_file = docs_path / "system_design.md"
+    async def run(self, context, *args, **kwargs) -> ActionOutput:
+        """ Send an Advance Stage message to the environment """
+        new_stage = None
+        for msg in context:
+            if msg.cause_by in ADVANCE.keys():
+                new_stage = ADVANCE[msg.cause_by]
+                break
+        if new_stage is None:
+            logger.warning("Could not find the Approval Message in the provided history!")
+            logger.warning(context)
 
-        design_content = system_design_file.read_text()
-        logger.debug(design_content)
-        output_class = ActionOutput.create_model_class("approved_design", DESIGN_OUTPUT_MAPPING)
-        #parsed_data = markdown_to_json.dictify(design_content)
-        parsed_data = OutputParser.parse_markdown_deliverable(design_content, DESIGN_OUTPUT_MAPPING)
-        logger.debug(parsed_data)
+        rsp: str = f'[CONTENT]{ "Advance Stage": "{new_stage}" }[/CONTENT]'
+        output_class = ActionOutput.create_model_class("stage_advance", OUTPUT_MAPPING)
+        parsed_data: dict = OutputParser.parse_data_with_mapping(rsp, OUTPUT_MAPPING)
         instruct_content = output_class(**parsed_data)
-        return ActionOutput(design_content, instruct_content)
-
-    async def run(self, design, *args, **kwargs) -> ActionOutput:
-        """ Wait for a Human Approval """
-        prompt = "Do you approve the System Design? (yes/no)"
-        design_approval = await self._aask_v1(prompt, "design_approval", OUTPUT_MAPPING, format='json', system_msgs=['Design'])
-
-        if design_approval.instruct_content.dict()['Approval Response'] == 'yes':
-            logger.info("Got approval for System Design!")
-            output = self.get_design_from_disk()
-            
-            if isinstance(self.llm, HumanProvider) and self.llm.callback is not None:
-                self.llm.callback(action="advance", stage="Design")
-        else:
-            logger.warning("No approval - stop project!")
-            output = design_approval
-            raise ApprovalError("Approval Error - Design not approved", approver="Design Approver")
-
-
-        return output
+        advance_action: ActionOutput = ActionOutput(rsp, instruct_content=instruct_content)
+        return advance_action
