@@ -22,9 +22,11 @@ class HumanProvider(BaseGPTAPI):
         self.callback = callback
 
     #async def ask(self, msg: str, stage: str) -> str:
-    def ask(self, msg: str, stage: str ="Requirements") -> str:
+    def ask(self, msg: str, stage: str ="Requirements", autoapprove=False) -> str:
         logger.info("It's your turn, please type in your response. You may also refer to the context below\n")
-        if self.callback is not None:
+        if autoapprove:
+            rsp = "yes"
+        elif self.callback is not None:
             # API Input
             self.callback(action="approve", stage=stage)
             # Block until we get a response!
@@ -52,7 +54,11 @@ class HumanProvider(BaseGPTAPI):
 
     async def aask(self, msg: str, system_msgs: Optional[list[str]] = None) -> str:
         stage = system_msgs[0]
-        return self.ask(msg, stage=stage)
+        if len(system_msgs>1):
+            autoapprove = system_msgs[1]
+        else: 
+            autoapprove = False
+        return self.ask(msg, stage=stage, autoapprove=autoapprove)
 
     def completion(self, messages: list[dict]):
         """dummy implementation of abstract method in base"""

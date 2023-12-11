@@ -8,7 +8,7 @@
 
 from typing import Callable
 
-from metagpt.actions import WriteTasks, WriteTaskApproval
+from metagpt.actions import WriteTasks, WriteTaskApproval, ManagementAction
 from metagpt.roles import Role
 
 
@@ -46,4 +46,4 @@ class TaskApprover(Role):
         if callback is not None:
             # Using API to receive approval
             self._actions[0].llm.set_callback(callback)
-        self._watch([WriteTasks])
+        self._watch([WriteTasks, ManagementAction])

@@ -47,8 +47,19 @@ class WriteDesignApproval(Action):
 
     async def run(self, design, *args, **kwargs) -> ActionOutput:
         """ Wait for a Human Approval """
+
+        autoapprove = False
+        for msg in design:
+            if "AUTO-APPROVE: Design" in msg.content:
+                autoapprove = True
+        
         prompt = "Do you approve the System Design? (yes/no)"
-        design_approval = await self._aask_v1(prompt, "design_approval", OUTPUT_MAPPING, format='json', system_msgs=['Design'])
+        design_approval = await self._aask_v1(prompt, 
+                                              "design_approval",
+                                              OUTPUT_MAPPING,
+                                              format='json',
+                                              system_msgs=['Design', autoapprove]
+                                              )
 
         if design_approval.instruct_content.dict()['Approval Response'] == 'yes':
             logger.info("Got approval for System Design!")

@@ -63,15 +63,26 @@ class WriteProductApproval(Action):
     
     async def run(self, context, *args, **kwargs) -> ActionOutput:
         """ Wait for a Human Approval """
+        
+        autoapprove = False
+        for msg in context:
+            if "AUTO-APPROVE: Requirements" in msg.content:
+                autoapprove = True
+                
         prompt = "Do you approve the Product Requirements? (yes/no)"
-        prd_approval = await self._aask_v1(prompt, "prd_approval", OUTPUT_MAPPING, format='json', system_msgs=['Requirements'])
+        prd_approval = await self._aask_v1(prompt,
+                                           "prd_approval",
+                                           OUTPUT_MAPPING,
+                                           format='json',
+                                           system_msgs=['Requirements', autoapprove]
+                                           )
         
         if prd_approval.instruct_content.dict()['Approval Response'] == 'yes':
             logger.info("Got approval for Product Requirements!")
             output = self._get_prd_from_disk()
 
-            if isinstance(self.llm, HumanProvider) and self.llm.callback is not None:
-                self.llm.callback(action="advance", stage="Design")
+            #if isinstance(self.llm, HumanProvider) and self.llm.callback is not None:
+            #    self.llm.callback(action="advance", stage="Design")
         else:
             logger.warning("No approval - stop project!")
             output = prd_approval

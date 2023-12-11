@@ -48,8 +48,19 @@ class WriteTaskApproval(Action):
 
     async def run(self, context, *args, **kwargs) -> ActionOutput:
         """ Wait for a Human Approval """
+
+        autoapprove = False
+        for msg in context:
+            if "AUTO-APPROVE: Plan" in msg.content:
+                autoapprove = True
+        
         prompt = "Do you approve the Tasks and API Spec? (yes/no)"
-        task_approval = await self._aask_v1(prompt, "task_approval", OUTPUT_MAPPING, format='json', system_msgs=['Plan'])
+        task_approval = await self._aask_v1(prompt,
+                                            "task_approval",
+                                            OUTPUT_MAPPING,
+                                            format='json',
+                                            system_msgs=['Plan', autoapprove]
+                                            )
 
         if task_approval.instruct_content.dict()['Approval Response'] == 'yes':
             logger.info("Got approval for Tasks and API Spec!")

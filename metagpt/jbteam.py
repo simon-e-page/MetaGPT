@@ -14,7 +14,7 @@ from pathlib import Path
 import yaml
 from pydantic import BaseModel, Field
 
-from metagpt.actions import BossRequirement, AdvanceStage, STAGE_ACTIONS
+from metagpt.actions import BossRequirement, AdvanceStage, ManagementAction, STAGE_ACTIONS
 from metagpt.config import CONFIG
 import metagpt.const as CONST
 from metagpt.environment import Environment
@@ -219,6 +219,7 @@ class Team(BaseModel):
             messages = deserialize_batch(history_file.read_bytes())
             messages = self.filter_messages(messages, STAGE_ACTIONS[stage])
             self.environment.memory.add_batch(messages)
+            self.environment.publish_message(Message(role="Human", content=f"AUTO-APPROVE: {stage}", cause_by=ManagementAction, send_to=""))
         else:
             logger.info("Commencing project with Boss Requirement")
             self.environment.publish_message(Message(role="Human", content=self.environment.idea, cause_by=BossRequirement, send_to=""))
@@ -267,7 +268,7 @@ class Team(BaseModel):
         while n_round>0 and (CONST.STAGES[end_stage] >= CONST.STAGES[current_stage]):
             # self._save()
             #n_round -= 1
-            count: int = max_round - n_round
+            #count: int = max_round - n_round
             #logger.info(f"Entering round {count} of {max_round}")
             logger.info(f"Working on stage: {current_stage}")
             #logger.debug(f"{n_round=}")
