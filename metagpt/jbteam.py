@@ -18,7 +18,7 @@ from metagpt.actions import BossRequirement, STAGE_ACTIONS
 from metagpt.config import CONFIG
 import metagpt.const as CONST
 from metagpt.environment import Environment
-from metagpt.logs import logger, add_project_log
+from metagpt.logs import logger
 from metagpt.roles import Role, STAGE_ROLES
 from metagpt.schema import Message
 from metagpt.utils.common import NoMoneyException, ApprovalError, ProductConfigError
