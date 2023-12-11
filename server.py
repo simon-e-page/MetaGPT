@@ -43,16 +43,16 @@ class LogSink:
         self.position = self.stream.tell()
         self.cache = []
 
-    def get_lines(self, max=100) -> tuple:
+    def get_lines(self, max_lines=100) -> tuple:
         """ Returns lines from the stream up to max and a flag True if there is more to retrieve """
         self._tail()
-        if len(self.cache) <= max:
+        if len(self.cache) <= max_lines:
             ret = self.cache
             more = False
             self.cache = []
         else:
-            ret = self.cache[0:max]
-            self.cache = self.cache[max:]
+            ret = self.cache[0:max_lines]
+            self.cache = self.cache[max_lines:]
             more = True
         return ret, more
             
