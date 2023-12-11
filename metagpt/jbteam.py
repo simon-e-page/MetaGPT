@@ -228,7 +228,7 @@ class Team(BaseModel):
         self.stage_callback = callback
 
     def set_log_output(self, stream):
-        logger.add(stream, level=logger.info)
+        logger.add(stream, level="INFO")
         
     async def run(self, n_round=3, start_stage="Requirements", end_stage="Requirements"):
         """Run company until target stage or no money"""
