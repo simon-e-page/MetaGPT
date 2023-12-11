@@ -239,7 +239,9 @@ class Team(BaseModel):
         stage_num: int = CONST.STAGES[current_stage]
         new_stage: str = current_stage
 
+        logger.info(advances)
         for m in advances:
+            logger.info(m)
             stage: str = m.instruct_content.dict()['Advance Stage']
             new_stage_num: int = CONST.STAGES[new_stage]
             if new_stage_num > stage_num:
