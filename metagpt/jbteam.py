@@ -206,8 +206,12 @@ class Team(BaseModel):
 
     def set_memory(self, stage: str=None):
         """ Resets Memory of Roles and Environment to a specific stage. 
-            If None then restores to last run 
+            If None then continues from last run
         """
+
+        if stage is None:
+            # Setting to the last stage means we dont remove any memories
+            stage = "Test"
 
         history_file = CONFIG.product_root / "history.pickle"
         if history_file.exists():
@@ -220,7 +224,7 @@ class Team(BaseModel):
             self.environment.publish_message(Message(role="Human", content=self.environment.idea, cause_by=BossRequirement, send_to=""))
         
         for name, role in self.environment.get_roles().items():
-            if type(role) not in STAGE_ROLES:
+            if type(role) not in STAGE_ROLES[stage]:
                 logger.info(f"Clearing memory for {name}")
                 role._rc.memory.clear()
 
