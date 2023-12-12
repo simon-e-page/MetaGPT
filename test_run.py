@@ -5,7 +5,7 @@ import fire
 import time as t
 
 
-import server
+import jbcode
 
 
 def main(
@@ -33,7 +33,7 @@ def main(
     :return:
     """
     #asyncio.run(startup(product_name, investment=investment, n_round=n_round, code_review=code_review, run_tests=run_tests, implement=implement, stage=stage))
-    server.run_project(product_name=product_name,
+    jbcode.run_project(product_name=product_name,
                 investment=investment,
                 n_round=n_round,
                 code_review=code_review,
@@ -42,17 +42,17 @@ def main(
                 stage=stage
                 )
 
-    status = server.get_status()
+    status = jbcode.get_status()
     while status != "Waiting":
         print(f"Stage: {status}")
         t.sleep(10)
-        status = server.get_status()
+        status = jbcode.get_status()
     
     print("Now waiting for approval..")
     exit(1)
     
 if __name__ == "__main__":
-    l = server.get_projects()
+    l = jbcode.get_projects()
     print(f"Current Projects: {l}")
 
     fire.Fire(main)

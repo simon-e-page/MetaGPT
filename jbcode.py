@@ -3,6 +3,7 @@
 import asyncio
 import time as t
 import os
+import fire
 from io import StringIO
 import traceback
 from typing import Callable
@@ -173,10 +174,11 @@ def run_project_background(n_round: int = 5,
 
 @authenticated_callable
 def run_project(
-    product_name, 
-    investment=5.0, 
-    stage="Requirements",
-    end_stage="Requirements"
+    product_name: str, 
+    investment: float = 5.0,
+    stage: str = "Requirements",
+    end_stage: str = "Requirements",
+    use_callback: bool = True
     ) -> str:
 
     """ Main execution launcher """
@@ -192,7 +194,8 @@ def run_project(
                 product_name=product_name,
                 investment=investment, 
                 stage=stage,
-                end_stage=end_stage
+                end_stage=end_stage,
+                use_callback=use_callback
                 )
         except FileNotFoundError:
             ret = "Error: Call Create Project first!"
@@ -212,13 +215,17 @@ def update_stage(stage: str):
 
 
 def startup(
-    product_name, 
-    investment=5.0, 
-    stage="Requirements",
-    end_stage = "Requirements"        
+    product_name: str, 
+    investment: float = 5.0, 
+    stage: str = "Requirements",
+    end_stage: str = "Requirements",
+    use_callback: bool = True
 ) -> int:
     
-    api_callback: Callable = prompt_approval
+    if use_callback:
+        api_callback: Callable = prompt_approval
+    else:
+        api_callback = None
 
     company.invest(investment)
     company.start_project(product_name, stage=stage, end_stage=end_stage)
@@ -334,7 +341,9 @@ def get_status():
     return check_status()
 
 
-if __name__ == "__main__":
+
+def run_server():
+    """ Runs an Anvil Server backend """
     anvil_id = os.environ.get("ANVIL_APP_ID", None)
     if anvil_id:
         try:
@@ -350,3 +359,85 @@ if __name__ == "__main__":
     while True:
         print(check_status())
         t.sleep(60)         
+
+
+def main(
+    server: bool = False,
+    create: bool = False,
+    list_projects: bool = False,
+    product_name: str = '',
+    idea: str = '',
+    investment: float = 3.0,
+    start_stage: str ='Requirements',
+    end_stage: str ='Plan',
+    n_round: int = 7,
+):
+    """
+    We are a software startup comprised of AI. By investing in us,
+    you are empowering a future filled with limitless possibilities.
+    
+    Usage:
+    1) As a server:
+    jbteamp.py --server 
+    
+    2) To create a new project from the command line:
+    jbteam.py --create --product_name="<New product name>" --idea="<Initial prompt>"
+    
+    3) To list known projects from the command line:
+    jbteam.py --list_projects
+    
+    3) To run a project from the command line:
+    jbteam.py --product_name="<Product Name>" [--investment=n.n] [--start_stage="Requirements"] [--end_stage="Plan"]
+    
+    The defined stages are (in order): Requirements, Design, Plan, Build, Test
+    
+    :param server: Exceute as a server backend for an Anvil Frontend (needs ANVIL_APP_ID environment variable).
+    :param create: Creates a new project
+    :param list_projects: List known projects in the workspace
+    :param product_name: The name of your product and key directory name in the workspace. 
+    Make sure the directory WORKSPACE_ROOT/PRODUCT_NAME exists.
+    Make sure that there is a file product.yaml in that directory with at least the IDEA and STAGE defined
+    :param idea: Starting prompt to use
+    :param investment: As an investor, you have the opportunity to contribute
+    a certain dollar amount to this AI company.
+    :param n_round: not used anymore
+    :oaram start_stage: what stage to start the project. Overwrites any previous deliverables for later stages 
+    :param end_stage: What stage to complete before finishing. Ends at an approved deliverable or code completion
+    :return:
+    """
+
+    if server:
+        run_server()
+        
+    elif create:
+        assert len(product_name)>0
+        assert len(idea)>0
+        create_project(product_name=product_name, project_data={'IDEA': idea})
+
+    elif list_projects:
+        print("Current known projects:")
+        for project in get_projects():
+            print(f"{project['NAME']}: {project['IDEA']}")
+
+    else:
+        assert len(product_name)>0
+        try:
+            get_project(product_name)
+            run_project(
+                        product_name=product_name,
+                        investment=investment,
+                        n_round=n_round,
+                        start_stage=start_stage,
+                        end_stage=end_stage,
+                        use_callback=False
+                        )
+        except Exception:
+            traceback.print_exc()
+
+    
+if __name__ == "__main__":
+    fire.Fire(main)
+
+
+        
+    
