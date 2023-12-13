@@ -17,7 +17,7 @@ from metagpt.roles.sales import Sales
 from metagpt.roles.customer_service import CustomerService
 
 from metagpt.roles.jbproduct_approver import ProductApprover
-from metagpt.roles.jbdesign_approver import DesignApprover
+from metagpt.roles.jbdesign_approver import JBDesignApprover
 from metagpt.roles.jbtask_approver import TaskApprover
 from metagpt.roles.stage_governance import StageGovernance
 from metagpt.roles.jbproduct_manager import JBProductManager
@@ -34,8 +34,8 @@ STAGE_ROLES = {
     "Requirements": [],
     "Design": [ JBProductManager ],
     "Plan": [ JBProductManager, ProductApprover, JBArchitect ],
-    "Build": [ JBProductManager, ProductApprover, JBArchitect, JBProjectManager ],
-    "Test": [ JBProductManager, ProductApprover, JBArchitect, JBProjectManager, TaskApprover, JBEngineer ],
+    "Build": [ JBProductManager, ProductApprover, JBArchitect, JBDesignApprover, JBProjectManager ],
+    "Test": [ JBProductManager, ProductApprover, JBArchitect, JBDesignApprover, JBProjectManager, TaskApprover, JBEngineer ],
 }
 
 __all__ = [
@@ -49,7 +49,7 @@ __all__ = [
     "Sales",
     "CustomerService",
     "ProductApprover",
-    "DesignApprover",
+    "JBDesignApprover",
     "TaskApprover",
     "StageGovernance",
     "JBArchitect",

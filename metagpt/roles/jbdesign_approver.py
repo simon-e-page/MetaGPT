@@ -12,7 +12,7 @@ from metagpt.actions import WriteJBDesign, WriteDesignApproval, ManagementAction
 from metagpt.roles import Role
 
 
-class DesignApprover(Role):
+class JBDesignApprover(Role):
     """
     Represents a Human Design Approver role responsible for approving a System Design for to enter a Build Stage.
 
