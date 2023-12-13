@@ -15,10 +15,14 @@ from metagpt.roles.qa_engineer import QaEngineer
 from metagpt.roles.seacher import Searcher
 from metagpt.roles.sales import Sales
 from metagpt.roles.customer_service import CustomerService
-from metagpt.roles.product_approver import ProductApprover
-from metagpt.roles.design_approver import DesignApprover
-from metagpt.roles.task_approver import TaskApprover
+
+from metagpt.roles.jbproduct_approver import ProductApprover
+from metagpt.roles.jbdesign_approver import DesignApprover
+from metagpt.roles.jbtask_approver import TaskApprover
 from metagpt.roles.stage_governance import StageGovernance
+from metagpt.roles.jbarchitect import JBArchitect
+from metagpt.roles.jbengineer import JBEngineer
+from metagpt.roles.jbproject_manager import JBProjectManager
 
 # This denotes the roles whose memories should be 'retained'
 # at the commencement of each stage
@@ -27,9 +31,9 @@ from metagpt.roles.stage_governance import StageGovernance
 STAGE_ROLES = {
     "Requirements": [],
     "Design": [ ProductManager ],
-    "Plan": [ ProductManager, ProductApprover, Architect ],
-    "Build": [ ProductManager, ProductApprover, Architect, ProjectManager ],
-    "Test": [ ProductManager, ProductApprover, Architect, ProjectManager, TaskApprover, Engineer ],
+    "Plan": [ ProductManager, ProductApprover, JBArchitect ],
+    "Build": [ ProductManager, ProductApprover, JBArchitect, JBProjectManager ],
+    "Test": [ ProductManager, ProductApprover, JBArchitect, JBProjectManager, TaskApprover, JBEngineer ],
 }
 
 __all__ = [
@@ -45,5 +49,8 @@ __all__ = [
     "ProductApprover",
     "DesignApprover",
     "TaskApprover",
-    "StageGovernance"
+    "StageGovernance",
+    "JBArchitect",
+    "JBEngineer",
+    "JBProjectManager",
 ]

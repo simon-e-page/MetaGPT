@@ -48,7 +48,7 @@ async def gather_ordered_k(coros, k) -> list:
     return results
 
 
-class Engineer(Role):
+class JBEngineer(Role):
     """
     Represents an Engineer role responsible for writing and possibly reviewing code.
 
@@ -174,7 +174,7 @@ class Engineer(Role):
 
         logger.info(f"Done {self.get_workspace()} generating.")
         msg = Message(
-            content=MSG_SEP.join(code_msg_all), role=self.profile, cause_by=type(self._rc.todo), send_to="QaEngineer"
+            content=MSG_SEP.join(code_msg_all), role=self.profile, cause_by=type(self._rc.todo), send_to="JBQaEngineer"
         )
         return msg
 
@@ -212,7 +212,7 @@ class Engineer(Role):
 
         logger.info(f"Done {self.get_workspace()} generating.")
         msg = Message(
-            content=MSG_SEP.join(code_msg_all), role=self.profile, cause_by=type(self._rc.todo), send_to="QaEngineer"
+            content=MSG_SEP.join(code_msg_all), role=self.profile, cause_by=type(self._rc.todo), send_to="JBQaEngineer"
         )
         return msg
 

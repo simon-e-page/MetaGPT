@@ -11,7 +11,7 @@ from metagpt.actions.design_api import WriteDesign
 from metagpt.roles import Role
 
 
-class Architect(Role):
+class JBArchitect(Role):
     """
     Represents an Architect role in a software development process.
 

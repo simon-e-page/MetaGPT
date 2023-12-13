@@ -14,10 +14,10 @@ from anvil import BlobMedia
 
 from metagpt.jbteam import Team
 from metagpt.roles import (
-    Architect,
-    Engineer,
+    JBArchitect,
+    JBEngineer,
     ProductManager,
-    ProjectManager,
+    JBProjectManager,
     DesignApprover,
     ProductApprover,
     TaskApprover,
@@ -235,8 +235,8 @@ def startup(
     company.hire(
         [
             ProductManager(),
-            Architect(),
-            ProjectManager(),
+            JBArchitect(),
+            JBProjectManager(),
             DesignApprover(callback = api_callback),
             ProductApprover(callback = api_callback),
             TaskApprover(callback = api_callback),
@@ -253,13 +253,13 @@ def startup(
     # if implement or code_review
     if end_stage == 'Build':
         # developing features: implement the idea
-        company.hire([Engineer(n_borg=5, use_code_review=True)])
+        company.hire([JBEngineer(n_borg=5, use_code_review=True)])
         n_round = 6
 
     if end_stage == 'Test':
         # developing features: run tests on the spot and identify bugs
         # (bug fixing capability comes soon!)
-        company.hire([Engineer(n_borg=5, use_code_review=True), QaEngineer()])
+        company.hire([JBEngineer(n_borg=5, use_code_review=True), QaEngineer()])
         n_round = 7
     
     return n_round
