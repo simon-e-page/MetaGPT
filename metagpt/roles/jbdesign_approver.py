@@ -8,7 +8,7 @@
 
 from typing import Callable
 
-from metagpt.actions import WriteDesign, WriteDesignApproval, ManagementAction
+from metagpt.actions import WriteJBDesign, WriteDesignApproval, ManagementAction
 from metagpt.roles import Role
 
 
@@ -45,4 +45,4 @@ class DesignApprover(Role):
         if callback is not None:
             # Using API to receive approval
             self._actions[0].llm.set_callback(callback)
-        self._watch([WriteDesign, ManagementAction])
+        self._watch([WriteJBDesign, ManagementAction])

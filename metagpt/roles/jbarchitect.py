@@ -6,8 +6,7 @@
 @File    : architect.py
 """
 
-from metagpt.actions import WriteProductApproval
-from metagpt.actions.design_api import WriteDesign
+from metagpt.actions import WriteProductApproval, WriteJBDesign
 from metagpt.roles import Role
 
 
@@ -33,7 +32,7 @@ class JBArchitect(Role):
         super().__init__(name, profile, goal, constraints)
 
         # Initialize actions specific to the Architect role
-        self._init_actions([WriteDesign])
+        self._init_actions([WriteJBDesign])
 
         # Set events or actions the Architect should watch or be aware of
         self._watch({WriteProductApproval})
