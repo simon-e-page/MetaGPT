@@ -12,7 +12,7 @@ from metagpt.actions import WriteJBTasks, WriteTaskApproval, ManagementAction
 from metagpt.roles import Role
 
 
-class TaskApprover(Role):
+class JBTaskApprover(Role):
     """
     Represents a Human Approver role responsible for approving the Project Management Tasks and API Spec
     for to enter the Build Stage.
