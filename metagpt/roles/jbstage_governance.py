@@ -15,7 +15,7 @@ ADVANCE: dict = {
             WriteTaskApproval: "Build"
             }
 
-class StageGovernance(Role):
+class JBStageGovernance(Role):
     """
     Represents an automated role responsible for advancing the execution to the next Stage
 

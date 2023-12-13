@@ -19,7 +19,7 @@ from metagpt.roles.customer_service import CustomerService
 from metagpt.roles.jbproduct_approver import JBProductApprover
 from metagpt.roles.jbdesign_approver import JBDesignApprover
 from metagpt.roles.jbtask_approver import JBTaskApprover
-from metagpt.roles.stage_governance import StageGovernance
+from metagpt.roles.jbstage_governance import JBStageGovernance
 from metagpt.roles.jbproduct_manager import JBProductManager
 from metagpt.roles.jbarchitect import JBArchitect
 from metagpt.roles.jbengineer import JBEngineer
@@ -51,7 +51,7 @@ __all__ = [
     "JBProductApprover",
     "JBDesignApprover",
     "JBTaskApprover",
-    "StageGovernance",
+    "JBStageGovernance",
     "JBArchitect",
     "JBEngineer",
     "JBProjectManager",
