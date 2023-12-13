@@ -19,7 +19,7 @@ from metagpt.roles import (
     JBProductManager,
     JBProjectManager,
     JBDesignApprover,
-    ProductApprover,
+    JBProductApprover,
     TaskApprover,
     JBQaEngineer,
     StageGovernance,
@@ -238,7 +238,7 @@ def startup(
             JBArchitect(),
             JBProjectManager(),
             JBDesignApprover(callback = api_callback),
-            ProductApprover(callback = api_callback),
+            JBProductApprover(callback = api_callback),
             TaskApprover(callback = api_callback),
             StageGovernance()
         ]

@@ -13,7 +13,7 @@ from metagpt.roles import Role
 
 
 
-class ProductApprover(Role):
+class JBProductApprover(Role):
     """
     Represents a Human Approver role responsible for approving a PRD for to enter the Design Stage.
 
