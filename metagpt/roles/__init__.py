@@ -23,6 +23,7 @@ from metagpt.roles.stage_governance import StageGovernance
 from metagpt.roles.jbarchitect import JBArchitect
 from metagpt.roles.jbengineer import JBEngineer
 from metagpt.roles.jbproject_manager import JBProjectManager
+from metagpt.roles.jbqa_engineer import JBQaEngineer
 
 # This denotes the roles whose memories should be 'retained'
 # at the commencement of each stage
@@ -53,4 +54,5 @@ __all__ = [
     "JBArchitect",
     "JBEngineer",
     "JBProjectManager",
+    "JBQaEngineer",
 ]

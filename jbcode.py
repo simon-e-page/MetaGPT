@@ -21,7 +21,7 @@ from metagpt.roles import (
     DesignApprover,
     ProductApprover,
     TaskApprover,
-    QaEngineer,
+    JBQaEngineer,
     StageGovernance,
 )
 
@@ -259,7 +259,7 @@ def startup(
     if end_stage == 'Test':
         # developing features: run tests on the spot and identify bugs
         # (bug fixing capability comes soon!)
-        company.hire([JBEngineer(n_borg=5, use_code_review=True), QaEngineer()])
+        company.hire([JBEngineer(n_borg=5, use_code_review=True), JBQaEngineer()])
         n_round = 7
     
     return n_round
