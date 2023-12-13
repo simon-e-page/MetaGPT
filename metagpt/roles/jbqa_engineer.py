@@ -11,13 +11,12 @@ from pathlib import Path
 from metagpt.actions import (
     DebugError,
     RunCode,
-    WriteCode,
+    WriteJBCode,
     WriteCodeReview,
     WriteDesignApproval,
     WriteTest,
 )
-#from metagpt.const import WORKSPACE_ROOT
-import metagpt.const as CONST
+
 from metagpt.logs import logger
 from metagpt.roles import Role
 from metagpt.schema import Message
@@ -38,7 +37,7 @@ class JBQaEngineer(Role):
         self._init_actions(
             [WriteTest]
         )  # FIXME: a bit hack here, only init one action to circumvent _think() logic, will overwrite _think() in future updates
-        self._watch([WriteCode, WriteCodeReview, WriteTest, RunCode, DebugError])
+        self._watch([WriteJBCode, WriteCodeReview, WriteTest, RunCode, DebugError])
         self.test_round = 0
         self.test_round_allowed = test_round_allowed
 
@@ -178,7 +177,7 @@ class JBQaEngineer(Role):
         for msg in self._rc.news:
             # Decide what to do based on observed msg type, currently defined by human,
             # might potentially be moved to _think, that is, let the agent decides for itself
-            if msg.cause_by in [WriteCode, WriteCodeReview]:
+            if msg.cause_by in [WriteJBCode, WriteCodeReview]:
                 # engineer wrote a code, time to write a test for it
                 await self._write_test(msg)
             elif msg.cause_by in [WriteTest, DebugError]:

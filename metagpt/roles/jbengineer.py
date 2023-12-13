@@ -10,9 +10,7 @@ import shutil
 from collections import OrderedDict
 from pathlib import Path
 
-from metagpt.actions import WriteCode, WriteCodeReview, WriteTaskApproval, WriteDesignApproval
-#from metagpt.const import WORKSPACE_ROOT
-import metagpt.const as CONST
+from metagpt.actions import WriteJBCode, WriteCodeReview, WriteTaskApproval, WriteDesignApproval
 from metagpt.config import CONFIG
 from metagpt.logs import logger
 from metagpt.roles import Role
@@ -73,10 +71,10 @@ class JBEngineer(Role):
     ) -> None:
         """Initializes the Engineer role with given attributes."""
         super().__init__(name, profile, goal, constraints)
-        self._init_actions([WriteCode])
+        self._init_actions([WriteJBCode])
         self.use_code_review = use_code_review
         if self.use_code_review:
-            self._init_actions([WriteCode, WriteCodeReview])
+            self._init_actions([WriteJBCode, WriteCodeReview])
         self._watch([WriteTaskApproval])
         self.todos = []
         self.n_borg = n_borg
@@ -139,7 +137,7 @@ class JBEngineer(Role):
         # self.recreate_workspace()
         todo_coros = []
         for todo in self.todos:
-            todo_coro = WriteCode().run(
+            todo_coro = WriteJBCode().run(
                 context=self._rc.memory.get_by_actions([WriteTaskApproval, WriteDesignApproval]), filename=todo
             )
             todo_coros.append(todo_coro)
@@ -161,7 +159,7 @@ class JBEngineer(Role):
     async def _act_sp(self) -> Message:
         code_msg_all = []  # gather all code info, will pass to qa_engineer for tests later
         for todo in self.todos:
-            code = await WriteCode().run(context=self._rc.history, filename=todo)
+            code = await WriteJBCode().run(context=self._rc.history, filename=todo)
             # logger.info(todo)
             # logger.info(code_rsp)
             # code = self.parse_code(code_rsp)
@@ -189,12 +187,12 @@ class JBEngineer(Role):
             TODO: The goal is not to need it. After clear task decomposition, based on the design idea, you should be able to write a single file without needing other codes. If you can't, it means you need a clearer definition. This is the key to writing longer code.
             """
             context = []
-            msg = self._rc.memory.get_by_actions([WriteDesignApproval, WriteTaskApproval, WriteCode])
+            msg = self._rc.memory.get_by_actions([WriteDesignApproval, WriteTaskApproval, WriteJBCode])
             for m in msg:
                 context.append(m.content)
             context_str = "\n".join(context)
             # Write code
-            code = await WriteCode().run(context=context_str, filename=todo)
+            code = await WriteJBCode().run(context=context_str, filename=todo)
             # Code review
             if self.use_code_review:
                 try:
@@ -204,7 +202,7 @@ class JBEngineer(Role):
                     logger.error("code review failed!", e)
                     pass
             file_path = self.write_file(todo, code)
-            msg = Message(content=code, role=self.profile, cause_by=WriteCode)
+            msg = Message(content=code, role=self.profile, cause_by=WriteJBCode)
             self._rc.memory.add(msg)
 
             code_msg = todo + FILENAME_CODE_SEP + str(file_path)
