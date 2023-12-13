@@ -30,6 +30,7 @@ from metagpt.actions.advance_stage import AdvanceStage
 from metagpt.actions.management_action import ManagementAction
 from metagpt.actions.write_jb_prd import WriteJBPRD
 from metagpt.actions.write_jb_design import WriteJBDesign
+from metagpt.actions.write_jb_tasks import WriteJBTasks
 
 class ActionType(Enum):
     """All types of Actions, used for indexing."""
@@ -58,13 +59,14 @@ class ActionType(Enum):
     MANAGEMENT_ACTION = ManagementAction
     WRITE_JB_PRD = WriteJBPRD
     WRITE_JB_DESIGN = WriteJBDesign
+    WRITE_JB_TASKS = WriteJBTasks
 
 STAGE_ACTIONS = {
     'Requirements': [BossRequirement],
     'Design': [BossRequirement, WriteJBPRD, WriteProductApproval],
     'Plan': [BossRequirement, WriteJBPRD, WriteProductApproval, WriteJBDesign, WriteDesignApproval],
-    'Build': [BossRequirement, WriteJBPRD, WriteProductApproval, WriteJBDesign, WriteDesignApproval, WriteTasks, WriteTaskApproval],
-    'Test': [BossRequirement, WriteJBPRD, WriteProductApproval, WriteJBDesign, WriteDesignApproval, WriteTasks, WriteTaskApproval, WriteCode, WriteCodeReview],
+    'Build': [BossRequirement, WriteJBPRD, WriteProductApproval, WriteJBDesign, WriteDesignApproval, WriteJBTasks, WriteTaskApproval],
+    'Test': [BossRequirement, WriteJBPRD, WriteProductApproval, WriteJBDesign, WriteDesignApproval, WriteJBTasks, WriteTaskApproval, WriteCode, WriteCodeReview],
 }
 
 __all__ = [
