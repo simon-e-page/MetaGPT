@@ -6,14 +6,11 @@
 @File    : write_prd.py
 """
 from typing import List
-#import json
-#import markdown_to_json
 
 from metagpt.actions import Action, ActionOutput
 from metagpt.config import CONFIG
 from metagpt.logs import logger
 from metagpt.utils.common import OutputParser, ApprovalError
-from metagpt.provider.human_provider import HumanProvider
 
 OUTPUT_MAPPING = {
     "Approval Response": (str, ...),
@@ -81,8 +78,6 @@ class WriteProductApproval(Action):
             logger.info("Got approval for Product Requirements!")
             output = self._get_prd_from_disk()
 
-            #if isinstance(self.llm, HumanProvider) and self.llm.callback is not None:
-            #    self.llm.callback(action="advance", stage="Design")
         else:
             logger.warning("No approval - stop project!")
             output = prd_approval

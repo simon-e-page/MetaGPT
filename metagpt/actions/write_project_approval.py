@@ -11,7 +11,6 @@ from metagpt.actions import Action, ActionOutput
 from metagpt.config import CONFIG
 from metagpt.logs import logger
 from metagpt.utils.common import OutputParser, ApprovalError
-from metagpt.provider.human_provider import HumanProvider
 
 OUTPUT_MAPPING = {
     "Approval Response": (str, ...),
@@ -66,9 +65,6 @@ class WriteTaskApproval(Action):
             logger.info("Got approval for Tasks and API Spec!")
             output = self._get_tasks_from_disk()
             
-            if isinstance(self.llm, HumanProvider) and self.llm.callback is not None:
-                self.llm.callback(action="advance", stage="Design")
-
         else:
             logger.warning("No approval - stop project!")
             output = task_approval
