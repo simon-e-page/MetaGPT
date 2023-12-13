@@ -16,7 +16,7 @@ from metagpt.jbteam import Team
 from metagpt.roles import (
     JBArchitect,
     JBEngineer,
-    ProductManager,
+    JBProductManager,
     JBProjectManager,
     DesignApprover,
     ProductApprover,
@@ -234,7 +234,7 @@ def startup(
 
     company.hire(
         [
-            ProductManager(),
+            JBProductManager(),
             JBArchitect(),
             JBProjectManager(),
             DesignApprover(callback = api_callback),
