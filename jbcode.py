@@ -28,6 +28,7 @@ from metagpt.roles import (
 
 # TODO: configure Config from frontend
 # TODO: set git settings on workspaces / projects
+# TODO: scan project memory when loading for previously created deliverables
 
 company: Team = None
 task = None
@@ -83,17 +84,41 @@ def get_projects() -> list:
 
 
 @authenticated_callable
-def get_project(product_name: str) -> str:
-    """ Retrieve an existing project and return the Idea, or None if it doesnt exist"""
+def get_project(product_name: str, use_callback=True) -> dict:
+    """ Retrieve an existing project and returns a dict of already completed stages and deliverables
+        Returns None if it doesnt exist
+    """
+    
     global company
-    if company is None:
-        company = Team()
+    if task is not None:
+        print("Project running!")
+        return None
+
+    if use_callback:
+        api_callback: Callable = prompt_approval
+    else:
+        api_callback = None
+    
     try:
-        idea: str = company.get_project(product_name)
+        company = Team()
+        company.hire(
+            [
+                JBProductManager(),
+                JBArchitect(),
+                JBProjectManager(),
+                JBDesignApprover(callback = api_callback),
+                JBProductApprover(callback = api_callback),
+                JBTaskApprover(callback = api_callback),
+                JBStageGovernance(),
+                JBEngineer(n_borg=5, use_code_review=True),
+                JBQaEngineer()
+            ]
+        )
+        deliverables: dict = company.get_project(product_name)
     except Exception:
         traceback.print_exc()
-        idea = None
-    return idea
+        deliverables = None
+    return deliverables
     
 @authenticated_callable
 def update_project(product_name: str, project_data: dict):
@@ -222,45 +247,54 @@ def startup(
     use_callback: bool = True
 ) -> int:
     
-    if use_callback:
-        api_callback: Callable = prompt_approval
-    else:
-        api_callback = None
+    #if use_callback:
+    #    api_callback: Callable = prompt_approval
+    #else:
+    #    api_callback = None
 
     company.invest(investment)
     company.start_project(product_name, stage=stage, end_stage=end_stage)
     company.set_stage_callback(update_stage)
     company.set_log_output(log_stream.stream)
 
-    company.hire(
-        [
-            JBProductManager(),
-            JBArchitect(),
-            JBProjectManager(),
-            JBDesignApprover(callback = api_callback),
-            JBProductApprover(callback = api_callback),
-            JBTaskApprover(callback = api_callback),
-            JBStageGovernance()
-        ]
-    )
+    #company.hire(
+    #    [
+    #        JBProductManager(),
+    #        JBArchitect(),
+    #        JBProjectManager(),
+    #        JBDesignApprover(callback = api_callback),
+    #        JBProductApprover(callback = api_callback),
+    #        JBTaskApprover(callback = api_callback),
+    #        JBStageGovernance()
+    #    ]
+    #)
+
+    remove_list = []
+    if end_stage not in ['Build', 'Test']:
+        remove_list.append('Engineer')
+    elif end_stage not in ['Test']:
+        remove_list.append('QaEngineer')
+
+    if len(remove_list)>0:
+        company.dehire(remove_list)
 
     # n_round is now ignored!
     n_round = 2
 
-    if end_stage == "Design":
-        n_round = 4
+    #if end_stage == "Design":
+    #    n_round = 4
 
     # if implement or code_review
-    if end_stage == 'Build':
-        # developing features: implement the idea
-        company.hire([JBEngineer(n_borg=5, use_code_review=True)])
-        n_round = 6
+    #if end_stage == 'Build':
+    #    # developing features: implement the idea
+    #    company.hire([JBEngineer(n_borg=5, use_code_review=True)])
+    #    n_round = 6
 
-    if end_stage == 'Test':
-        # developing features: run tests on the spot and identify bugs
-        # (bug fixing capability comes soon!)
-        company.hire([JBEngineer(n_borg=5, use_code_review=True), JBQaEngineer()])
-        n_round = 7
+    #if end_stage == 'Test':
+    #    # developing features: run tests on the spot and identify bugs
+    #    # (bug fixing capability comes soon!)
+    #    company.hire([JBEngineer(n_borg=5, use_code_review=True), JBQaEngineer()])
+    #    n_round = 7
     
     return n_round
 

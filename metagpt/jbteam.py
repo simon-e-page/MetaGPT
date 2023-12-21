@@ -45,6 +45,14 @@ class Team(BaseModel):
         logger.info(f"Including the following roles: {','.join(role_names)}")
         self.environment.add_roles(roles)
 
+    def dehire(self, profiles: list) -> None:
+        """ Remove a role from the environment based on its profile string"""
+        # TODO: better to be done in the environment object?
+        env_roles: dict = self.environment.roles
+        for profile in profiles:
+            if profile in env_roles.keys():
+                del env_roles[profile]
+
     def invest(self, investment: float):
         """Invest company. raise NoMoneyException when exceed max_budget."""
         self.investment = investment
@@ -57,15 +65,12 @@ class Team(BaseModel):
 
 
     def _map_stage_to_deliverable(self, stage: str) -> Path:
-        if stage == "Requirements":
-            path: Path = CONFIG.product_root / "docs" / "prd.md"
-        elif stage == "Design":
-            path = CONFIG.product_root / "docs" / "system_design.md"
-        elif stage == "Plan":
-            path = CONFIG.product_root / "docs" / "api_spec_and_tasks.md"
-        else:
-            path = None
-        return path
+        DELIVERABLE_MAP = {
+            "Requirements": CONFIG.product_root / "docs" / "prd.md",
+            "Design": CONFIG.product_root / "docs" / "system_design.md",
+            "Plan": CONFIG.product_root / "docs" / "api_spec_and_tasks.md"
+        }
+        return DELIVERABLE_MAP.get(stage, None)
     
     def get_deliverable(self, stage: str) -> str:
         path: Path = self._map_stage_to_deliverable(stage)
@@ -152,7 +157,15 @@ class Team(BaseModel):
             raise FileNotFoundError(f"Need following directory with product config to start: {CONFIG.product_root}")
 
         CONFIG.set_product_config(self.get_product_config(product_name))
-        return CONFIG.idea
+        deliverables: dict = {'Idea': CONFIG.idea}
+
+        history_file = CONFIG.product_root / "history.pickle"
+        if history_file.exists():
+            self.set_memory('Test')
+            for stage in ['Requirements', 'Design', 'Plan', 'Build', 'Test']:
+                deliverables[stage] = self.get_deliverable(stage)
+
+        return deliverables
 
     def create_project(self, product_name: str, idea: str):
         stage = "Requirements"
