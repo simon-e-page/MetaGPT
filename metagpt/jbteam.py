@@ -66,9 +66,9 @@ class Team(BaseModel):
 
     def _map_stage_to_deliverable(self, stage: str) -> Path:
         DELIVERABLE_MAP = {
-            "Requirements": CONFIG.product_root / "docs" / "prd.md",
-            "Design": CONFIG.product_root / "docs" / "system_design.md",
-            "Plan": CONFIG.product_root / "docs" / "api_spec_and_tasks.md"
+            "Requirements": { 'name': 'prd',    'path': CONFIG.product_root / "docs" / "prd.md" },
+            "Design":       { 'name': 'design', 'path': CONFIG.product_root / "docs" / "system_design.md" },
+            "Plan":         { 'name': 'tasks', 'path': CONFIG.product_root / "docs" / "api_spec_and_tasks.md" },
         }
         return DELIVERABLE_MAP.get(stage, None)
     
