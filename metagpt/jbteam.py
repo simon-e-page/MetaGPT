@@ -14,7 +14,7 @@ from pathlib import Path
 import yaml
 from pydantic import BaseModel, Field
 
-from metagpt.actions import BossRequirement, AdvanceStage, ManagementAction, STAGE_ACTIONS
+from metagpt.actions import BossRequirement, AdvanceStage, ManagementAction, STAGE_ACTIONS, WriteJBCode
 from metagpt.config import CONFIG
 import metagpt.const as CONST
 from metagpt.environment import Environment
@@ -65,25 +65,36 @@ class Team(BaseModel):
 
 
     def _map_stage_to_deliverable(self, stage: str) -> Path:
+        """ sets out deliverables for each stage """
+        # TODO: extend to retrieval from the internal message history
         DELIVERABLE_MAP = {
-            "Requirements": { 'name': 'prd',    'path': CONFIG.product_root / "docs" / "prd.md" },
-            "Design":       { 'name': 'design', 'path': CONFIG.product_root / "docs" / "system_design.md" },
-            "Plan":         { 'name': 'tasks', 'path': CONFIG.product_root / "docs" / "api_spec_and_tasks.md" },
+            "Requirements": { 'name': 'prd',               'path': CONFIG.product_root / "docs" / "prd.md" },
+            "Design":       { 'name': 'design',            'path': CONFIG.product_root / "docs" / "system_design.md" },
+            "Plan":         { 'name': 'tasks',             'path': CONFIG.product_root / "docs" / "api_spec_and_tasks.md" },
+            "Build":        { 'name': 'code_review',       'path': WriteJBCode },
+            "Test":         { 'name': 'test_build_report', 'path': None },
+
         }
         return DELIVERABLE_MAP.get(stage, None)
     
     def get_deliverable(self, stage: str) -> str:
-        path: Path = self._map_stage_to_deliverable(stage)
-        content: str = ""
-        if path is not None:
+        path = self._map_stage_to_deliverable(stage)['path']
+        name: str = self._map_stage_to_deliverable(stage)['name']
+        content = None
+
+        if isinstance(path, Path):
             try:
                 content = path.read_text()
             except FileNotFoundError:
                 logger.warning(f"Can't find deliverable: {path}")
+        
+        elif path is not None:
+            memories = self.environment.memory.get_by_actions([path])
+            content = { x.role: x.content for x in memories }
         else:
             logger.warning(f"No deliverable defined for stage {stage}")
         
-        return content
+        return { name: content }
 
     def update_deliverable(self, stage: str, content: str) -> str:
         path: Path = self._map_stage_to_deliverable(stage)
@@ -163,7 +174,7 @@ class Team(BaseModel):
         if history_file.exists():
             self.set_memory('Test')
             for stage in ['Requirements', 'Design', 'Plan', 'Build', 'Test']:
-                deliverables[stage] = self.get_deliverable(stage)
+                deliverables.update(self.get_deliverable(stage))
 
         return deliverables
 

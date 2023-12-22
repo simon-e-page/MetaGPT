@@ -202,7 +202,10 @@ class JBEngineer(Role):
                     logger.error("code review failed!", e)
                     pass
             file_path = self.write_file(todo, code)
-            msg = Message(content=code, role=self.profile, cause_by=WriteJBCode)
+            # We want to note the filename in the Message (future: headers for messages?)
+            # Does this break something else?
+            #msg = Message(content=code, role=self.profile, cause_by=WriteJBCode)
+            msg = Message(content=code, role=todo, cause_by=WriteJBCode)
             self._rc.memory.add(msg)
 
             code_msg = todo + FILENAME_CODE_SEP + str(file_path)
