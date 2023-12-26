@@ -21,8 +21,8 @@ from metagpt.environment import Environment
 from metagpt.logs import logger
 from metagpt.roles import Role, STAGE_ROLES
 from metagpt.schema import Message
-from metagpt.utils.common import NoMoneyException, ApprovalError, ProductConfigError
-
+from metagpt.utils.common import NoMoneyException, ProductConfigError
+from metagpt.utils.jb_common import ApprovalError
 from metagpt.utils.serialize import serialize_batch, deserialize_batch
 
 

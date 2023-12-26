@@ -10,7 +10,7 @@ from typing import List
 from metagpt.actions import Action, ActionOutput
 from metagpt.config import CONFIG
 from metagpt.logs import logger
-from metagpt.utils.common import OutputParser, ApprovalError
+from metagpt.utils.jb_common import ApprovalError, JBParser
 
 OUTPUT_MAPPING = {
     "Approval Response": (str, ...),
@@ -40,7 +40,7 @@ class WriteTaskApproval(Action):
         logger.debug(design_content)
         output_class = ActionOutput.create_model_class("approved_tasks", TASK_OUTPUT_MAPPING)
         #parsed_data = markdown_to_json.dictify(design_content)
-        parsed_data = OutputParser.parse_markdown_deliverable(design_content, TASK_OUTPUT_MAPPING)
+        parsed_data = JBParser.parse_markdown_deliverable(design_content, TASK_OUTPUT_MAPPING)
         logger.debug(parsed_data)
         instruct_content = output_class(**parsed_data)
         return ActionOutput(design_content, instruct_content)
