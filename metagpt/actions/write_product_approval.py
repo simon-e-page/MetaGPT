@@ -10,7 +10,7 @@ from typing import List
 from metagpt.actions import Action, ActionOutput
 from metagpt.config import CONFIG
 from metagpt.logs import logger
-from metagpt.utils.common import OutputParser, ApprovalError
+from metagpt.utils.jb_common import JBParser, ApprovalError
 
 OUTPUT_MAPPING = {
     "Approval Response": (str, ...),
@@ -53,7 +53,7 @@ class WriteProductApproval(Action):
         logger.debug(prd_content)
         output_class = ActionOutput.create_model_class("approved_prd", PRD_OUTPUT_MAPPING)
         #parsed_data = markdown_to_json.jsonify(prd_content)
-        parsed_data = OutputParser.parse_markdown_deliverable(prd_content, PRD_OUTPUT_MAPPING)
+        parsed_data = JBParser.parse_markdown_deliverable(prd_content, PRD_OUTPUT_MAPPING)
         logger.debug(parsed_data)
         instruct_content = output_class(**parsed_data)
         return ActionOutput(prd_content, instruct_content)
