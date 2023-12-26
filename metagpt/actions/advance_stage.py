@@ -2,16 +2,13 @@
 # -*- coding: utf-8 -*-
 """
 @Time    : 2023/5/11 17:45
-@Author  : alexanderwu
+@Author  : simonpage
 @File    : advance_stage.py
 """
-from typing import List
-from metagpt.actions import WriteProductApproval, WriteDesignApproval, WriteTaskApproval
 
+from metagpt.actions import WriteProductApproval, WriteDesignApproval, WriteTaskApproval
 from metagpt.actions import Action, ActionOutput
-from metagpt.config import CONFIG
 from metagpt.logs import logger
-from metagpt.utils.common import OutputParser, ApprovalError
 
 OUTPUT_MAPPING = {
     "Advance Stage": (str, ...),
