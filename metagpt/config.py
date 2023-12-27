@@ -131,7 +131,7 @@ class Config(metaclass=Singleton):
     def product_name(self):
         return self._product_name
 
-    @product_root.setter
+    @product_name.setter
     def product_name(self, value):
         self._product_root: Path = Path(self.workspace_root) / value
         self._product_name: str = value

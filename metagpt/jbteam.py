@@ -161,7 +161,7 @@ class Team(BaseModel):
         CONFIG.idea = idea
         self.save_product_config()
 
-    def get_project(self, product_name: str) -> str:
+    def get_project(self, product_name: str) -> dict:
         CONFIG.product_name = product_name
 
         if not os.path.exists(CONFIG.product_root):
