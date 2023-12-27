@@ -40,7 +40,11 @@ class LongTermMemory(Memory):
             if message.cause_by == action and not self.msg_from_recover:
                 # currently, only add role's watching messages to its memory_storage
                 # and ignore adding messages from recover repeatedly
-                self.memory_storage.add(message)
+                try:
+                    self.memory_storage.add(message)
+                except TypeError as e:
+                    logger.warning(f"Message that caused exception is: {message}")
+                    raise
 
     def find_news(self, observed: list[Message], k=0) -> list[Message]:
         """
