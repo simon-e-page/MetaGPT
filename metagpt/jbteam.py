@@ -189,8 +189,8 @@ class Team(BaseModel):
         return { name: content }
 
     def update_deliverable(self, stage: str, content: str) -> str:
-        path: Path = self._map_stage_to_deliverable(stage)
-        if path is not None:
+        path: Path = self._map_stage_to_deliverable(stage)['path']
+        if isinstance(path, Path):
             try:
                 content = path.write_text(content, encoding='utf-8')
                 ret = "OK"

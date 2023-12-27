@@ -54,9 +54,9 @@ class HumanProvider(BaseGPTAPI):
 
     async def aask(self, msg: str, system_msgs: Optional[list[str]] = None) -> str:
         stage = system_msgs[0]
-        if len(system_msgs>1):
+        if len(system_msgs)>1:
             autoapprove = system_msgs[1]
-        else: 
+        else:
             autoapprove = False
         return self.ask(msg, stage=stage, autoapprove=autoapprove)
 
