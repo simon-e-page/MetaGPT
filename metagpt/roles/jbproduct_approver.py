@@ -64,16 +64,8 @@ class JBProductApprover(Role):
                     self.approval_found = True
 
         observed: list = self._rc.env.memory.get_by_actions(self._rc.watch)
-        seen: list = self._rc.memory.get_by_actions(self._rc.watch)
-        seen_msgs = [f"{i.role}: {i.content[:20]}..." for i in seen]
-        observed_msgs = [f"{i.role}: {i.content[:20]}..." for i in observed]
-
-        logger.info(f"Seen messages: {seen_msgs}")
-        logger.info(f"Observed messages: {observed_msgs}")
-
-        news = [ i for i in observed if i not in seen ]
-        self._rc.news = news
-        #self._rc.news = self._rc.memory.find_news(observed)  # find news (previously unseen messages) from observed messages
+        
+        self._rc.news = self._rc.memory.find_news(observed)  # find news (previously unseen messages) from observed messages
 
         for i in env_msgs:
             self.recv(i)
