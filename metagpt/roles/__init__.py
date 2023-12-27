@@ -46,6 +46,14 @@ STAGE_TEAM = {
     "Test": [ JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover, JBEngineer, JBQaEngineer, JBStageGovernance ],
 }
 
+APPROVERS: dict = {
+    "Requirements": [ JBProductApprover, JBStageGovernance ],
+    "Design": [ JBDesignApprover, JBStageGovernance ],
+    "Plan": [ JBTaskApprover, JBStageGovernance ],
+    "Build": [ JBEngineer, JBStageGovernance ],
+    "Test": [ JBQaEngineer, JBStageGovernance ],
+}
+
 __all__ = [
     "Role",
     "Architect",

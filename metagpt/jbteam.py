@@ -19,7 +19,7 @@ from metagpt.config import CONFIG
 import metagpt.const as CONST
 from metagpt.environment import Environment
 from metagpt.logs import logger
-from metagpt.roles import Role, STAGE_ROLES, STAGE_TEAM
+from metagpt.roles import Role, STAGE_ROLES, STAGE_TEAM, APPROVERS
 from metagpt.schema import Message
 from metagpt.utils.common import NoMoneyException, ProductConfigError
 from metagpt.utils.jb_common import ApprovalError
@@ -286,7 +286,11 @@ class Team(BaseModel):
             news_text = [f"{i.role}: {i.content[:20]}..." for i in messages]
             logger.info(f'Replayed: {news_text}')
             self.environment.memory.add_batch(messages)
+
+            # Only the approver roles should see a new message in the environment to kick off proceedings
             for role in self.environment.get_roles().values():
+                if role in APPROVERS[stage]:
+                    continue
                 for message in messages:
                     role.recv(message)
             ret = True
