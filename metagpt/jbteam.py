@@ -289,7 +289,7 @@ class Team(BaseModel):
 
             # Only the approver roles should see a new message in the environment to kick off proceedings
             for name, role in self.environment.get_roles().items():
-                if role not in APPROVERS[stage]:
+                if type(role) not in APPROVERS[stage]:
                     logger.info(f"And including fast forward memory recall for {name}")
                     for message in messages:
                         role.recv(message)
