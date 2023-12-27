@@ -258,7 +258,7 @@ class Team(BaseModel):
         """ Strips all messages that are not in the list of specific actions"""
         messages = [ m for m in messages if m.cause_by in keep ]
         return messages
-
+        
 
     def set_memory(self, stage: str=None):
         """ Resets Memory of Roles and Environment to a specific stage. 
@@ -271,11 +271,13 @@ class Team(BaseModel):
 
         history_file = CONFIG.product_root / "history.pickle"
         if history_file.exists():
-            logger.warning("Loading messages from a previous execution and replaying!")
+            logger.warning(f"Loading messages from a previous execution and replaying up to {stage}!")
             messages = deserialize_batch(history_file.read_bytes())
             messages = self.filter_messages(messages, STAGE_ACTIONS[stage])
             self.environment.memory.add_batch(messages)
-            self.environment.publish_message(Message(role="Human", content=f"AUTO-APPROVE: {stage}", cause_by=ManagementAction, send_to=""))
+            prev_stage = self.get_previous_stage(stage)
+            if prev_stage is not None:
+                self.environment.publish_message(Message(role="Human", content=f"AUTO-APPROVE: {prev_stage}", cause_by=ManagementAction, send_to=""))
         else:
             logger.info("Commencing project with Boss Requirement")
             self.environment.publish_message(Message(role="Human", content=CONFIG.idea, cause_by=BossRequirement, send_to=""))
@@ -291,6 +293,14 @@ class Team(BaseModel):
     def set_log_output(self, stream):
         logger.add(stream, level="INFO")
         
+    def get_previous_stage(self, current_stage: str) -> str:
+        stage_num: int = CONST.STAGES[current_stage]
+        if stage_num > 0:
+            new_stage: str = CONST.STAGE_LIST[stage_num-1]
+        else:
+            new_stage = None
+        return new_stage
+    
     def scan_advances(self, current_stage: str) -> str:
         advances = self.environment.memory.get_by_action(AdvanceStage)
         stage_num: int = CONST.STAGES[current_stage]

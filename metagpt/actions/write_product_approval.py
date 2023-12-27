@@ -7,7 +7,7 @@
 """
 from typing import List
 
-from metagpt.actions import Action, ActionOutput
+from metagpt.actions import Action, ActionOutput, ManagementAction, WriteJBPRD
 from metagpt.config import CONFIG
 from metagpt.logs import logger
 from metagpt.utils.jb_common import JBParser, ApprovalError
@@ -62,25 +62,35 @@ class WriteProductApproval(Action):
         """ Wait for a Human Approval """
         
         autoapprove = False
+        ready = False
         for msg in context:
-            if "AUTO-APPROVE: Requirements" in msg.content:
+            if msg.cause_by == ManagementAction and "AUTO-APPROVE: Requirements" in msg.content:
                 autoapprove = True
+                ready = True
+                break
+            if msg.cause_by == WriteJBPRD:
+                ready = True
                 
-        prompt = "Do you approve the Product Requirements? (yes/no)"
-        prd_approval = await self._aask_v1(prompt,
-                                           "prd_approval",
-                                           OUTPUT_MAPPING,
-                                           format='json',
-                                           system_msgs=['Requirements', autoapprove]
-                                           )
+        prd_approval = None
         
-        if prd_approval.instruct_content.dict()['Approval Response'] == 'yes':
-            logger.info("Got approval for Product Requirements!")
-            output = self._get_prd_from_disk()
+        if ready:
+            prompt = "Do you approve the Product Requirements? (yes/no)"
+            prd_approval = await self._aask_v1(prompt,
+                                            "prd_approval",
+                                            OUTPUT_MAPPING,
+                                            format='json',
+                                            system_msgs=['Requirements', autoapprove]
+                                            )
+            
+            if prd_approval.instruct_content.dict()['Approval Response'] == 'yes':
+                logger.info("Got approval for Product Requirements!")
+                output = self._get_prd_from_disk()
 
+            else:
+                logger.warning("No approval - stop project!")
+                output = prd_approval
+                raise ApprovalError("Approval Error - Product not approved", approver="Product Approver")
         else:
-            logger.warning("No approval - stop project!")
-            output = prd_approval
-            raise ApprovalError("Approval Error - Product not approved", approver="Product Approver")
+            logger.info("Not for me. Ignore")
 
         return output

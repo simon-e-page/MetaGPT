@@ -48,10 +48,10 @@ SKILL_DIRECTORY = PROJECT_ROOT / "metagpt/skills"
 
 MEM_TTL = 24 * 30 * 3600
 
+STAGE_LIST = [ "Requirements", "Design", "Plan", "Build", "Test"]
 STAGES: dict = { "Requirements": 0,
                  "Design": 1,
                  "Plan": 2,
                  "Build": 3,
                  "Test": 4
                 }
-
