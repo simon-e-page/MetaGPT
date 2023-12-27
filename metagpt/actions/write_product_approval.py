@@ -7,7 +7,7 @@
 """
 from typing import List
 
-from metagpt.actions import Action, ActionOutput, 
+from metagpt.actions import Action, ActionOutput
 from metagpt.actions.management_action import ManagementAction
 from metagpt.actions.write_jb_prd import WriteJBPRD
 from metagpt.config import CONFIG
