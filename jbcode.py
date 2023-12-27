@@ -160,6 +160,7 @@ def check_status() -> tuple:
     stage: str = ""
     error: str = ""
     stage: str = ""
+    status: str = ""
 
     if task is not None:
         if task_state.get('Waiting', False):
@@ -168,19 +169,19 @@ def check_status() -> tuple:
         elif task.running():
             stage = task_state.get('stage', "Requirements")
             status = "Runnimg"
+        elif task.done():
+            try:
+                result = task.result()
+                print("###############\nCompleted task output:\n#################\n")
+                print(result)
+                status = "Complete"
+            except Exception:
+                traceback.print_exc()
+                status = "Idle"
+                error = traceback.format_exc()
+            task = None
         else:
-            if task.done():
-                try:
-                    result = task.result()
-                    print("###############\nCompleted task output:\n#################\n")
-                    print(result)
-                    status = "Complete"
-                except Exception:
-                    traceback.print_exc()
-                    status = "Idle"
-                    error = traceback.format_exc()
-                    status = "Idle"
-                task = None
+            status = "Unknown!"
     else:
         status = "Idle"
     return (status, stage, error)
