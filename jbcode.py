@@ -172,8 +172,9 @@ def check_status() -> tuple:
             if task.done():
                 try:
                     result = task.result()
+                    print("###############\nCompleted task output:\n#################\n")
                     print(result)
-                    status = "Idle"
+                    status = "Complete"
                 except Exception:
                     traceback.print_exc()
                     status = "Idle"
