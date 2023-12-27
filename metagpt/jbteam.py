@@ -152,6 +152,9 @@ class Team(BaseModel):
         CONFIG.max_budget = investment
         logger.info(f'Investment: ${investment}.')
 
+    def get_balance(self) -> float:
+        return CONFIG.total_cost
+
     def _check_balance(self):
         if CONFIG.total_cost > CONFIG.max_budget:
             raise NoMoneyException(CONFIG.total_cost, f'Insufficient funds: {CONFIG.max_budget}')
@@ -376,9 +379,14 @@ class Team(BaseModel):
         n_round = 20
         while n_round>0 and (CONST.STAGES[end_stage] >= CONST.STAGES[current_stage]):
             logger.info(f"Working on stage: {current_stage}")
-            self._check_balance()
+            
             try:
+                self._check_balance()
                 await self.environment.run()
+            except NoMoneyException as e:
+                logger.error("Ran out of money! Cannot continue!")
+                logger.error(f"Total spent: {e.amount} out of {CONFIG.max_budget}")
+                n_round = 0
             except ApprovalError as e:
                 logger.error(f"Approval not given by {e.approver}")
                 role = self.environment.get_role(e.approver)

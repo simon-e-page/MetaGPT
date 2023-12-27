@@ -154,6 +154,14 @@ def download_project(product_name: str) -> bytes:
         media_obj = None
     return media_obj
 
+@authenticated_callable
+def get_balance():
+    if company is None:
+        return 0
+    else:
+        balance: float = company.get_balance()
+        return balance
+
 
 def check_status() -> tuple:
     global task
