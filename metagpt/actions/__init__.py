@@ -65,9 +65,9 @@ class ActionType(Enum):
 
 STAGE_ACTIONS = {
     'Requirements': [BossRequirement],
-    'Design': [BossRequirement, WriteJBPRD, WriteProductApproval],
-    'Plan': [BossRequirement, WriteJBPRD, WriteProductApproval, WriteJBDesign, WriteDesignApproval],
-    'Build': [BossRequirement, WriteJBPRD, WriteProductApproval, WriteJBDesign, WriteDesignApproval, WriteJBTasks, WriteTaskApproval],
+    'Design': [BossRequirement, WriteJBPRD],
+    'Plan': [BossRequirement, WriteJBPRD, WriteProductApproval, WriteJBDesign],
+    'Build': [BossRequirement, WriteJBPRD, WriteProductApproval, WriteJBDesign, WriteDesignApproval, WriteJBTasks],
     'Test': [BossRequirement, WriteJBPRD, WriteProductApproval, WriteJBDesign, WriteDesignApproval, WriteJBTasks, WriteTaskApproval, WriteJBCode, WriteCodeReview],
 }
 
