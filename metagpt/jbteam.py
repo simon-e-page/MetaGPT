@@ -19,7 +19,7 @@ from metagpt.config import CONFIG
 import metagpt.const as CONST
 from metagpt.environment import Environment
 from metagpt.logs import logger
-from metagpt.roles import Role, STAGE_ROLES
+from metagpt.roles import Role, STAGE_ROLES, STAGE_TEAM
 from metagpt.schema import Message
 from metagpt.utils.common import NoMoneyException, ProductConfigError
 from metagpt.utils.jb_common import ApprovalError
@@ -318,6 +318,12 @@ class Team(BaseModel):
 
         return new_stage         
 
+    def set_team(self, end_stage):
+        for name, role in self.environment.get_roles().items():
+            if type(role) not in STAGE_TEAM[end_stage]:
+                logger.info(f"Removing {role} from the team!")
+                del self.environment.get_roles()[name]
+
     async def run(self, n_round=3, start_stage="Requirements", end_stage="Requirements"):
         """Run company until target stage or no money"""
 
@@ -333,6 +339,8 @@ class Team(BaseModel):
         else:
             logger.info("Commencing project with Boss Requirement")
             self.environment.publish_message(Message(role="Human", content=CONFIG.idea, cause_by=BossRequirement, send_to=""))
+
+        self.set_team(end_stage)
 
         logger.info(f"Team will execute rounds of Tasks unless they finish the {end_stage} stage or run out of Investment funds!")
 

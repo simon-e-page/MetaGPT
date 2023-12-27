@@ -38,6 +38,14 @@ STAGE_ROLES = {
     "Test": [ JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover, JBEngineer ],
 }
 
+STAGE_TEAM = {
+    "Requirements": [JBProductManager, JBProductApprover],
+    "Design": [ JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover ],
+    "Plan": [JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover ],
+    "Build": [JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover, JBEngineer ],
+    "Test": [ JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover, JBEngineer, JBQaEngineer ],
+}
+
 __all__ = [
     "Role",
     "Architect",
