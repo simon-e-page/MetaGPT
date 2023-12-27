@@ -369,6 +369,9 @@ class Team(BaseModel):
             self.stage_callback(stage=current_stage)
 
         #while n_round > 0 and (CONST.STAGES[end_stage] >= CONST.STAGES[current_stage]):
+        # Failsafe to avoid infinite loop
+        # TODO: change to monitor new messages in the environment??
+        n_round = 20
         while n_round>0 and (CONST.STAGES[end_stage] >= CONST.STAGES[current_stage]):
             logger.info(f"Working on stage: {current_stage}")
             self._check_balance()
@@ -395,6 +398,8 @@ class Team(BaseModel):
                 if self.stage_callback is not None:
                     self.stage_callback(stage=new_stage)
                 current_stage = new_stage
+                
+            n_round -= 1
             
         history_file = CONFIG.product_root / "history.pickle"
         with open(history_file, 'wb') as file:
