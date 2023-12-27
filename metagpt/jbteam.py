@@ -282,6 +282,8 @@ class Team(BaseModel):
             messages = deserialize_batch(history_file.read_bytes())
             messages = self.filter_messages(messages, STAGE_ACTIONS[stage])
             logger.info(f"Publishing {len(messages)} messages to the environment")
+            news_text = [f"{i.role}: {i.content[:20]}..." for i in messages]
+            logger.info(f'Replayed: {news_text}')
             self.environment.memory.add_batch(messages)
             ret = True
         
