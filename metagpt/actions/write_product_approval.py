@@ -47,6 +47,11 @@ class WriteProductApproval(Action):
     """
     def __init__(self, name="", context=None, llm=None):
         super().__init__(name, context, llm)
+        self.autoapprove = False
+
+    def set_autoapproval(self):
+        logger.info("Got Auto-Approval Directive for Product Requirements!")
+        self.autoapprove = True
 
     def _get_prd_from_disk(self):
         path = CONFIG.product_root / "docs" / "prd.md"
@@ -62,24 +67,24 @@ class WriteProductApproval(Action):
     async def run(self, context, *args, **kwargs) -> ActionOutput:
         """ Wait for a Human Approval """
         
-        autoapprove = False
-        ready = False
-        for msg in context:
-            if msg.cause_by == ManagementAction:
-                if "AUTO-APPROVE: Requirements" in msg.content:
-                    autoapprove = True
-            else:
-                ready = True
+        #autoapprove = self.autoapprove
+        #ready = False
+        #for msg in context:
+        #    if msg.cause_by == ManagementAction:
+        #        if "AUTO-APPROVE: Requirements" in msg.content:
+        #            autoapprove = True
+        #    else:
+        #        ready = True
                 
-        output = ActionOutput(content="No action taken", instruct_content={})
+        #output = ActionOutput(content="No action taken", instruct_content={})
         
-        if ready:
+        if True:
             prompt = "Do you approve the Product Requirements? (yes/no)"
             prd_approval = await self._aask_v1(prompt,
                                             "prd_approval",
                                             OUTPUT_MAPPING,
                                             format='json',
-                                            system_msgs=['Requirements', autoapprove]
+                                            system_msgs=['Requirements', self.autoapprove]
                                             )
             
             if prd_approval.instruct_content.dict()['Approval Response'] == 'yes':
@@ -90,7 +95,7 @@ class WriteProductApproval(Action):
                 logger.warning("No approval - stop project!")
                 output = prd_approval
                 raise ApprovalError("Approval Error - Product not approved", approver="Product Approver")
-        else:
-            logger.info("Not for me. Ignore")
+        #else:
+        #    logger.info("Not for me. Ignore")
 
         return output
