@@ -64,6 +64,33 @@ class Team(BaseModel):
         return ret
 
     @classmethod
+    def reset_project(cls, product_name: str) -> None:
+        """Remove all files/dirs except the Product Config"""
+
+        _base_dir: Path = Path(CONFIG.workspace_root) / product_name
+
+        _current_config: dict = cls.get_product_config(product_name=product_name)
+        for root, dirs, files in os.walk(_base_dir, topdown=False):
+            for file in files:
+                file_path: str = os.path.join(root, file)
+                try:
+                    os.remove(file_path)
+                except Exception as e:
+                    logger.warning(f"Error deleting file: {file_path} - {e}")
+
+            for dir_name in dirs:
+                dir_path: str = os.path.join(root, dir_name)
+                try:
+                    os.rmdir(dir_path)
+                except Exception as e:
+                    logger.warning(f"Error deleting directory: {dir_path} - {e}")
+
+        os.makedirs(_base_dir, exist_ok=True)
+        cls.save_product_config_to_file(product_name=product_name, config=_current_config)
+
+
+
+    @classmethod
     def get_product_config(cls, product_name: str) -> dict:    
         _base: dict = {
             'IDEA': 'Make a simple web application that displays Hello World',

@@ -117,34 +117,21 @@ def get_project(product_name: str, use_callback=True) -> dict:
     return deliverables
     
 @authenticated_callable
-def update_project(product_name: str, project_data: dict):
-    # TODO: take this out of the Team structure..
-    global company
-    if company is None:
-        company = Team()
+def update_project(product_name: str, project_data: dict) -> None:
     idea: str = project_data['IDEA']
-    company.update_project(product_name, idea)
+    Team.update_project(product_name, idea)
 
 
 @authenticated_callable
 def create_project(product_name: str, project_data: dict) -> bool:
-    # TODO: take this out of the Team structure..
-    global company
-    if company is None:
-        company = Team()
     idea: str = project_data['IDEA']
-    return company.create_project(product_name, idea)
+    return Team.create_project(product_name, idea)
 
 @authenticated_callable
 def download_project(product_name: str) -> bytes:
-    # TODO: take this out of the Team structure..
-    global company
-    if company is None:
-        company = Team()
-
     zipfile = None
     try:
-        zipfile: bytes = company.download_project(product_name)
+        zipfile: bytes = Team.download_project(product_name)
     except Exception:
         traceback.print_exc()
 
@@ -155,7 +142,12 @@ def download_project(product_name: str) -> bytes:
     return media_obj
 
 @authenticated_callable
-def get_balance():
+def reset_project(product_name: str) -> None:
+    Team.reset_project(product_name)
+
+
+@authenticated_callable
+def get_balance() -> float:
     if company is None:
         return 0
     else:
