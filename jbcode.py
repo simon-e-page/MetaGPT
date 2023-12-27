@@ -301,6 +301,7 @@ def approve_stage(stage, approval=None) -> str:
     if task_state is None or task_state.get('Waiting'):
         print(f"Got approval message for {stage}")
         task_state['Approval'] = approval
+        task_state['Waiting'] = False
     else:
         # Do nothing!
         ret = f"Error: task is not waiting for {stage} approval"
