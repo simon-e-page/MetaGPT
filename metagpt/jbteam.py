@@ -273,6 +273,7 @@ class Team(BaseModel):
             stage = "Test"
 
         logger.info("Clearing all memory to reset history")
+        self.environment.memory.clear()
         for name, role in self.environment.get_roles().items():
             role._rc.memory.clear()
         
