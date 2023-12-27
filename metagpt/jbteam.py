@@ -319,15 +319,20 @@ class Team(BaseModel):
         return new_stage         
 
     def set_team(self, end_stage):
+        remove = []
         for name, role in self.environment.get_roles().items():
             if type(role) not in STAGE_TEAM[end_stage]:
                 logger.info(f"Removing {role} from the team!")
-                del self.environment.get_roles()[name]
+                remove.append(name)
+                
+        for name in remove:
+            del self.environment.get_roles()[name]
 
     async def run(self, n_round=3, start_stage="Requirements", end_stage="Requirements"):
         """Run company until target stage or no money"""
 
         current_stage: str = start_stage
+        self.set_team(end_stage)
         
         if self.set_memory(start_stage):
             prev_stage = self.get_previous_stage(start_stage)
@@ -340,7 +345,6 @@ class Team(BaseModel):
             logger.info("Commencing project with Boss Requirement")
             self.environment.publish_message(Message(role="Human", content=CONFIG.idea, cause_by=BossRequirement, send_to=""))
 
-        self.set_team(end_stage)
 
         logger.info(f"Team will execute rounds of Tasks unless they finish the {end_stage} stage or run out of Investment funds!")
 
