@@ -339,8 +339,10 @@ class Team(BaseModel):
         for name, role in self.environment.get_roles().items():
             self.bench[name] = role
             if type(role) not in STAGE_TEAM[end_stage]:
-                logger.info(f"Removing {name} from the team!")
+                #logger.info(f"Removing {name} from the team!")
                 remove.append(name)
+            else:
+                logger.info(f"Confirming {name} in the team for this execution")
 
         for name in remove:
             del self.environment.get_roles()[name]
