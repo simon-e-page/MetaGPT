@@ -96,7 +96,11 @@ class Config(metaclass=Singleton):
 
         self.prompt_format = self._get("PROMPT_FORMAT", "markdown")
         self.workspace_root: str = self._get("WORKSPACE_ROOT", f"{PROJECT_ROOT}/workspace")
-
+        
+        self._product_root = None
+        self._product_config = None
+        self._product_name = None
+        
     def _init_with_config_files_and_env(self, configs: dict, yaml_file):
         """Load from config/key.yaml, config/config.yaml, and env in decreasing order of priority"""
         configs.update(os.environ)

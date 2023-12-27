@@ -100,7 +100,7 @@ def get_project(product_name: str, use_callback=True) -> dict:
         api_callback = None
     
     try:
-        company = Team()
+        company = Team(product_name=product_name)
         company.hire(
             [
                 JBProductManager(),

@@ -31,14 +31,16 @@ class Team(BaseModel):
     Team: Possesses one or more roles (agents), SOP (Standard Operating Procedures), and a platform for instant messaging,
     dedicated to perform any multi-agent activity, such as collaboratively writing executable code.
     """
+
+    product_name: str
     environment: Environment = Field(default_factory=Environment)
     investment: float = Field(default=10.0)
     idea: str = Field(default="")
     stage_callback: Callable = Field(default=None)
-
+    
     class Config:
         arbitrary_types_allowed = True
-
+        
     def hire(self, roles: list[Role]):
         """Hire roles to cooperate"""
         role_names = [ x.profile for x in roles ]
@@ -161,13 +163,15 @@ class Team(BaseModel):
         CONFIG.idea = idea
         self.save_product_config()
 
-    def get_project(self, product_name: str) -> dict:
-        CONFIG.product_name = product_name
+    def get_project(self) -> dict:
+        # First set CONFIG object up
+        # TODO: implement in __init__?
+        CONFIG.product_name = self.product_name
 
         if not os.path.exists(CONFIG.product_root):
             raise FileNotFoundError(f"Need following directory with product config to start: {CONFIG.product_root}")
 
-        CONFIG.set_product_config(self.get_product_config(product_name))
+        CONFIG.set_product_config(self.get_product_config(self.product_name))
         deliverables: dict = {'Idea': CONFIG.idea}
 
         history_file = CONFIG.product_root / "history.pickle"
