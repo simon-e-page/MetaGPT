@@ -278,16 +278,17 @@ class Team(BaseModel):
         
         history_file = CONFIG.product_root / "history.pickle"
         if history_file.exists():
-            logger.warning(f"Loading messages from a previous execution and replaying up to {stage}!")
+            logger.info(f"Loading messages from a previous execution and replaying up to {stage}!")
             messages = deserialize_batch(history_file.read_bytes())
             messages = self.filter_messages(messages, STAGE_ACTIONS[stage])
+            logger.info(f"Publishing {len(messages)} messages to the environment")
             self.environment.memory.add_batch(messages)
             ret = True
         
-        for name, role in self.environment.get_roles().items():
-            if type(role) not in STAGE_ROLES[stage]:
-                logger.info(f"Clearing memory for {name}")
-                role._rc.memory.clear()
+        #for name, role in self.environment.get_roles().items():
+        #    if type(role) not in STAGE_ROLES[stage]:
+        #        logger.info(f"Clearing memory for {name}")
+        #        role._rc.memory.clear()
 
         return ret
     
