@@ -46,7 +46,7 @@ class JBTaskApprover(Role):
         if callback is not None:
             # Using API to receive approval
             self._actions[0].llm.set_callback(callback)
-        self._watch([WriteJBTasks, ManagementAction])
+        self._watch([WriteJBTasks])
 
     async def _observe(self) -> int:
         """Override to listen for Management Directives to set Auto-Approval but take no response"""
