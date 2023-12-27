@@ -47,6 +47,7 @@ class JBDesignApprover(Role):
             self._actions[0].llm.set_callback(callback)
         self._watch([WriteJBDesign])
         self.autoapproval_msg = "AUTO-APPROVE: Design"
+        self.approval_found = False
 
     async def _observe(self) -> int:
         """Override to listen for Management Directives to set Auto-Approval but take no response"""
@@ -54,11 +55,13 @@ class JBDesignApprover(Role):
             return 0
         env_msgs = self._rc.env.memory.get()
 
-        autoapprovals = self._rc.env.memory.get_by_actions([ManagementAction])
-        for msg in autoapprovals:
-            if self.autoapproval_msg in msg.content:
-                self._actions[0].set_autoapproval()
-                
+        if not self.approval_found:
+            autoapprovals = self._rc.env.memory.get_by_actions([ManagementAction])
+            for msg in autoapprovals:
+                if self.autoapproval_msg in msg.content:
+                    self._actions[0].set_autoapproval()
+                    self.approval_found = True
+                                    
         observed = self._rc.env.memory.get_by_actions(self._rc.watch)
         
         self._rc.news = self._rc.memory.find_news(observed)  # find news (previously unseen messages) from observed messages
