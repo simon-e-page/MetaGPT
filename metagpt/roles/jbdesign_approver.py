@@ -46,6 +46,7 @@ class JBDesignApprover(Role):
             # Using API to receive approval
             self._actions[0].llm.set_callback(callback)
         self._watch([WriteJBDesign])
+        self.autoapproval_msg = "AUTO-APPROVE: Design"
 
     async def _observe(self) -> int:
         """Override to listen for Management Directives to set Auto-Approval but take no response"""
