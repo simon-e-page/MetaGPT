@@ -9,16 +9,18 @@
 from metagpt.actions import WriteProductApproval, WriteDesignApproval, WriteTaskApproval
 from metagpt.actions import Action, ActionOutput
 from metagpt.logs import logger
+from collections import OrderedDict
 
 OUTPUT_MAPPING = {
     "Advance Stage": (str, ...),
 }
 
-ADVANCE: dict = { 
-            WriteProductApproval: 'Design',
-            WriteDesignApproval: "Plan",
-            WriteTaskApproval: "Build"
+ADVANCE: OrderedDict = { 
+            WriteProductApproval: {'index': 0, 'stage': 'Design'},
+            WriteDesignApproval:  {'index': 1, 'stage': "Plan"  },
+            WriteTaskApproval:    {'index': 2, 'stage': "Build" },
             }
+
 
 class AdvanceStage(Action):
     def __init__(self, name="", context=None, llm=None):
@@ -26,11 +28,16 @@ class AdvanceStage(Action):
 
     async def run(self, context, *args, **kwargs) -> ActionOutput:
         """ Send an Advance Stage message to the environment """
+
+        # Look for the latest (most advanced) approval message
         new_stage = None
+        new_index = -1
         for msg in context:
             if msg.cause_by in ADVANCE.keys():
-                new_stage = ADVANCE[msg.cause_by]
-                break
+                temp_index = ADVANCE[msg.cause_by]['index']
+                if temp_index > new_index:
+                    new_stage = ADVANCE[msg.cause_by]['stage']
+                    new_index = temp_index
 
         if new_stage is None:
             logger.warning("Could not find the Approval Message in the provided history!")
