@@ -38,6 +38,7 @@ class Team(BaseModel):
     investment: float = Field(default=10.0)
     idea: str = Field(default="")
     stage_callback: Callable = Field(default=None)
+    bench: dict = Field(default={})
     
     class Config:
         arbitrary_types_allowed = True
@@ -319,12 +320,17 @@ class Team(BaseModel):
         return new_stage         
 
     def set_team(self, end_stage):
+        if len(self.bench)>0 is not None:
+            self.environment.add_roles(self.bench.values())
+            self.bench = {}
+
         remove = []
         for name, role in self.environment.get_roles().items():
+            self.bench[name] = role
             if type(role) not in STAGE_TEAM[end_stage]:
-                logger.info(f"Removing {role} from the team!")
+                logger.info(f"Removing {name} from the team!")
                 remove.append(name)
-                
+
         for name in remove:
             del self.environment.get_roles()[name]
 

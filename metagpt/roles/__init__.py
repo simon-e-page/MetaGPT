@@ -39,11 +39,11 @@ STAGE_ROLES = {
 }
 
 STAGE_TEAM = {
-    "Requirements": [JBProductManager, JBProductApprover],
-    "Design": [ JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover ],
-    "Plan": [JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover ],
-    "Build": [JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover, JBEngineer ],
-    "Test": [ JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover, JBEngineer, JBQaEngineer ],
+    "Requirements": [JBProductManager, JBProductApprover, JBStageGovernance],
+    "Design": [ JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBStageGovernance ],
+    "Plan": [JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover, JBStageGovernance ],
+    "Build": [JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover, JBEngineer, JBStageGovernance ],
+    "Test": [ JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover, JBEngineer, JBQaEngineer, JBStageGovernance ],
 }
 
 __all__ = [
