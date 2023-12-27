@@ -23,11 +23,13 @@ class HumanProvider(BaseGPTAPI):
 
     #async def ask(self, msg: str, stage: str) -> str:
     def ask(self, msg: str, stage: str ="Requirements", autoapprove=False) -> str:
-        logger.info("It's your turn, please type in your response. You may also refer to the context below\n")
+        
         if autoapprove:
+            logger.info("Responding with Auto-Approval")
             rsp = "yes"
         elif self.callback is not None:
             # API Input
+            logger.info("Waiting for API response.")
             self.callback(action="approve", stage=stage)
             # Block until we get a response!
             rsp  = self.callback(action="check", stage=stage)
@@ -38,6 +40,7 @@ class HumanProvider(BaseGPTAPI):
                 logger.info(f"Approval received: {rsp}")
         else:
             # Direct Human input
+            logger.info("Waiting for human response.")
             rsp = input(msg)
 
         if rsp in['yes', 'y']:
