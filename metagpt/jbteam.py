@@ -277,7 +277,7 @@ class Team(BaseModel):
         for name, role in self.environment.get_roles().items():
             role._rc.memory.clear()
         
-        history_file = CONFIG.product_root / "history.pickle"
+        history_file: Path = CONFIG.product_root / "history.pickle"
         if history_file.exists():
             logger.info(f"Loading messages from a previous execution and replaying up to {stage}!")
             messages = deserialize_batch(history_file.read_bytes())
