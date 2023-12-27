@@ -61,7 +61,7 @@ class JBDesignApprover(Role):
                 if self.autoapproval_msg in msg.content:
                     self._actions[0].set_autoapproval()
                     self.approval_found = True
-                                    
+
         observed = self._rc.env.memory.get_by_actions(self._rc.watch)
         
         self._rc.news = self._rc.memory.find_news(observed)  # find news (previously unseen messages) from observed messages
@@ -69,7 +69,7 @@ class JBDesignApprover(Role):
         for i in env_msgs:
             self.recv(i)
 
-        news_text = [f"{i.role}: {i.content[:20]}..." for i in self._rc.news]
+        #news_text = [f"{i.role}: {i.content[:20]}..." for i in self._rc.news]
         #if news_text:
         #    logger.debug(f'{self._setting} observed: {news_text}')
         return len(self._rc.news)
