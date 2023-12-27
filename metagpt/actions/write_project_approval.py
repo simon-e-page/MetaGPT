@@ -32,6 +32,11 @@ TASK_OUTPUT_MAPPING = {
 class WriteTaskApproval(Action):
     def __init__(self, name="", context=None, llm=None):
         super().__init__(name, context, llm)
+        self.autoapprove = False
+
+    def set_autoapproval(self):
+        logger.info("Got Auto-Approval Directive for Project Tasks!")
+        self.autoapprove = True
 
     def _get_tasks_from_disk(self):
         docs_path = CONFIG.product_root / "docs"
@@ -48,37 +53,22 @@ class WriteTaskApproval(Action):
 
     async def run(self, context, *args, **kwargs) -> ActionOutput:
         """ Wait for a Human Approval """
-
-        autoapprove = False
-        ready = False
-        for msg in context:
-            if msg.cause_by == ManagementAction:
-                if "AUTO-APPROVE: Plan" in msg.content:
-                    autoapprove = True
-            else:
-                ready = True
-                
-        output = ActionOutput(content="No action taken", instruct_content={})
         
-        if ready:
-            prompt = "Do you approve the Tasks and API Spec? (yes/no)"
-            task_approval = await self._aask_v1(prompt,
-                                                "task_approval",
-                                                OUTPUT_MAPPING,
-                                                format='json',
-                                                system_msgs=['Plan', autoapprove]
-                                                )
+        prompt = "Do you approve the Tasks and API Spec? (yes/no)"
+        task_approval = await self._aask_v1(prompt,
+                                            "task_approval",
+                                            OUTPUT_MAPPING,
+                                            format='json',
+                                            system_msgs=['Plan', self.autoapprove]
+                                            )
 
-            if task_approval.instruct_content.dict()['Approval Response'] == 'yes':
-                logger.info("Got approval for Tasks and API Spec!")
-                output = self._get_tasks_from_disk()
-                
-            else:
-                logger.warning("No approval - stop project!")
-                output = task_approval
-                raise ApprovalError("Approval Error - API Spec not approved", approver="Task Approver")
+        if task_approval.instruct_content.dict()['Approval Response'] == 'yes':
+            logger.info("Got approval for Tasks and API Spec!")
+            output = self._get_tasks_from_disk()
+            
         else:
-            logger.info("Not for me. Ignore")
-
+            logger.warning("No approval - stop project!")
+            output = task_approval
+            raise ApprovalError("Approval Error - API Spec not approved", approver="Task Approver")
 
         return output

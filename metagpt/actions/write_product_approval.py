@@ -66,36 +66,24 @@ class WriteProductApproval(Action):
     
     async def run(self, context, *args, **kwargs) -> ActionOutput:
         """ Wait for a Human Approval """
-        
-        #autoapprove = self.autoapprove
-        #ready = False
-        #for msg in context:
-        #    if msg.cause_by == ManagementAction:
-        #        if "AUTO-APPROVE: Requirements" in msg.content:
-        #            autoapprove = True
-        #    else:
-        #        ready = True
                 
-        #output = ActionOutput(content="No action taken", instruct_content={})
-        
-        if True:
-            prompt = "Do you approve the Product Requirements? (yes/no)"
-            prd_approval = await self._aask_v1(prompt,
-                                            "prd_approval",
-                                            OUTPUT_MAPPING,
-                                            format='json',
-                                            system_msgs=['Requirements', self.autoapprove]
-                                            )
-            
-            if prd_approval.instruct_content.dict()['Approval Response'] == 'yes':
-                logger.info("Got approval for Product Requirements!")
-                output = self._get_prd_from_disk()
+        logger.info(f"Auto-approve status = {self.autoapprove}")
 
-            else:
-                logger.warning("No approval - stop project!")
-                output = prd_approval
-                raise ApprovalError("Approval Error - Product not approved", approver="Product Approver")
-        #else:
-        #    logger.info("Not for me. Ignore")
+        prompt = "Do you approve the Product Requirements? (yes/no)"
+        prd_approval = await self._aask_v1(prompt,
+                                        "prd_approval",
+                                        OUTPUT_MAPPING,
+                                        format='json',
+                                        system_msgs=['Requirements', self.autoapprove]
+                                        )
+        
+        if prd_approval.instruct_content.dict()['Approval Response'] == 'yes':
+            logger.info("Got approval for Product Requirements!")
+            output = self._get_prd_from_disk()
+
+        else:
+            logger.warning("No approval - stop project!")
+            output = prd_approval
+            raise ApprovalError("Approval Error - Product not approved", approver="Product Approver")
 
         return output

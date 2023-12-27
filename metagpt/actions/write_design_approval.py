@@ -31,6 +31,11 @@ DESIGN_OUTPUT_MAPPING = {
 class WriteDesignApproval(Action):
     def __init__(self, name="", context=None, llm=None):
         super().__init__(name, context, llm)
+        self.autoapprove = False
+
+    def set_autoapproval(self):
+        logger.info("Got Auto-Approval Directive for Product Design!")
+        self.autoapprove = True
 
     def get_design_from_disk(self):
         docs_path = CONFIG.product_root / "docs"
@@ -48,38 +53,22 @@ class WriteDesignApproval(Action):
     async def run(self, context, *args, **kwargs) -> ActionOutput:
         """ Wait for a Human Approval """
 
-        autoapprove = False
-        ready = False
-        for msg in context:
-            # Check history for auto-approve directives
-            if msg.cause_by == ManagementAction:
-                if "AUTO-APPROVE: Design" in msg.content:
-                    autoapprove = True
-            else:
-                # Only take action if there is a deliverable
-                ready = True
-        
-        output = ActionOutput(content="No action taken", instruct_content={})
-        
-        if ready:
-            prompt = "Do you approve the System Design? (yes/no)"
-            design_approval = await self._aask_v1(prompt, 
-                                                "design_approval",
-                                                OUTPUT_MAPPING,
-                                                format='json',
-                                                system_msgs=['Design', autoapprove]
-                                                )
+        prompt = "Do you approve the System Design? (yes/no)"
+        design_approval = await self._aask_v1(prompt, 
+                                            "design_approval",
+                                            OUTPUT_MAPPING,
+                                            format='json',
+                                            system_msgs=['Design', self.autoapprove]
+                                            )
 
-            if design_approval.instruct_content.dict()['Approval Response'] == 'yes':
-                logger.info("Got approval for System Design!")
-                output = self.get_design_from_disk()
-                
-            else:
-                logger.warning("No approval - stop project!")
-                output = design_approval
-                raise ApprovalError("Approval Error - Design not approved", approver="Design Approver")
+        if design_approval.instruct_content.dict()['Approval Response'] == 'yes':
+            logger.info("Got approval for System Design!")
+            output = self.get_design_from_disk()
+            
         else:
-            logger.info("Not for me. Ignore")
+            logger.warning("No approval - stop project!")
+            output = design_approval
+            raise ApprovalError("Approval Error - Design not approved", approver="Design Approver")
 
 
         return output
