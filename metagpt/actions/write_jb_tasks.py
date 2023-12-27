@@ -6,6 +6,7 @@
 @File    : project_management.py
 """
 from typing import List
+from pathlib import Path
 
 from metagpt.actions.action import Action
 from metagpt.config import CONFIG
@@ -170,11 +171,11 @@ class WriteJBTasks(Action):
         #else:
         #    ws_name = CodeParser.parse_str(block="Python package name", text=context[-1].content)
         #ws_name = CONFIG.product_name
-        file_path = CONFIG.product_name / "docs" / "api_spec_and_tasks.md"
+        file_path: Path = CONFIG.product_root / "docs" / "api_spec_and_tasks.md"
         file_path.write_text(json_to_markdown(rsp.instruct_content.dict()))
 
         # Write requirements.txt
-        requirements_path = CONFIG.product_name / "requirements.txt"
+        requirements_path: Path = CONFIG.product_root / "requirements.txt"
         requirements_path.write_text("\n".join(rsp.instruct_content.dict().get("Required Python third-party packages")))
 
     async def run(self, context, format=CONFIG.prompt_format):
