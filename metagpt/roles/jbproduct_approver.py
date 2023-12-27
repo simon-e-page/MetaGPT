@@ -70,7 +70,7 @@ class JBProductApprover(Role):
         for i in env_msgs:
             self.recv(i)
 
-        news_text = [f"{i.role}: {i.content[:20]}..." for i in self._rc.news]
+        news_text: list = [f"{i.role}: {i.content[:20]}..." for i in self._rc.news]
         if news_text:
             logger.info(f'{self._setting} observed: {news_text}')
         return len(self._rc.news)
