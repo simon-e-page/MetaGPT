@@ -283,16 +283,16 @@ class Team(BaseModel):
             messages = deserialize_batch(history_file.read_bytes())
             messages = self.filter_messages(messages, STAGE_ACTIONS[stage])
             logger.info(f"Publishing {len(messages)} messages to the environment")
-            news_text = [f"{i.role}: {i.content[:20]}..." for i in messages]
-            logger.info(f'Replayed: {news_text}')
+            #news_text = [f"{i.role}: {i.content[:20]}..." for i in messages]
+            #logger.info(f'Replayed: {news_text}')
             self.environment.memory.add_batch(messages)
 
             # Only the approver roles should see a new message in the environment to kick off proceedings
-            for role in self.environment.get_roles().values():
-                if role in APPROVERS[stage]:
-                    continue
-                for message in messages:
-                    role.recv(message)
+            for name, role in self.environment.get_roles().items():
+                if role not in APPROVERS[stage]:
+                    logger.info(f"And including fast forward memory recall for {name}")
+                    for message in messages:
+                        role.recv(message)
             ret = True
         
         #for name, role in self.environment.get_roles().items():
@@ -398,7 +398,7 @@ class Team(BaseModel):
                 if self.stage_callback is not None:
                     self.stage_callback(stage=new_stage)
                 current_stage = new_stage
-                
+
             n_round -= 1
             
         history_file = CONFIG.product_root / "history.pickle"
