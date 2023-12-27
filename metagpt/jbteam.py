@@ -86,6 +86,7 @@ class Team(BaseModel):
                     logger.warning(f"Error deleting directory: {dir_path} - {e}")
 
         os.makedirs(_base_dir, exist_ok=True)
+        _current_config['STAGE'] = 'Requirements'
         cls.save_product_config_to_file(product_name=product_name, config=_current_config)
 
 
