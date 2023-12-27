@@ -273,7 +273,7 @@ class Team(BaseModel):
 
         logger.info("Clearing all memory to reset history")
         for name, role in self.environment.get_roles().items():
-                role._rc.memory.clear()
+            role._rc.memory.clear()
         
         history_file = CONFIG.product_root / "history.pickle"
         if history_file.exists():
