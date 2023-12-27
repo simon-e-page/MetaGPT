@@ -8,6 +8,7 @@
 from typing import List
 
 from metagpt.actions import Action, ActionOutput
+from metagpt.actions.management_action import ManagementAction
 from metagpt.config import CONFIG
 from metagpt.logs import logger
 from metagpt.utils.jb_common import ApprovalError, JBParser
@@ -49,26 +50,35 @@ class WriteTaskApproval(Action):
         """ Wait for a Human Approval """
 
         autoapprove = False
+        ready = False
         for msg in context:
-            if "AUTO-APPROVE: Plan" in msg.content:
-                autoapprove = True
+            if msg.cause_by == ManagementAction:
+                if "AUTO-APPROVE: Plan" in msg.content:
+                    autoapprove = True
+            else:
+                ready = True
+                
+        output = "No action taken"
         
-        prompt = "Do you approve the Tasks and API Spec? (yes/no)"
-        task_approval = await self._aask_v1(prompt,
-                                            "task_approval",
-                                            OUTPUT_MAPPING,
-                                            format='json',
-                                            system_msgs=['Plan', autoapprove]
-                                            )
+        if ready:
+            prompt = "Do you approve the Tasks and API Spec? (yes/no)"
+            task_approval = await self._aask_v1(prompt,
+                                                "task_approval",
+                                                OUTPUT_MAPPING,
+                                                format='json',
+                                                system_msgs=['Plan', autoapprove]
+                                                )
 
-        if task_approval.instruct_content.dict()['Approval Response'] == 'yes':
-            logger.info("Got approval for Tasks and API Spec!")
-            output = self._get_tasks_from_disk()
-            
+            if task_approval.instruct_content.dict()['Approval Response'] == 'yes':
+                logger.info("Got approval for Tasks and API Spec!")
+                output = self._get_tasks_from_disk()
+                
+            else:
+                logger.warning("No approval - stop project!")
+                output = task_approval
+                raise ApprovalError("Approval Error - API Spec not approved", approver="Task Approver")
         else:
-            logger.warning("No approval - stop project!")
-            output = task_approval
-            raise ApprovalError("Approval Error - API Spec not approved", approver="Task Approver")
+            logger.info("Not for me. Ignore")
 
 
         return output

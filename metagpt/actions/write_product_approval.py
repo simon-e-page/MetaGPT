@@ -9,7 +9,6 @@ from typing import List
 
 from metagpt.actions import Action, ActionOutput
 from metagpt.actions.management_action import ManagementAction
-from metagpt.actions.write_jb_prd import WriteJBPRD
 from metagpt.config import CONFIG
 from metagpt.logs import logger
 from metagpt.utils.jb_common import JBParser, ApprovalError
@@ -66,14 +65,13 @@ class WriteProductApproval(Action):
         autoapprove = False
         ready = False
         for msg in context:
-            if msg.cause_by == ManagementAction and "AUTO-APPROVE: Requirements" in msg.content:
-                autoapprove = True
-                ready = True
-                break
-            if msg.cause_by == WriteJBPRD:
+            if msg.cause_by == ManagementAction:
+                if "AUTO-APPROVE: Requirements" in msg.content:
+                    autoapprove = True
+            else:
                 ready = True
                 
-        prd_approval = None
+        output = "No action taken"
         
         if ready:
             prompt = "Do you approve the Product Requirements? (yes/no)"

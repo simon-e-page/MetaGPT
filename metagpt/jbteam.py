@@ -265,28 +265,31 @@ class Team(BaseModel):
             If None then continues from last run
         """
 
+        ret = False
+        
         if stage is None:
             # Setting to the last stage means we dont remove any memories
             stage = "Test"
 
+        logger.info("Clearing all memory to reset history")
+        for name, role in self.environment.get_roles().items():
+                role._rc.memory.clear()
+        
         history_file = CONFIG.product_root / "history.pickle"
         if history_file.exists():
             logger.warning(f"Loading messages from a previous execution and replaying up to {stage}!")
             messages = deserialize_batch(history_file.read_bytes())
             messages = self.filter_messages(messages, STAGE_ACTIONS[stage])
             self.environment.memory.add_batch(messages)
-            prev_stage = self.get_previous_stage(stage)
-            if prev_stage is not None:
-                self.environment.publish_message(Message(role="Human", content=f"AUTO-APPROVE: {prev_stage}", cause_by=ManagementAction, send_to=""))
-        else:
-            logger.info("Commencing project with Boss Requirement")
-            self.environment.publish_message(Message(role="Human", content=CONFIG.idea, cause_by=BossRequirement, send_to=""))
+            ret = True
         
         for name, role in self.environment.get_roles().items():
             if type(role) not in STAGE_ROLES[stage]:
                 logger.info(f"Clearing memory for {name}")
                 role._rc.memory.clear()
 
+        return ret
+    
     def set_stage_callback(self, callback: Callable):
         self.stage_callback = callback
 
@@ -318,8 +321,18 @@ class Team(BaseModel):
     async def run(self, n_round=3, start_stage="Requirements", end_stage="Requirements"):
         """Run company until target stage or no money"""
 
-        self.set_memory(start_stage)
         current_stage: str = start_stage
+        
+        if self.set_memory(start_stage):
+            prev_stage = self.get_previous_stage(start_stage)
+            
+            while prev_stage is not None:
+                self.environment.publish_message(Message(role="Human", content=f"AUTO-APPROVE: {prev_stage}", cause_by=ManagementAction, send_to=""))
+                prev_stage = self.get_previous_stage(prev_stage)
+                
+        else:
+            logger.info("Commencing project with Boss Requirement")
+            self.environment.publish_message(Message(role="Human", content=CONFIG.idea, cause_by=BossRequirement, send_to=""))
 
         logger.info(f"Team will execute rounds of Tasks unless they finish the {end_stage} stage or run out of Investment funds!")
 
