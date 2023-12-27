@@ -188,23 +188,17 @@ class WriteJBDesign(Action):
         ]  # CodeParser.parse_code(block="Program call flow", text=content)
         await mermaid_to_file(data_api_design, resources_path / "data_api_design")
         await mermaid_to_file(seq_flow, resources_path / "seq_flow")
-        system_design_file = docs_path / "system_design.md"
+        system_design_file: Path = docs_path / "system_design.md"
         logger.info(f"Saving System Designs to {system_design_file}")
-        system_design_file.write_text((json_to_markdown(system_design.instruct_content.dict())))
+        markdown: str = json_to_markdown(system_design.instruct_content.dict())
+        logger.info(markdown)
+        system_design_file.write_text((markdown))
 
-    async def _save(self, context, system_design):
+    async def _save(self, context, system_design) -> None:
         """ Save system design to output workspace """
-        #if isinstance(system_design, ActionOutput):
-        #    ws_name = system_design.instruct_content.dict()["Python package name"]
-        #else:
-        #    ws_name = CodeParser.parse_str(block="Python package name", text=system_design)
-        workspace = CONST.WORKSPACE_ROOT
-        #self.recreate_workspace(workspace)
-        docs_path = workspace / "docs"
-        resources_path = workspace / "resources"
-        #docs_path.mkdir(parents=True, exist_ok=True)
-        #resources_path.mkdir(parents=True, exist_ok=True)
-        #await self._save_prd(docs_path, resources_path, context)
+        workspace: Path = CONFIG.product_root
+        docs_path: Path = workspace / "docs"
+        resources_path: Path = workspace / "resources"
         await self._save_system_design(docs_path, resources_path, system_design)
 
     async def run(self, context, format=CONFIG.prompt_format):
