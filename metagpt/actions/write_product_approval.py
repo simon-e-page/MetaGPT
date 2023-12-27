@@ -7,7 +7,9 @@
 """
 from typing import List
 
-from metagpt.actions import Action, ActionOutput, ManagementAction, WriteJBPRD
+from metagpt.actions import Action, ActionOutput, 
+from metagpt.actions.management_action import ManagementAction
+from metagpt.actions.write_jb_prd import WriteJBPRD
 from metagpt.config import CONFIG
 from metagpt.logs import logger
 from metagpt.utils.jb_common import JBParser, ApprovalError
