@@ -287,7 +287,8 @@ class Team(BaseModel):
             logger.info(f'Replayed: {news_text}')
             self.environment.memory.add_batch(messages)
             for role in self.environment.get_roles().values():
-                role._rc.memory.add_batch(messages)
+                for message in messages:
+                    role.recv(message)
             ret = True
         
         #for name, role in self.environment.get_roles().items():

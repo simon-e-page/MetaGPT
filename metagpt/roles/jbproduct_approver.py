@@ -68,8 +68,8 @@ class JBProductApprover(Role):
         seen_msgs = [f"{i.role}: {i.content[:20]}..." for i in seen]
         observed_msgs = [f"{i.role}: {i.content[:20]}..." for i in observed]
 
-        logger.info(f"Seen messages: {seen_msgs}")
-        logger.info(f"Observed messages: {observed_msgs}")
+        #logger.info(f"Seen messages: {seen_msgs}")
+        #logger.info(f"Observed messages: {observed_msgs}")
 
         news = [ i for i in observed if i not in seen ]
         self._rc.news = news
