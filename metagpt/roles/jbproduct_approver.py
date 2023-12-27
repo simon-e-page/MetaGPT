@@ -54,7 +54,7 @@ class JBProductApprover(Role):
         """Override to listen for Management Directives to set Auto-Approval but take no response"""
         if not self._rc.env:
             return 0
-        env_msgs = self._rc.env.memory.get()
+        env_msgs: list = self._rc.env.memory.get()
 
         if not self.approval_found:
             autoapprovals = self._rc.env.memory.get_by_actions([ManagementAction])
@@ -63,9 +63,17 @@ class JBProductApprover(Role):
                     self._actions[0].set_autoapproval()
                     self.approval_found = True
 
-        observed = self._rc.env.memory.get_by_actions(self._rc.watch)
-        
-        self._rc.news = self._rc.memory.find_news(observed)  # find news (previously unseen messages) from observed messages
+        observed: list = self._rc.env.memory.get_by_actions(self._rc.watch)
+        seen: list = self._rc.memory.get_by_actions(self._rc.watch)
+        seen_msgs = [f"{i.role}: {i.content[:20]}..." for i in seen]
+        observed_msgs = [f"{i.role}: {i.content[:20]}..." for i in observed]
+
+        logger.info(f"Seen messages: {seen_msgs}")
+        logger.info(f"Observed messages: {observed_msgs}")
+
+        news = [ i for i in observed if i not in seen ]
+        self._rc.news = news
+        #self._rc.news = self._rc.memory.find_news(observed)  # find news (previously unseen messages) from observed messages
 
         for i in env_msgs:
             self.recv(i)
