@@ -58,7 +58,7 @@ class WriteTaskApproval(Action):
             else:
                 ready = True
                 
-        output = "No action taken"
+        output = ActionOutput(content="No action taken", instruct_content={})
         
         if ready:
             prompt = "Do you approve the Tasks and API Spec? (yes/no)"
