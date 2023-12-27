@@ -43,18 +43,93 @@ class Team(BaseModel):
         arbitrary_types_allowed = True
 
     @classmethod
-    def get_project_list(self) -> list:
+    def download_project(cls, product_name: str) -> bytes:
+        """Create a zip file of the project directory into a bytes object and return it."""
+
+        _base_dir: Path = Path(CONFIG.workspace_root) / product_name
+        
+        zip_file_bytes = io.BytesIO()
+        cwd = os.getcwd()
+        if _base_dir.exists():
+            os.chdir(_base_dir)
+            with zipfile.ZipFile(zip_file_bytes, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                for root, dirs, files in os.walk("."):
+                    for file in files:
+                        zipf.write(os.path.join(root, file))
+            os.chdir(cwd)
+            ret = zip_file_bytes.getvalue()
+        else:
+            ret = None
+        return ret
+
+    @classmethod
+    def get_product_config(cls, product_name: str) -> dict:    
+        _base: dict = {
+            'IDEA': 'Make a simple web application that displays Hello World',
+            'STAGE': 'Requirements'
+        }
+        
+        _yaml_file: Path = Path(CONFIG.workspace_root) / product_name / "product.yaml"
+
+        with open(_yaml_file, "r", encoding="utf-8") as file:
+            yaml_data = yaml.safe_load(file)
+            if yaml_data:               
+                _base.update(yaml_data)
+            else:
+                raise ProductConfigError(f"No valid product config found at {_yaml_file}")
+        return _base
+
+    @classmethod
+    def update_project(cls, product_name: str, idea: str):
+        _base_dir: Path = Path(CONFIG.workspace_root) / product_name
+        if _base_dir.exists():
+            existing = cls.get_product_config(product_name)
+            existing['IDEA'] = idea
+            cls.save_product_config_to_file(product_name, existing)
+
+    @classmethod
+    def save_product_config_to_file(cls, product_name: str, config: dict):
+        _base_dir: Path = Path(CONFIG.workspace_root) / product_name
+        _yaml_file: Path = _base_dir / "product.yaml"
+        if _base_dir.exists():
+            with open(_yaml_file, "w", encoding="utf-8") as file:
+                yaml.safe_dump(config, file)
+
+    @classmethod
+    def get_project_list(cls) -> list:
         projects: list = []
         path: Path = Path(CONFIG.workspace_root)
         for i in path.iterdir():
             if i.is_dir():
                 try:
-                    entry: dict = self.get_product_config(i.name)
+                    entry: dict = cls.get_product_config(i.name)
                     entry['NAME'] = i.name
                     projects.append(entry)
                 except ProductConfigError:
                     logger.warning(f"Invalid product config: {i.name}")
         return projects
+
+    @classmethod
+    def create_project(cls, product_name: str, idea: str, stage='Requirements'):
+        _base_dir: Path = Path(CONFIG.workspace_root) / product_name
+
+        _base: dict = {
+            'IDEA': idea,
+            'STAGE': stage
+        }
+
+        ret = True
+        try:
+            os.makedirs(_base_dir)
+        except OSError:
+            logger.warning("Project already exists!")
+            ret = False
+            
+        if ret:
+            cls.save_product_config_to_file(product_name, _base)
+        return ret
+
+
         
     def hire(self, roles: list[Role]):
         """Hire roles to cooperate"""
@@ -127,22 +202,6 @@ class Team(BaseModel):
             ret = "Error"
         return ret
 
-    def get_product_config(self, product_name: str) -> dict:    
-        _base: dict = {
-            'IDEA': 'Make a simple web application that displays Hello World',
-            'STAGE': 'Requirements'
-        }
-        
-        _yaml_file: Path = Path(CONFIG.workspace_root) / product_name / "product.yaml"
-
-        with open(_yaml_file, "r", encoding="utf-8") as file:
-            yaml_data = yaml.safe_load(file)
-            if yaml_data:               
-                _base.update(yaml_data)
-            else:
-                raise ProductConfigError(f"No valid product config found at {_yaml_file}")
-        return _base
-    
     def create_product_config(self, idea, stage):
         data = {
             'IDEA': idea,
@@ -152,20 +211,10 @@ class Team(BaseModel):
         CONFIG.product_config = yaml.dump(data)
         self.save_product_config()
         
-    def save_product_config(self, product_name=None):
-        if product_name is not None:
-            _yaml_file: Path = Path(CONFIG.workspace_root) / product_name / "product.yaml"
-        else:
-            _yaml_file: Path = CONFIG.product_root / "product.yaml"
-        with open(_yaml_file, "w", encoding="utf-8") as file:
-            yaml.safe_dump(CONFIG.product_config, file)
+    def save_product_config(self):
+        self.save_product_config_to_file(self.product_name, CONFIG.product_config)
 
-    def update_project(self, product_name: str, idea: str):
-        self.get_project(product_name)
-        CONFIG.idea = idea
-        self.save_product_config()
-
-    def get_project(self) -> dict:
+    def load_product_config(self) -> None:
         # First set CONFIG object up
         # TODO: implement in __init__?
         CONFIG.product_name = self.product_name
@@ -174,6 +223,8 @@ class Team(BaseModel):
             raise FileNotFoundError(f"Need following directory with product config to start: {CONFIG.product_root}")
 
         CONFIG.set_product_config(self.get_product_config(self.product_name))
+        
+    def get_project(self) -> dict:
         deliverables: dict = {'Idea': CONFIG.idea}
 
         history_file = CONFIG.product_root / "history.pickle"
@@ -184,25 +235,12 @@ class Team(BaseModel):
 
         return deliverables
 
-    def create_project(self, product_name: str, idea: str):
-        stage = "Requirements"
-        CONFIG.product_name = product_name
-        ret = True
-        try:
-            os.makedirs(CONFIG.product_root)
-        except OSError:
-            logger.warning("Project already exists!")
-            ret = False
-        if ret:
-            CONFIG.set_product_config(self.create_product_config(idea, stage))
-            self.save_product_config()
-        return ret
 
     def start_project(self, product_name: str, stage: str = "Requirements", send_to: str = "", end_stage="Requirements"):
         """Start a project from the start or a specific stage (assuming prior stages have been run)"""
         logger.info(f'Starting project: {product_name}')
 
-        self.get_project(product_name=product_name)
+        #self.get_project()
         CONFIG.stage = stage
         CONFIG.end_stage = end_stage
 
@@ -211,18 +249,6 @@ class Team(BaseModel):
         logger.info(f'For product {product_name} we are commencing stage: {stage}')
 
     
-    def download_project(self, product_name) -> bytes:
-        """Create a zip file of the project directory into a bytes object and return it."""
-        self.get_project(product_name)
-        zip_file_bytes = io.BytesIO()
-        cwd = os.getcwd()
-        os.chdir(CONFIG.product_root)
-        with zipfile.ZipFile(zip_file_bytes, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            for root, dirs, files in os.walk("."):
-                for file in files:
-                    zipf.write(os.path.join(root, file))
-        os.chdir(cwd)
-        return zip_file_bytes.getvalue()
 
     def _save(self):
         logger.info(self.json())
@@ -252,7 +278,7 @@ class Team(BaseModel):
             self.environment.publish_message(Message(role="Human", content=f"AUTO-APPROVE: {stage}", cause_by=ManagementAction, send_to=""))
         else:
             logger.info("Commencing project with Boss Requirement")
-            self.environment.publish_message(Message(role="Human", content=self.environment.idea, cause_by=BossRequirement, send_to=""))
+            self.environment.publish_message(Message(role="Human", content=CONFIG.idea, cause_by=BossRequirement, send_to=""))
         
         for name, role in self.environment.get_roles().items():
             if type(role) not in STAGE_ROLES[stage]:

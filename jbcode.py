@@ -96,6 +96,7 @@ def get_project(product_name: str, use_callback=True) -> dict:
     
     try:
         company = Team(product_name=product_name)
+        company.load_product_config()
         company.hire(
             [
                 JBProductManager(),
@@ -109,7 +110,7 @@ def get_project(product_name: str, use_callback=True) -> dict:
                 JBQaEngineer()
             ]
         )
-        deliverables: dict = company.get_project(product_name)
+        deliverables: dict = company.get_project()
     except Exception:
         traceback.print_exc()
         deliverables = None
