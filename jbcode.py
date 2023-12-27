@@ -12,7 +12,7 @@ from concurrent.futures import ThreadPoolExecutor
 import anvil.server
 from anvil import BlobMedia
 
-from metagpt.jbteam import Team, get_project_list
+from metagpt.jbteam import Team
 from metagpt.roles import (
     JBArchitect,
     JBEngineer,
