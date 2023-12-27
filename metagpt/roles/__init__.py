@@ -46,12 +46,13 @@ STAGE_TEAM = {
     "Test": [ JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover, JBEngineer, JBQaEngineer, JBStageGovernance ],
 }
 
+# This works by triggering the action from the Approver of the Previous Stage
 APPROVERS: dict = {
-    "Requirements": [ JBProductApprover, JBStageGovernance ],
-    "Design": [ JBDesignApprover, JBStageGovernance ],
-    "Plan": [ JBTaskApprover, JBStageGovernance ],
-    "Build": [ JBEngineer, JBStageGovernance ],
-    "Test": [ JBQaEngineer, JBStageGovernance ],
+    "Requirements": [],
+    "Design": [ JBProductApprover, JBStageGovernance ],
+    "Plan": [ JBDesignApprover, JBStageGovernance ],
+    "Build": [ JBTaskApprover, JBStageGovernance ],
+    "Test": [ JBEngineer, JBStageGovernance ],
 }
 
 __all__ = [
