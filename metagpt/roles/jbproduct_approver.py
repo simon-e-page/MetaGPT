@@ -10,7 +10,7 @@ from typing import Callable
 
 from metagpt.actions import WriteJBPRD, WriteProductApproval, ManagementAction
 from metagpt.roles import Role
-
+from metagpt.logs import logger
 
 
 class JBProductApprover(Role):
@@ -71,7 +71,7 @@ class JBProductApprover(Role):
             self.recv(i)
 
         news_text = [f"{i.role}: {i.content[:20]}..." for i in self._rc.news]
-        #if news_text:
-        #    logger.debug(f'{self._setting} observed: {news_text}')
+        if news_text:
+            logger.info(f'{self._setting} observed: {news_text}')
         return len(self._rc.news)
 

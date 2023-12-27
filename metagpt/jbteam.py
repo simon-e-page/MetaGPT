@@ -380,7 +380,7 @@ class Team(BaseModel):
             
             new_stage: str = self.scan_advances(current_stage)
             if new_stage != current_stage:
-                logger.info(f"Execution advanced to new {new_stage} stage!")
+                logger.info(f"Execution advanced to {new_stage} stage!")
 
                 if self.stage_callback is not None:
                     self.stage_callback(stage=new_stage)
