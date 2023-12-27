@@ -12,7 +12,7 @@ from concurrent.futures import ThreadPoolExecutor
 import anvil.server
 from anvil import BlobMedia
 
-from metagpt.jbteam import Team
+from metagpt.jbteam import Team, get_project_list
 from metagpt.roles import (
     JBArchitect,
     JBEngineer,
@@ -76,12 +76,7 @@ authenticated_callable = anvil.server.callable()
 @authenticated_callable
 def get_projects() -> list:
     """ Retrieve existing projects and return a list of names"""
-    global company
-    if company is None:
-        company = Team()
-    projects: str = company.get_projects()
-    return projects
-
+    return Team.get_project_list()
 
 @authenticated_callable
 def get_project(product_name: str, use_callback=True) -> dict:

@@ -26,6 +26,7 @@ from metagpt.utils.jb_common import ApprovalError
 from metagpt.utils.serialize import serialize_batch, deserialize_batch
 
 
+
 class Team(BaseModel):
     """
     Team: Possesses one or more roles (agents), SOP (Standard Operating Procedures), and a platform for instant messaging,
@@ -40,6 +41,20 @@ class Team(BaseModel):
     
     class Config:
         arbitrary_types_allowed = True
+
+    @classmethod
+    def get_project_list(self) -> list:
+        projects: list = []
+        path: Path = Path(CONFIG.workspace_root)
+        for i in path.iterdir():
+            if i.is_dir():
+                try:
+                    entry: dict = self.get_product_config(i.name)
+                    entry['NAME'] = i.name
+                    projects.append(entry)
+                except ProductConfigError:
+                    logger.warning(f"Invalid product config: {i.name}")
+        return projects
         
     def hire(self, roles: list[Role]):
         """Hire roles to cooperate"""
@@ -144,19 +159,6 @@ class Team(BaseModel):
             _yaml_file: Path = CONFIG.product_root / "product.yaml"
         with open(_yaml_file, "w", encoding="utf-8") as file:
             yaml.safe_dump(CONFIG.product_config, file)
-
-    def get_projects(self) -> list:
-        projects: list = []
-        path: Path = Path(CONFIG.workspace_root)
-        for i in path.iterdir():
-            if i.is_dir():
-                try:
-                    entry: dict = self.get_product_config(i.name)
-                    entry['NAME'] = i.name
-                    projects.append(entry)
-                except ProductConfigError:
-                    logger.warning(f"Invalid product config: {i.name}")
-        return projects
 
     def update_project(self, product_name: str, idea: str):
         self.get_project(product_name)
