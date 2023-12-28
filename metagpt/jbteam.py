@@ -257,7 +257,7 @@ class Team(BaseModel):
         CONFIG.set_product_config(self.get_product_config(self.product_name))
         
     def get_project(self) -> dict:
-        deliverables: dict = {'Idea': CONFIG.idea}
+        deliverables: dict = {'IDEA': CONFIG.idea}
 
         history_file = CONFIG.product_root / "history.pickle"
         if history_file.exists():
