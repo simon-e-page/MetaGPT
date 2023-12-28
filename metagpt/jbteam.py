@@ -57,10 +57,10 @@ class Team(BaseModel):
         return folder_name
 
     @classmethod
-    def download_project(cls, product_name: str) -> bytes:
+    def download_project(cls, email: str, product_name: str) -> bytes:
         """Create a zip file of the project directory into a bytes object and return it."""
 
-        _base_dir: Path = Path(CONFIG.workspace_root) / product_name
+        _base_dir: Path = Path(CONFIG.workspace_root) / cls.generate_folder_name(email) / product_name
         
         zip_file_bytes = io.BytesIO()
         cwd = os.getcwd()
@@ -77,12 +77,16 @@ class Team(BaseModel):
         return ret
 
     @classmethod
-    def reset_project(cls, product_name: str) -> None:
+    def reset_project(cls, email: str, product_name: str) -> None:
         """Remove all files/dirs except the Product Config"""
 
-        _base_dir: Path = Path(CONFIG.workspace_root) / product_name
+        _base_dir: Path = Path(CONFIG.workspace_root) / cls.generate_folder_name(email) / product_name
 
-        _current_config: dict = cls.get_product_config(product_name=product_name)
+        if not _base_dir.exists():
+            return
+
+        _current_config: dict = cls.get_product_config(email=email, product_name=product_name)
+        
         for root, dirs, files in os.walk(_base_dir, topdown=False):
             for file in files:
                 file_path: str = os.path.join(root, file)
@@ -100,19 +104,23 @@ class Team(BaseModel):
 
         os.makedirs(_base_dir, exist_ok=True)
         _current_config['STAGE'] = 'Requirements'
-        cls.save_product_config_to_file(product_name=product_name, config=_current_config)
+        cls.save_product_config_to_file(email=email, product_name=product_name, config=_current_config)
 
 
 
     @classmethod
-    def get_product_config(cls, product_name: str) -> dict:    
+    def get_product_config(cls, email: str, product_name: str) -> dict:    
         _base: dict = {
             'IDEA': 'Make a simple web application that displays Hello World',
             'STAGE': 'Requirements'
         }
         
-        _yaml_file: Path = Path(CONFIG.workspace_root) / product_name / "product.yaml"
+        _yaml_file: Path = Path(CONFIG.workspace_root) / cls.generate_folder_name(email) / product_name / "product.yaml"
 
+        if not _yaml_file.exists():
+            logger.warning(f"No config found at {_yaml_file}!")
+            return _base
+        
         with open(_yaml_file, "r", encoding="utf-8") as file:
             yaml_data = yaml.safe_load(file)
             if yaml_data:               
@@ -122,12 +130,12 @@ class Team(BaseModel):
         return _base
 
     @classmethod
-    def update_project(cls, product_name: str, idea: str):
-        _base_dir: Path = Path(CONFIG.workspace_root) / product_name
+    def update_project(cls, email: str, product_name: str, idea: str):
+        _base_dir: Path = Path(CONFIG.workspace_root) / cls.generate_folder_name(email) / product_name
         if _base_dir.exists():
-            existing = cls.get_product_config(product_name)
+            existing = cls.get_product_config(email, product_name)
             existing['IDEA'] = idea
-            cls.save_product_config_to_file(product_name, existing)
+            cls.save_product_config_to_file(email=email, product_name=product_name, config=existing)
 
     @classmethod
     def save_product_config_to_file(cls, email: str, product_name: str, config: dict):
@@ -145,7 +153,7 @@ class Team(BaseModel):
             for i in path.iterdir():
                 if i.is_dir():
                     try:
-                        entry: dict = cls.get_product_config(i.name)
+                        entry: dict = cls.get_product_config(email=email, product_name=i.name)
                         entry['NAME'] = i.name
                         projects.append(entry)
                     except ProductConfigError:
