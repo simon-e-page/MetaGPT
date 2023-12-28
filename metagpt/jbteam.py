@@ -260,7 +260,7 @@ class Team(BaseModel):
         deliverables: dict = CONFIG.product_config.copy()
         deliverables['NAME'] = CONFIG.product_name
 
-        history_file = CONFIG.product_root / "history.pickle"
+        history_file: Path = CONFIG.product_root / "history.pickle"
         if history_file.exists():
             self.set_memory('Test')
             for stage in ['Requirements', 'Design', 'Plan', 'Build', 'Test']:
