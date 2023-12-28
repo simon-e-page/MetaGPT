@@ -96,6 +96,11 @@ def get_project(product_name: str, use_callback=True) -> dict:
         print("Project running!")
         return None
 
+    email: str = anvil.google.auth.get_user_email()
+    if email is None:
+        print("Not logged in!")
+        return None
+    
     if use_callback:
         api_callback: Callable = prompt_approval
     else:
@@ -103,7 +108,7 @@ def get_project(product_name: str, use_callback=True) -> dict:
     
     try:
         company = Team(product_name=product_name)
-        company.load_product_config()
+        company.load_product_config(email=email)
         company.hire(
             [
                 JBProductManager(),
@@ -125,21 +130,30 @@ def get_project(product_name: str, use_callback=True) -> dict:
     
 @authenticated_callable
 def update_project(product_name: str, project_data: dict) -> None:
-    idea: str = project_data['IDEA']
-    Team.update_project(product_name, idea)
+    email: str = anvil.google.auth.get_user_email()
+    if email is not None:
+        idea: str = project_data['IDEA']
+        Team.update_project(email=email, product_name=product_name, idea=idea)
 
 
 @authenticated_callable
 def create_project(product_name: str, project_data: dict) -> bool:
     email = anvil.google.auth.get_user_email()
-    idea: str = project_data['IDEA']
-    return Team.create_project(email, product_name, idea)
+    if email is None:
+        return False
+    else:
+        idea: str = project_data['IDEA']
+        return Team.create_project(email, product_name, idea)
 
 @authenticated_callable
 def download_project(product_name: str) -> bytes:
+    email = anvil.google.auth.get_user_email()
+    if email is None:
+        return None
+    
     zipfile = None
     try:
-        zipfile: bytes = Team.download_project(product_name)
+        zipfile: bytes = Team.download_project(email=email, product_name=product_name)
     except Exception:
         traceback.print_exc()
 
@@ -151,6 +165,10 @@ def download_project(product_name: str) -> bytes:
 
 @authenticated_callable
 def reset_project(product_name: str) -> None:
+    email = anvil.google.auth.get_user_email()
+    if email is None:
+        return
+    
     Team.reset_project(product_name)
 
 
