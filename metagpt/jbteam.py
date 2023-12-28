@@ -47,7 +47,7 @@ class Team(BaseModel):
 
     
     @classmethod
-    def generate_folder_name(email):
+    def generate_folder_name(cls, email) -> str:
         # Remove invalid characters from the email address
         cleaned_email = re.sub(r'[^\w\s.-]', '', email)
 
