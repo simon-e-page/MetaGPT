@@ -39,6 +39,7 @@ class Team(BaseModel):
     idea: str = Field(default="")
     stage_callback: Callable = Field(default=None)
     bench: dict = Field(default={})
+    _log_stream = Field(default=None)
     
     class Config:
         arbitrary_types_allowed = True
@@ -334,11 +335,15 @@ class Team(BaseModel):
 
         return ret
     
-    def set_stage_callback(self, callback: Callable):
+    def set_stage_callback(self, callback: Callable) -> None:
         self.stage_callback = callback
 
-    def set_log_output(self, stream):
-        logger.add(stream, level="INFO")
+    def set_log_output(self, stream) -> None:
+        """ Handler to direct log output to a stream (for API retrieval)"""
+        # Only do once!
+        if self._log_stream is None:
+            logger.add(stream, level="INFO")
+            self._log_stream = stream
         
     def get_previous_stage(self, current_stage: str) -> str:
         stage_num: int = CONST.STAGES[current_stage]
