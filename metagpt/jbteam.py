@@ -48,15 +48,12 @@ class Team(BaseModel):
     
     @classmethod
     def generate_folder_name(cls, email) -> str:
-        # Remove invalid characters from the email address
-        cleaned_email = re.sub(r'[^\w\s.-]', '', email)
-
-        # Replace spaces and dots with underscores
-        folder_name = re.sub(r'[\s.]+', '_', cleaned_email)
-
         # Replace @ with __at__
-        folder_name = re.sub(r'[@]+', '__at__', folder_name)
-
+        cleaned_email = re.sub(r'@', '__at__', email)
+        # Remove invalid characters from the email address
+        cleaned_email = re.sub(r'[^\w.-]', '', cleaned_email)
+        # Replace dots with underscores
+        folder_name = re.sub(r'[.]+', '_', cleaned_email)
         return folder_name
 
     @classmethod
