@@ -71,14 +71,19 @@ class LogSink:
 log_stream = LogSink()
 
 # TODO: add auth to the frontend
-authenticated_callable = anvil.server.callable(require_user=True)
-#authenticated_callable = anvil.server.callable()
+#authenticated_callable = anvil.server.callable(require_user=True)
+authenticated_callable = anvil.server.callable()
 
 @authenticated_callable
 def get_projects() -> list:
     """ Retrieve existing projects and return a list of names"""
-    email = anvil.google.auth.get_user_email()
-    return Team.get_project_list(email=email)
+    email: str = anvil.google.auth.get_user_email()
+    project_list: list = []
+    if email is None:
+        print("Cannot list projects!")
+    else:
+        project_list = Team.get_project_list(email=email)
+    return project_list
 
 @authenticated_callable
 def get_project(product_name: str, use_callback=True) -> dict:
