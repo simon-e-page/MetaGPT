@@ -174,7 +174,7 @@ def reset_project(product_name: str) -> None:
     if email is None:
         return
     
-    Team.reset_project(product_name)
+    Team.reset_project(email=email, product_name=product_name)
 
 
 @authenticated_callable
@@ -185,6 +185,19 @@ def get_balance() -> float:
         balance: float = company.get_balance()
         return balance
 
+@authenticated_callable
+def get_message_count():
+    if company is None:
+        return 0
+    else:
+        return len(company.get_messages())
+    
+@authenticated_callable
+def get_messages(k: int=0) -> list:
+    if company is None:
+        return []
+    else:
+        return company.get_messages(k)
 
 def check_status() -> tuple:
     global task

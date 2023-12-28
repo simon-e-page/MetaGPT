@@ -255,7 +255,10 @@ class Team(BaseModel):
         if CONFIG.total_cost > CONFIG.max_budget:
             raise NoMoneyException(CONFIG.total_cost, f'Insufficient funds: {CONFIG.max_budget}')
 
-
+    def get_messages(self, k=0) -> list:
+        msgs: list = self.environment.memory.get(k)
+        return msgs
+    
     def _map_stage_to_deliverable(self, stage: str) -> Path:
         """ sets out deliverables for each stage """
         DELIVERABLE_MAP = {
