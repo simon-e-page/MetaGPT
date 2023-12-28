@@ -82,6 +82,7 @@ def get_projects() -> list:
     if email is None:
         print("Cannot list projects!")
     else:
+        print(f"Successful login from {email}")
         project_list = Team.get_project_list(email=email)
     return project_list
 
