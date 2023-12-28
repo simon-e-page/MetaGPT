@@ -39,7 +39,7 @@ class Team(BaseModel):
     idea: str = Field(default="")
     stage_callback: Callable = Field(default=None)
     bench: dict = Field(default={})
-    _log_stream = Field(default=False)
+    _log_stream: bool = Field(default=False)
     
     class Config:
         arbitrary_types_allowed = True
@@ -341,6 +341,7 @@ class Team(BaseModel):
     def set_log_output(self, stream) -> None:
         """ Handler to direct log output to a stream (for API retrieval)"""
         # Only do once!
+        logger.info(f"Attempting to add a log stream with current value: {self._log_stream}")
         if not self._log_stream:
             logger.add(stream, level="INFO")
             self._log_stream = True
