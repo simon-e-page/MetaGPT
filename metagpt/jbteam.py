@@ -141,14 +141,15 @@ class Team(BaseModel):
     def get_project_list(cls, email: str) -> list:
         projects: list = []
         path: Path = Path(CONFIG.workspace_root) / cls.generate_folder_name(email)
-        for i in path.iterdir():
-            if i.is_dir():
-                try:
-                    entry: dict = cls.get_product_config(i.name)
-                    entry['NAME'] = i.name
-                    projects.append(entry)
-                except ProductConfigError:
-                    logger.warning(f"Invalid product config: {i.name}")
+        if path.exists():
+            for i in path.iterdir():
+                if i.is_dir():
+                    try:
+                        entry: dict = cls.get_product_config(i.name)
+                        entry['NAME'] = i.name
+                        projects.append(entry)
+                    except ProductConfigError:
+                        logger.warning(f"Invalid product config: {i.name}")
         return projects
 
     @classmethod
