@@ -10,6 +10,7 @@ from typing import Callable
 from concurrent.futures import ThreadPoolExecutor
 
 import anvil.server
+import anvil.google.auth
 from anvil import BlobMedia
 
 from metagpt.jbteam import Team
@@ -70,13 +71,14 @@ class LogSink:
 log_stream = LogSink()
 
 # TODO: add auth to the frontend
-#authenticated_callable = anvil.server.callable(require_user=True)
-authenticated_callable = anvil.server.callable()
+authenticated_callable = anvil.server.callable(require_user=True)
+#authenticated_callable = anvil.server.callable()
 
 @authenticated_callable
 def get_projects() -> list:
     """ Retrieve existing projects and return a list of names"""
-    return Team.get_project_list()
+    email = anvil.google.auth.get_user_email()
+    return Team.get_project_list(email=email)
 
 @authenticated_callable
 def get_project(product_name: str, use_callback=True) -> dict:
@@ -124,8 +126,9 @@ def update_project(product_name: str, project_data: dict) -> None:
 
 @authenticated_callable
 def create_project(product_name: str, project_data: dict) -> bool:
+    email = anvil.google.auth.get_user_email()
     idea: str = project_data['IDEA']
-    return Team.create_project(product_name, idea)
+    return Team.create_project(email, product_name, idea)
 
 @authenticated_callable
 def download_project(product_name: str) -> bytes:

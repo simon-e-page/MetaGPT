@@ -9,6 +9,7 @@ import os
 import traceback
 import zipfile
 import io
+import re
 from typing import Callable
 from pathlib import Path
 import yaml
@@ -43,6 +44,20 @@ class Team(BaseModel):
     
     class Config:
         arbitrary_types_allowed = True
+
+    
+    @classmethod
+    def generate_folder_name(email):
+        # Remove invalid characters from the email address
+        cleaned_email = re.sub(r'[^\w\s.-]', '', email)
+
+        # Replace spaces and dots with underscores
+        folder_name = re.sub(r'[\s.]+', '_', cleaned_email)
+
+        # Replace @ with __at__
+        folder_name = re.sub(r'[@]+', '__at__', folder_name)
+
+        return folder_name
 
     @classmethod
     def download_project(cls, product_name: str) -> bytes:
@@ -118,17 +133,17 @@ class Team(BaseModel):
             cls.save_product_config_to_file(product_name, existing)
 
     @classmethod
-    def save_product_config_to_file(cls, product_name: str, config: dict):
-        _base_dir: Path = Path(CONFIG.workspace_root) / product_name
+    def save_product_config_to_file(cls, email: str, product_name: str, config: dict):
+        _base_dir: Path = Path(CONFIG.workspace_root) / cls.generate_folder_name(email) / product_name
         _yaml_file: Path = _base_dir / "product.yaml"
         if _base_dir.exists():
             with open(_yaml_file, "w", encoding="utf-8") as file:
                 yaml.safe_dump(config, file)
 
     @classmethod
-    def get_project_list(cls) -> list:
+    def get_project_list(cls, email: str) -> list:
         projects: list = []
-        path: Path = Path(CONFIG.workspace_root)
+        path: Path = Path(CONFIG.workspace_root) / cls.generate_folder_name(email)
         for i in path.iterdir():
             if i.is_dir():
                 try:
@@ -140,8 +155,8 @@ class Team(BaseModel):
         return projects
 
     @classmethod
-    def create_project(cls, product_name: str, idea: str, stage='Requirements'):
-        _base_dir: Path = Path(CONFIG.workspace_root) / product_name
+    def create_project(cls, email: str, product_name: str, idea: str, stage='Requirements'):
+        _base_dir: Path = Path(CONFIG.workspace_root) / cls.generate_folder_name(email) / product_name
 
         _base: dict = {
             'IDEA': idea,
@@ -156,7 +171,7 @@ class Team(BaseModel):
             ret = False
             
         if ret:
-            cls.save_product_config_to_file(product_name, _base)
+            cls.save_product_config_to_file(email, product_name, _base)
         return ret
 
 
