@@ -12,7 +12,7 @@ import io
 from typing import Callable
 from pathlib import Path
 import yaml
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 
 from metagpt.actions import BossRequirement, AdvanceStage, ManagementAction, STAGE_ACTIONS, WriteJBCode
 from metagpt.config import CONFIG
@@ -37,9 +37,9 @@ class Team(BaseModel):
     environment: Environment = Field(default_factory=Environment)
     investment: float = Field(default=10.0)
     idea: str = Field(default="")
-    stage_callback: Callable = Field(default=None)
-    bench: dict = Field(default={})
-    _log_stream: bool = False
+    _stage_callback: Callable = PrivateAttr(None)
+    _bench: dict = PrivateAttr({})
+    _log_stream: bool = PrivateAttr(False)
     
     class Config:
         arbitrary_types_allowed = True
@@ -336,7 +336,7 @@ class Team(BaseModel):
         return ret
     
     def set_stage_callback(self, callback: Callable) -> None:
-        self.stage_callback = callback
+        self._stage_callback = callback
 
     def set_log_output(self, stream) -> None:
         """ Handler to direct log output to a stream (for API retrieval)"""
@@ -369,13 +369,13 @@ class Team(BaseModel):
         return new_stage         
 
     def set_team(self, end_stage):
-        if len(self.bench)>0:
-            self.environment.add_roles(self.bench.values())
-            self.bench = {}
+        if len(self._bench)>0:
+            self.environment.add_roles(self._bench.values())
+            self._bench = {}
 
         remove = []
         for name, role in self.environment.get_roles().items():
-            self.bench[name] = role
+            self._bench[name] = role
             if type(role) not in STAGE_TEAM[end_stage]:
                 #logger.info(f"Removing {name} from the team!")
                 remove.append(name)
@@ -405,8 +405,8 @@ class Team(BaseModel):
 
         logger.info(f"Team will execute rounds of Tasks unless they finish the {end_stage} stage or run out of Investment funds!")
 
-        if self.stage_callback is not None:
-            self.stage_callback(stage=current_stage)
+        if self._stage_callback is not None:
+            self._stage_callback(stage=current_stage)
 
         #while n_round > 0 and (CONST.STAGES[end_stage] >= CONST.STAGES[current_stage]):
         # Failsafe to avoid infinite loop
@@ -440,8 +440,8 @@ class Team(BaseModel):
             if new_stage != current_stage:
                 logger.info(f"Execution advanced to {new_stage} stage!")
 
-                if self.stage_callback is not None:
-                    self.stage_callback(stage=new_stage)
+                if self._stage_callback is not None:
+                    self._stage_callback(stage=new_stage)
                 current_stage = new_stage
 
             n_round -= 1
