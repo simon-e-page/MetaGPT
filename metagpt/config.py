@@ -97,10 +97,6 @@ class Config(metaclass=Singleton):
         self.prompt_format = self._get("PROMPT_FORMAT", "markdown")
         self.workspace_root: str = self._get("WORKSPACE_ROOT", f"{PROJECT_ROOT}/workspace")
         
-        self._product_root: Path = None
-        self._product_config: dict = None
-        self._product_name: str = None
-        self._email: str = ""
         
     def _init_with_config_files_and_env(self, configs: dict, yaml_file):
         """Load from config/key.yaml, config/config.yaml, and env in decreasing order of priority"""
@@ -127,60 +123,5 @@ class Config(metaclass=Singleton):
         if value is None:
             raise ValueError(f"Key '{key}' not found in environment variables or in the YAML file")
         return value
-
-    @property
-    def product_root(self) -> Path:
-        return self._product_root
-
-    @product_root.setter
-    def product_root(self, value) -> None:
-        self._product_root: Path = value
-
-    @property
-    def product_name(self) -> str:
-        return self._product_name
-
-    @product_name.setter
-    def product_name(self, value) -> None:
-        self._product_name: str = value
-
-    @property
-    def email(self) -> str:
-        return self._email
-    
-    @email.setter
-    def email(self, value: str) -> None:
-        self._email = value
-
-    def set_product_config(self, config_dict):
-        self._product_config = config_dict
-
-    @property
-    def product_config(self):
-        return self._product_config
-
-    @property
-    def idea(self) -> str:
-        return self._product_config.get('IDEA', '')
-
-    @idea.setter
-    def idea(self, idea: str) -> None:
-        self._product_config['IDEA'] = idea
-
-    @property
-    def stage(self) -> str:
-        return self._product_config.get('STAGE', None)
-
-    @stage.setter
-    def stage(self, stage: str) -> None:
-        self._product_config['STAGE'] = stage
-
-    @property
-    def end_stage(self) -> str:
-        return self._product_config.get('END_STAGE', None)
-
-    @end_stage.setter
-    def end_stage(self, end_stage: str) -> None:
-        self._product_config['END_STAGE'] = end_stage
 
 CONFIG = Config()

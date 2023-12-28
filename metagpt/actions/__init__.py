@@ -63,13 +63,6 @@ class ActionType(Enum):
     WRITE_JB_TASKS = WriteJBTasks
     WRITE_JB_CODE = WriteJBCode
 
-STAGE_ACTIONS = {
-    'Requirements': [BossRequirement],
-    'Design': [BossRequirement, WriteJBPRD],
-    'Plan': [BossRequirement, WriteJBPRD, WriteProductApproval, WriteJBDesign],
-    'Build': [BossRequirement, WriteJBPRD, WriteProductApproval, WriteJBDesign, WriteDesignApproval, WriteJBTasks],
-    'Test': [BossRequirement, WriteJBPRD, WriteProductApproval, WriteJBDesign, WriteDesignApproval, WriteJBTasks, WriteTaskApproval, WriteJBCode, WriteCodeReview],
-}
 
 __all__ = [
     "ActionType",

@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+@Time    : 2023/5/12 00:30
+@Author  : simonpage
+@File    : jbcode.py
+"""
+
 import asyncio
 import time as t
 import os
@@ -29,7 +35,6 @@ from metagpt.roles import (
 
 # TODO: configure Config from frontend
 # TODO: set git settings on workspaces / projects
-# TODO: scan project memory when loading for previously created deliverables
 
 company: Team = None
 task = None

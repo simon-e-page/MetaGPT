@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 @Time    : 2023/5/12 00:30
-@Author  : alexanderwu
-@File    : software_company.py
+@Author  : simonpage
+@File    : jbteam.py
 """
 import os
 import traceback
@@ -15,17 +15,63 @@ from pathlib import Path
 import yaml
 from pydantic import BaseModel, Field, PrivateAttr
 
-from metagpt.actions import BossRequirement, AdvanceStage, ManagementAction, STAGE_ACTIONS, WriteJBCode
+from metagpt.actions import BossRequirement, AdvanceStage, ManagementAction, WriteJBCode, WriteJBPRD, WriteProductApproval, WriteJBDesign, WriteDesignApproval, WriteJBTasks, WriteTaskApproval, WriteCodeReview
 from metagpt.config import CONFIG
+from metagpt.product_config import PRODUCT_CONFIG
 import metagpt.const as CONST
 from metagpt.environment import Environment
 from metagpt.logs import logger
-from metagpt.roles import Role, STAGE_ROLES, STAGE_TEAM, APPROVERS
+from metagpt.roles import Role, JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover, JBEngineer, JBQaEngineer, JBStageGovernance
 from metagpt.schema import Message
 from metagpt.utils.common import NoMoneyException, ProductConfigError
 from metagpt.utils.jb_common import ApprovalError
 from metagpt.utils.serialize import serialize_batch, deserialize_batch
 
+STAGE_LIST = [ "Requirements", "Design", "Plan", "Build", "Test"]
+
+STAGES: dict = { "Requirements": 0,
+                 "Design": 1,
+                 "Plan": 2,
+                 "Build": 3,
+                 "Test": 4
+                }
+
+STAGE_ACTIONS = {
+    'Requirements': [BossRequirement],
+    'Design': [BossRequirement, WriteJBPRD],
+    'Plan': [BossRequirement, WriteJBPRD, WriteProductApproval, WriteJBDesign],
+    'Build': [BossRequirement, WriteJBPRD, WriteProductApproval, WriteJBDesign, WriteDesignApproval, WriteJBTasks],
+    'Test': [BossRequirement, WriteJBPRD, WriteProductApproval, WriteJBDesign, WriteDesignApproval, WriteJBTasks, WriteTaskApproval, WriteJBCode, WriteCodeReview],
+}
+
+# This denotes the roles whose memories should be 'retained'
+# at the commencement of each stage
+# We assume Approval of the prior stage must occur before commencement
+
+STAGE_ROLES = {
+    "Requirements": [],
+    "Design": [ JBProductManager ],
+    "Plan": [ JBProductManager, JBProductApprover, JBArchitect ],
+    "Build": [ JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBProjectManager ],
+    "Test": [ JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover, JBEngineer ],
+}
+
+STAGE_TEAM = {
+    "Requirements": [JBProductManager, JBProductApprover, JBStageGovernance],
+    "Design": [ JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBStageGovernance ],
+    "Plan": [JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover, JBStageGovernance ],
+    "Build": [JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover, JBEngineer, JBStageGovernance ],
+    "Test": [ JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover, JBEngineer, JBQaEngineer, JBStageGovernance ],
+}
+
+# This works by triggering the action from the Approver of the Previous Stage
+APPROVERS: dict = {
+    "Requirements": [ JBProductManager, JBProductApprover, JBStageGovernance, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover, JBEngineer, JBQaEngineer],
+    "Design": [ JBProductApprover, JBStageGovernance, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover, JBEngineer, JBQaEngineer ],
+    "Plan": [ JBDesignApprover, JBStageGovernance, JBProjectManager, JBTaskApprover, JBEngineer, JBQaEngineer ],
+    "Build": [ JBTaskApprover, JBStageGovernance,JBEngineer, JBQaEngineer ],
+    "Test": [ JBEngineer, JBStageGovernance, JBQaEngineer ],
+}
 
 
 class Team(BaseModel):
@@ -212,11 +258,10 @@ class Team(BaseModel):
 
     def _map_stage_to_deliverable(self, stage: str) -> Path:
         """ sets out deliverables for each stage """
-        # TODO: extend to retrieval from the internal message history
         DELIVERABLE_MAP = {
-            "Requirements": { 'name': 'prd',               'path': CONFIG.product_root / "docs" / "prd.md" },
-            "Design":       { 'name': 'design',            'path': CONFIG.product_root / "docs" / "system_design.md" },
-            "Plan":         { 'name': 'tasks',             'path': CONFIG.product_root / "docs" / "api_spec_and_tasks.md" },
+            "Requirements": { 'name': 'prd',               'path': PRODUCT_CONFIG.product_root / "docs" / "prd.md" },
+            "Design":       { 'name': 'design',            'path': PRODUCT_CONFIG.product_root / "docs" / "system_design.md" },
+            "Plan":         { 'name': 'tasks',             'path': PRODUCT_CONFIG.product_root / "docs" / "api_spec_and_tasks.md" },
             "Build":        { 'name': 'code_review',       'path': WriteJBCode },
             "Test":         { 'name': 'test_build_report', 'path': None },
 
@@ -262,29 +307,29 @@ class Team(BaseModel):
             'STAGE': stage
         }
 
-        CONFIG.product_config = yaml.dump(data)
+        PRODUCT_CONFIG.product_config = yaml.dump(data)
         self.save_product_config()
         
     def save_product_config(self):
-        self.save_product_config_to_file(CONFIG.email, self.product_name, CONFIG.product_config)
+        self.save_product_config_to_file(PRODUCT_CONFIG.email, self.product_name, PRODUCT_CONFIG.product_config)
 
     def load_product_config(self, email: str) -> None:
         # First set CONFIG object up
         # TODO: implement in __init__?
-        CONFIG.email = email
-        CONFIG.product_name = self.product_name
-        CONFIG.product_root = Path(CONFIG.workspace_root) / self.generate_folder_name(email) / self.product_name
+        PRODUCT_CONFIG.email = email
+        PRODUCT_CONFIG.product_name = self.product_name
+        PRODUCT_CONFIG.product_root = Path(CONFIG.workspace_root) / self.generate_folder_name(email) / self.product_name
 
-        if not os.path.exists(CONFIG.product_root):
-            raise FileNotFoundError(f"Need following directory with product config to start: {CONFIG.product_root}")
+        if not os.path.exists(PRODUCT_CONFIG.product_root):
+            raise FileNotFoundError(f"Need following directory with product config to start: {PRODUCT_CONFIG.product_root}")
 
         CONFIG.set_product_config(self.get_product_config(email, self.product_name))
         
     def get_project(self) -> dict:
-        deliverables: dict = CONFIG.product_config.copy()
-        deliverables['NAME'] = CONFIG.product_name
+        deliverables: dict = PRODUCT_CONFIG.product_config.copy()
+        deliverables['NAME'] = PRODUCT_CONFIG.product_name
 
-        history_file: Path = CONFIG.product_root / "history.pickle"
+        history_file: Path = PRODUCT_CONFIG.product_root / "history.pickle"
         if history_file.exists():
             self.set_memory('Test')
             for stage in ['Requirements', 'Design', 'Plan', 'Build', 'Test']:
@@ -296,13 +341,8 @@ class Team(BaseModel):
     def start_project(self, product_name: str, stage: str = "Requirements", send_to: str = "", end_stage="Requirements"):
         """Start a project from the start or a specific stage (assuming prior stages have been run)"""
         logger.info(f'Starting project: {product_name}')
-
-        #self.get_project()
-        CONFIG.stage = stage
-        CONFIG.end_stage = end_stage
-
-        #add_project_log(CONFIG.product_root, replace=True)
-
+        PRODUCT_CONFIG.stage = stage
+        PRODUCT_CONFIG.end_stage = end_stage
         logger.info(f'For product {product_name} we are commencing stage: {stage}')
 
     
@@ -333,14 +373,12 @@ class Team(BaseModel):
         for name, role in self.environment.get_roles().items():
             role._rc.memory.clear()
         
-        history_file: Path = CONFIG.product_root / "history.pickle"
+        history_file: Path = PRODUCT_CONFIG.product_root / "history.pickle"
         if history_file.exists():
             logger.info(f"Loading messages from a previous execution and replaying up to {stage}!")
             messages = deserialize_batch(history_file.read_bytes())
             messages = self.filter_messages(messages, STAGE_ACTIONS[stage])
             logger.info(f"Publishing {len(messages)} messages to the environment")
-            #news_text = [f"{i.role}: {i.content[:20]}..." for i in messages]
-            #logger.info(f'Replayed: {news_text}')
             self.environment.memory.add_batch(messages)
 
             # Only the approver roles should see a new message in the environment to kick off proceedings
@@ -351,11 +389,6 @@ class Team(BaseModel):
                         role.recv(message)
             ret = True
         
-        #for name, role in self.environment.get_roles().items():
-        #    if type(role) not in STAGE_ROLES[stage]:
-        #        logger.info(f"Clearing memory for {name}")
-        #        role._rc.memory.clear()
-
         return ret
     
     def set_stage_callback(self, callback: Callable) -> None:
@@ -370,21 +403,21 @@ class Team(BaseModel):
             self._log_stream = True
         
     def get_previous_stage(self, current_stage: str) -> str:
-        stage_num: int = CONST.STAGES[current_stage]
+        stage_num: int = STAGES[current_stage]
         if stage_num > 0:
-            new_stage: str = CONST.STAGE_LIST[stage_num-1]
+            new_stage: str = STAGE_LIST[stage_num-1]
         else:
             new_stage = None
         return new_stage
     
     def scan_advances(self, current_stage: str) -> str:
         advances = self.environment.memory.get_by_action(AdvanceStage)
-        stage_num: int = CONST.STAGES[current_stage]
+        stage_num: int = STAGES[current_stage]
         new_stage: str = current_stage
 
         for m in advances:
             temp_stage: str = m.instruct_content.dict()['Advance Stage']
-            temp_stage_num: int = CONST.STAGES[temp_stage]
+            temp_stage_num: int = STAGES[temp_stage]
 
             if temp_stage_num > stage_num:
                 new_stage = temp_stage
@@ -400,7 +433,6 @@ class Team(BaseModel):
         for name, role in self.environment.get_roles().items():
             self._bench[name] = role
             if type(role) not in STAGE_TEAM[end_stage]:
-                #logger.info(f"Removing {name} from the team!")
                 remove.append(name)
             else:
                 logger.info(f"Confirming {name} in the team for this execution")
@@ -423,7 +455,7 @@ class Team(BaseModel):
                 
         else:
             logger.info("Commencing project with Boss Requirement")
-            self.environment.publish_message(Message(role="Human", content=CONFIG.idea, cause_by=BossRequirement, send_to=""))
+            self.environment.publish_message(Message(role="Human", content=PRODUCT_CONFIG.idea, cause_by=BossRequirement, send_to=""))
 
 
         logger.info(f"Team will execute rounds of Tasks unless they finish the {end_stage} stage or run out of Investment funds!")
@@ -431,13 +463,11 @@ class Team(BaseModel):
         if self._stage_callback is not None:
             self._stage_callback(stage=current_stage)
 
-        #while n_round > 0 and (CONST.STAGES[end_stage] >= CONST.STAGES[current_stage]):
-        # Failsafe to avoid infinite loop
-        # TODO: change to monitor new messages in the environment??
-        n_round = 20
-        while n_round>0 and (CONST.STAGES[end_stage] >= CONST.STAGES[current_stage]):
+        n_round = 3
+        while n_round>0 and (STAGES[end_stage] >= STAGES[current_stage]):
             logger.info(f"Working on stage: {current_stage}")
-            
+            start_msgs: int = len(self.environment.memory.get())
+
             try:
                 self._check_balance()
                 await self.environment.run()
@@ -459,6 +489,8 @@ class Team(BaseModel):
                 logger.error(traceback.format_exc())
                 n_round = 0
             
+            end_msgs: int = len(self.environment.memory.get())
+                
             new_stage: str = self.scan_advances(current_stage)
             if new_stage != current_stage:
                 logger.info(f"Execution advanced to {new_stage} stage!")
@@ -467,9 +499,11 @@ class Team(BaseModel):
                     self._stage_callback(stage=new_stage)
                 current_stage = new_stage
 
-            n_round -= 1
+            elif start_msgs == end_msgs:
+                logger.warning("No action taken during round! Aborting after three rounds!")
+                n_round -= 1
             
-        history_file = CONFIG.product_root / "history.pickle"
+        history_file = PRODUCT_CONFIG.product_root / "history.pickle"
         with open(history_file, 'wb') as file:
             file.write(serialize_batch(self.environment.memory.get()))
         
