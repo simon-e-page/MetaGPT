@@ -6,7 +6,6 @@
 @File    : product_config.py
 """
 
-from metagpt.const import PROJECT_ROOT
 from metagpt.utils.singleton import Singleton
 from pathlib import Path
 
@@ -16,7 +15,6 @@ class ProductConfig(metaclass=Singleton):
     _instance = None
 
     def __init__(self):
-        self.workspace_root: str = self._get("WORKSPACE_ROOT", f"{PROJECT_ROOT}/workspace")
         self._product_root: Path = None
         self._product_config: dict = None
         self._product_name: str = None
