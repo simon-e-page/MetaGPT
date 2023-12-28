@@ -22,7 +22,7 @@ from metagpt.roles import Role
 from metagpt.schema import Message
 from metagpt.utils.common import CodeParser, parse_recipient
 from metagpt.utils.special_tokens import FILENAME_CODE_SEP, MSG_SEP
-from metagpt.config import CONFIG
+from metagpt.product_config import PRODUCT_CONFIG
 
 class JBQaEngineer(Role):
     def __init__(
@@ -49,7 +49,7 @@ class JBQaEngineer(Role):
             package_name = CodeParser.parse_str(block="Python package name", text=system_design_msg.content)
 
         if len(package_name) == 0:
-            package_name = CONFIG.product_name
+            package_name = PRODUCT_CONFIG.product_name
         return package_name
 
     def get_workspace(self, return_proj_dir=True) -> Path:
@@ -57,14 +57,14 @@ class JBQaEngineer(Role):
         msg = self._rc.memory.get_by_action(WriteDesignApproval)[-1]
 
         if return_proj_dir:
-            ret_path = CONFIG.product_root
+            ret_path = PRODUCT_CONFIG.product_root
         else:
             if not msg:
-                ws_path = CONFIG.product_root / CONFIG.product_name
+                ws_path = PRODUCT_CONFIG.product_root / PRODUCT_CONFIG.product_name
             else:
                 package_name = self.parse_workspace(msg)
                 # Codes are written in workspace/{product_name}/{package_name}
-                ret_path = CONFIG.product_root / package_name
+                ret_path = PRODUCT_CONFIG.product_root / package_name
 
         return ret_path
 

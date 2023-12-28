@@ -3,9 +3,11 @@ Filename: MetaGPT/metagpt/provider/human_provider.py
 Created Date: Wednesday, November 8th 2023, 11:55:46 pm
 Author: garylin2099
 '''
+
+# Altered by simonpage
+
 from typing import Optional, Callable
 import time as t
-#import asyncio
 
 from metagpt.provider.base_gpt_api import BaseGPTAPI
 from metagpt.logs import logger
@@ -21,7 +23,6 @@ class HumanProvider(BaseGPTAPI):
     def set_callback(self, callback: Callable) -> None:
         self.callback = callback
 
-    #async def ask(self, msg: str, stage: str) -> str:
     def ask(self, msg: str, stage: str ="Requirements", autoapprove=False) -> str:
         
         if autoapprove:
@@ -35,7 +36,6 @@ class HumanProvider(BaseGPTAPI):
             rsp  = self.callback(action="check", stage=stage)
             while rsp is None:
                 t.sleep(10)
-                #await asyncio.sleep(10)
                 rsp  = self.callback(action="check", stage=stage)
                 logger.info(f"Approval received: {rsp}")
         else:

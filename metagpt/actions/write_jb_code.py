@@ -49,24 +49,6 @@ class WriteJBCode(Action):
     def _is_invalid(self, filename):
         return any(i in filename for i in ["mp3", "wav"])
 
-    # def _save(self, context, filename, code):
-    #     # logger.info(filename)
-    #     # logger.info(code_rsp)
-    #     if self._is_invalid(filename):
-    #         return
-
-    #     design = [i for i in context if i.cause_by == WriteDesign][0]
-
-    #     #ws_name = CodeParser.parse_str(block="Python package name", text=design.content)
-    #     ws_name = CONFIG.product_name
-    #     ws_path = CONST.WORKSPACE_ROOT / ws_name
-    #     #if f"{ws_name}/" not in filename and all(i not in filename for i in ["requirements.txt", ".md"]):
-    #     #    ws_path = ws_path / ws_name
-    #     code_path = ws_path / filename
-    #     code_path.parent.mkdir(parents=True, exist_ok=True)
-    #     code_path.write_text(code)
-    #     logger.info(f"Saving Code to {code_path}")
-
     @retry(stop=stop_after_attempt(2), wait=wait_random_exponential(min=60, max=180))
     async def write_code(self, prompt):
         code_rsp = await self._aask(prompt)
@@ -77,7 +59,5 @@ class WriteJBCode(Action):
         prompt = PROMPT_TEMPLATE.format(context=context, filename=filename)
         logger.info(f'Writing {filename}..')
         code = await self.write_code(prompt)
-        # code_rsp = await self._aask_v1(prompt, "code_rsp", OUTPUT_MAPPING)
-        #self._save(context, filename, code)
         return code
     

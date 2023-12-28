@@ -12,6 +12,7 @@ from typing import List
 from metagpt.actions import Action, ActionOutput
 from metagpt.actions.search_and_summarize import SearchAndSummarize
 from metagpt.config import CONFIG
+from metagpt.product_config import PRODUCT_CONFIG
 from metagpt.logs import logger
 from metagpt.utils.get_template import get_template
 from metagpt.utils.json_to_markdown import json_to_markdown
@@ -239,26 +240,16 @@ class WriteJBPRD(Action):
         prd_file = docs_path / "prd.md"
         prd_json = docs_path / "prd.json"
 
-        #if context[-1].instruct_content and context[-1].instruct_content.dict()["Competitive Quadrant Chart"]:
-        #    quadrant_chart = context[-1].instruct_content.dict()["Competitive Quadrant Chart"]
-        #    await mermaid_to_file(quadrant_chart, resources_path / "competitive_analysis")
-
         if prd.instruct_content:
             logger.info(f"Saving PRD to {prd_file} and {prd_json}")
             prd_file.write_text(json_to_markdown(prd.instruct_content.dict()))
             prd_json.write_text(json.dumps(prd.instruct_content.dict()))
 
     async def _save(self, prd):
-        #if isinstance(system_design, ActionOutput):
-        #    ws_name = system_design.instruct_content.dict()["Python package name"]
-        #else:
-        #    ws_name = CodeParser.parse_str(block="Python package name", text=system_design)
-        workspace = CONFIG.product_root
+        workspace = PRODUCT_CONFIG.product_root
         docs_path = workspace / "docs"
         resources_path = workspace / "resources"
         self.recreate_workspace([docs_path, resources_path])
-        #docs_path.mkdir(parents=True, exist_ok=True)
-        #resources_path.mkdir(parents=True, exist_ok=True)
         await self._save_prd(docs_path, resources_path, prd)
 
     async def run(self, requirements, format=CONFIG.prompt_format, *args, **kwargs) -> ActionOutput:

@@ -9,7 +9,7 @@ from typing import List
 
 from metagpt.actions import Action, ActionOutput
 from metagpt.actions.management_action import ManagementAction
-from metagpt.config import CONFIG
+from metagpt.product_config import PRODUCT_CONFIG
 from metagpt.logs import logger
 from metagpt.utils.jb_common import JBParser, ApprovalError
 
@@ -54,7 +54,7 @@ class WriteProductApproval(Action):
         self.autoapprove = True
 
     def _get_prd_from_disk(self):
-        path = CONFIG.product_root / "docs" / "prd.md"
+        path = PRODUCT_CONFIG.product_root / "docs" / "prd.md"
         prd_content = path.read_text()
         logger.debug(prd_content)
         output_class = ActionOutput.create_model_class("approved_prd", PRD_OUTPUT_MAPPING)

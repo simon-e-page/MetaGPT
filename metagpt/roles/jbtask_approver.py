@@ -70,7 +70,4 @@ class JBTaskApprover(Role):
         for i in env_msgs:
             self.recv(i)
 
-        #news_text = [f"{i.role}: {i.content[:20]}..." for i in self._rc.news]
-        #if news_text:
-        #    logger.debug(f'{self._setting} observed: {news_text}')
         return len(self._rc.news)

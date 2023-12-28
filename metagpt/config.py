@@ -3,6 +3,9 @@
 """
 Provide configuration, singleton
 """
+
+# Altered by simonpage
+
 import os
 
 import openai

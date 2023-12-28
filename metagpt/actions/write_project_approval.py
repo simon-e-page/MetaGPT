@@ -9,7 +9,7 @@ from typing import List
 
 from metagpt.actions import Action, ActionOutput
 from metagpt.actions.management_action import ManagementAction
-from metagpt.config import CONFIG
+from metagpt.product_config import PRODUCT_CONFIG
 from metagpt.logs import logger
 from metagpt.utils.jb_common import ApprovalError, JBParser
 
@@ -39,7 +39,7 @@ class WriteTaskApproval(Action):
         self.autoapprove = True
 
     def _get_tasks_from_disk(self):
-        docs_path = CONFIG.product_root / "docs"
+        docs_path = PRODUCT_CONFIG.product_root / "docs"
         system_design_file = docs_path / "api_spec_and_tasks.md"
 
         design_content = system_design_file.read_text()

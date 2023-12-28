@@ -11,7 +11,7 @@ from collections import OrderedDict
 from pathlib import Path
 
 from metagpt.actions import WriteJBCode, WriteCodeReview, WriteTaskApproval, WriteDesignApproval
-from metagpt.config import CONFIG
+from metagpt.product_config import PRODUCT_CONFIG
 from metagpt.logs import logger
 from metagpt.roles import Role
 from metagpt.schema import Message
@@ -97,17 +97,17 @@ class JBEngineer(Role):
             package_name = CodeParser.parse_str(block="Python package name", text=system_design_msg.content)
 
         if len(package_name) == 0:
-            package_name = CONFIG.product_name
+            package_name = PRODUCT_CONFIG.product_name
         return package_name
 
     def get_workspace(self) -> Path:
         msg = self._rc.memory.get_by_action(WriteDesignApproval)[-1]
         if not msg:
-            ws_path = CONFIG.product_root / CONFIG.product_name
+            ws_path = PRODUCT_CONFIG.product_root / PRODUCT_CONFIG.product_name
         else:
             package_name = self.parse_workspace(msg)
             # Codes are written in workspace/{product_name}/{package_name}
-            ws_path = CONFIG.product_root / package_name
+            ws_path = PRODUCT_CONFIG.product_root / package_name
             
         logger.info(f"Engineer writing code to {ws_path}")
         return ws_path

@@ -9,7 +9,7 @@ from typing import List
 
 from metagpt.actions import Action, ActionOutput
 from metagpt.actions.management_action import ManagementAction
-from metagpt.config import CONFIG
+from metagpt.product_config import PRODUCT_CONFIG
 from metagpt.logs import logger
 from metagpt.utils.jb_common import JBParser, ApprovalError
 
@@ -38,7 +38,7 @@ class WriteDesignApproval(Action):
         self.autoapprove = True
 
     def get_design_from_disk(self):
-        docs_path = CONFIG.product_root / "docs"
+        docs_path = PRODUCT_CONFIG.product_root / "docs"
         system_design_file = docs_path / "system_design.md"
 
         design_content = system_design_file.read_text()

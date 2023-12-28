@@ -10,6 +10,7 @@ from pathlib import Path
 
 from metagpt.actions.action import Action
 from metagpt.config import CONFIG
+from metagpt.product_config import PRODUCT_CONFIG
 from metagpt.utils.get_template import get_template
 from metagpt.utils.json_to_markdown import json_to_markdown
 
@@ -166,16 +167,11 @@ class WriteJBTasks(Action):
         super().__init__(name, context, llm)
 
     def _save(self, context, rsp):
-        #if context[-1].instruct_content:
-        #    ws_name = context[-1].instruct_content.dict()["Python package name"]
-        #else:
-        #    ws_name = CodeParser.parse_str(block="Python package name", text=context[-1].content)
-        #ws_name = CONFIG.product_name
-        file_path: Path = CONFIG.product_root / "docs" / "api_spec_and_tasks.md"
+        file_path: Path = PRODUCT_CONFIG.product_root / "docs" / "api_spec_and_tasks.md"
         file_path.write_text(json_to_markdown(rsp.instruct_content.dict()))
 
         # Write requirements.txt
-        requirements_path: Path = CONFIG.product_root / "requirements.txt"
+        requirements_path: Path = PRODUCT_CONFIG.product_root / "requirements.txt"
         requirements_path.write_text("\n".join(rsp.instruct_content.dict().get("Required Python third-party packages")))
 
     async def run(self, context, format=CONFIG.prompt_format):
