@@ -39,7 +39,7 @@ class Team(BaseModel):
     idea: str = Field(default="")
     stage_callback: Callable = Field(default=None)
     bench: dict = Field(default={})
-    _log_stream: bool = Field(default=False)
+    _log_stream: bool = False
     
     class Config:
         arbitrary_types_allowed = True
@@ -369,7 +369,7 @@ class Team(BaseModel):
         return new_stage         
 
     def set_team(self, end_stage):
-        if len(self.bench)>0 is not None:
+        if len(self.bench)>0:
             self.environment.add_roles(self.bench.values())
             self.bench = {}
 
