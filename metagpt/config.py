@@ -97,9 +97,10 @@ class Config(metaclass=Singleton):
         self.prompt_format = self._get("PROMPT_FORMAT", "markdown")
         self.workspace_root: str = self._get("WORKSPACE_ROOT", f"{PROJECT_ROOT}/workspace")
         
-        self._product_root = None
-        self._product_config = None
-        self._product_name = None
+        self._product_root: Path = None
+        self._product_config: dict = None
+        self._product_name: str = None
+        self._email: str = ""
         
     def _init_with_config_files_and_env(self, configs: dict, yaml_file):
         """Load from config/key.yaml, config/config.yaml, and env in decreasing order of priority"""
@@ -128,20 +129,28 @@ class Config(metaclass=Singleton):
         return value
 
     @property
-    def product_root(self):
+    def product_root(self) -> Path:
         return self._product_root
 
+    @product_root.setter
+    def product_root(self, value) -> None:
+        self._product_root: Path = value
+
     @property
-    def product_name(self):
+    def product_name(self) -> str:
         return self._product_name
 
     @product_name.setter
-    def product_name(self, value):
-        self._product_root: Path = Path(self.workspace_root) / value
+    def product_name(self, value) -> None:
         self._product_name: str = value
 
-        # This is a hack to see if it is imported correctly in Action classes
-        CONST.WORKSPACE_ROOT = self._product_root
+    @property
+    def email(self) -> str:
+        return self._email
+    
+    @email.setter
+    def email(self, value: str) -> None:
+        self._email = value
 
     def set_product_config(self, config_dict):
         self._product_config = config_dict

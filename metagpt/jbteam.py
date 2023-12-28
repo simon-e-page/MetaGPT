@@ -266,17 +266,19 @@ class Team(BaseModel):
         self.save_product_config()
         
     def save_product_config(self):
-        self.save_product_config_to_file(self.product_name, CONFIG.product_config)
+        self.save_product_config_to_file(CONFIG.email, self.product_name, CONFIG.product_config)
 
-    def load_product_config(self) -> None:
+    def load_product_config(self, email: str) -> None:
         # First set CONFIG object up
         # TODO: implement in __init__?
+        CONFIG.email = email
         CONFIG.product_name = self.product_name
+        CONFIG.product_root = Path(CONFIG.workspace_root) / self.generate_folder_name(email) / self.product_name
 
         if not os.path.exists(CONFIG.product_root):
             raise FileNotFoundError(f"Need following directory with product config to start: {CONFIG.product_root}")
 
-        CONFIG.set_product_config(self.get_product_config(self.product_name))
+        CONFIG.set_product_config(self.get_product_config(email, self.product_name))
         
     def get_project(self) -> dict:
         deliverables: dict = CONFIG.product_config.copy()
