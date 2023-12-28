@@ -323,7 +323,7 @@ class Team(BaseModel):
         if not os.path.exists(PRODUCT_CONFIG.product_root):
             raise FileNotFoundError(f"Need following directory with product config to start: {PRODUCT_CONFIG.product_root}")
 
-        CONFIG.set_product_config(self.get_product_config(email, self.product_name))
+        PRODUCT_CONFIG.set_product_config(self.get_product_config(email, self.product_name))
         
     def get_project(self) -> dict:
         deliverables: dict = PRODUCT_CONFIG.product_config.copy()
