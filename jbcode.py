@@ -185,19 +185,26 @@ def get_balance() -> float:
         balance: float = company.get_balance()
         return balance
 
-@authenticated_callable
-def get_message_count():
-    if company is None:
-        return 0
-    else:
-        return len(company.get_messages())
     
 @authenticated_callable
-def get_messages(k: int=0) -> list:
+def get_messages(except_first: int=0) -> list:
     if company is None:
         return []
     else:
-        return company.get_messages(k)
+        total_msgs = company.get_messages()
+        k = len(total_msgs) - except_first
+        raw_msgs = company.get_messages(k)
+        # NOTE: str(message) only returns role and content
+        # Need to convert raw Classes to be serializable??
+        msgs = [ {
+                  'cause_by': str(x.cause_by),
+                  'content': x.content,
+                  'role': x.role,
+                  'send_to': x.send_to,
+                  'sent_from': x.sent_from,
+                  'restricted_to': x.restricted_to
+                } for x in raw_msgs ]
+        return msgs
 
 def check_status() -> tuple:
     global task
