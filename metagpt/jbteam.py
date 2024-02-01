@@ -23,8 +23,8 @@ from metagpt.environment import Environment
 from metagpt.logs import logger
 from metagpt.roles import Role, JBProductManager, JBProductApprover, JBArchitect, JBDesignApprover, JBProjectManager, JBTaskApprover, JBEngineer, JBQaEngineer, JBStageGovernance
 from metagpt.schema import Message
-from metagpt.utils.common import NoMoneyException, ProductConfigError
-from metagpt.utils.jb_common import ApprovalError
+from metagpt.utils.common import NoMoneyException
+from metagpt.utils.jb_common import ApprovalError, ProductConfigError
 from metagpt.utils.serialize import serialize_batch, deserialize_batch
 
 STAGE_LIST = [ "Requirements", "Design", "Plan", "Build", "Test"]

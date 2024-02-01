@@ -28,9 +28,6 @@ def check_cmd_exists(command) -> int:
     result = os.system(check_command)
     return result
 
-class ProductConfigError(Exception):
-    def __init__(self, message, approver=""):
-        super().__init__(message)
 
 class OutputParser:
     @classmethod
