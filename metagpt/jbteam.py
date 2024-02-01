@@ -13,6 +13,7 @@ import re
 from typing import Callable
 from pathlib import Path
 import yaml
+import pickle
 from pydantic import BaseModel, Field, PrivateAttr
 
 from metagpt.actions import BossRequirement, AdvanceStage, ManagementAction, WriteJBCode, WriteJBPRD, WriteProductApproval, WriteJBDesign, WriteDesignApproval, WriteJBTasks, WriteTaskApproval, WriteCodeReview
@@ -25,7 +26,7 @@ from metagpt.roles import Role, JBProductManager, JBProductApprover, JBArchitect
 from metagpt.schema import Message
 from metagpt.utils.common import NoMoneyException
 from metagpt.utils.jb_common import ApprovalError, ProductConfigError
-from metagpt.utils.serialize import serialize_batch, deserialize_batch
+from metagpt.utils.serialize import reconstruct, deconstruct
 
 STAGE_LIST = [ "Requirements", "Design", "Plan", "Build", "Test"]
 
@@ -514,3 +515,11 @@ class Team(BaseModel):
         logger.info("Team execution completed!")
         return self.environment.history
     
+def serialize_batch(messages: list):
+    msg_ser = [ deconstruct(x) for x in messages ]
+    return pickle.dumps(msg_ser)
+
+def deserialize_batch(message_set: str) -> list:
+    msg_cps = pickle.loads(message_set)
+    messages = [ reconstruct(m) for m in msg_cps ] 
+    return messages

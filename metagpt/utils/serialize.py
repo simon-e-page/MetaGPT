@@ -69,13 +69,5 @@ def deconstruct(message: Message):
         message_cp.instruct_content = {"class": schema["title"], "mapping": mapping, "value": ic.dict()}
     return message_cp
 
-def serialize_batch(messages: list):
-    msg_ser = [ deconstruct(x) for x in messages ]
-    return pickle.dumps(msg_ser)
-
-def deserialize_batch(message_set: str) -> list:
-    msg_cps = pickle.loads(message_set)
-    messages = [ reconstruct(m) for m in msg_cps ] 
-    return messages
 
 
