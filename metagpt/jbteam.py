@@ -13,7 +13,7 @@ import re
 from typing import Callable
 from pathlib import Path
 import yaml
-import pickle
+import ast
 from pydantic import BaseModel, Field, PrivateAttr
 
 from metagpt.actions import BossRequirement, AdvanceStage, ManagementAction, WriteJBCode, WriteJBPRD, WriteProductApproval, WriteJBDesign, WriteDesignApproval, WriteJBTasks, WriteTaskApproval, WriteCodeReview
@@ -26,7 +26,7 @@ from metagpt.roles import Role, JBProductManager, JBProductApprover, JBArchitect
 from metagpt.schema import Message
 from metagpt.utils.common import NoMoneyException
 from metagpt.utils.jb_common import ApprovalError, ProductConfigError
-from metagpt.utils.serialize import reconstruct, deconstruct
+from metagpt.utils.serialize import serialize_message, deserialize_message
 
 STAGE_LIST = [ "Requirements", "Design", "Plan", "Build", "Test"]
 
@@ -515,11 +515,16 @@ class Team(BaseModel):
         logger.info("Team execution completed!")
         return self.environment.history
     
-def serialize_batch(messages: list):
-    msg_ser = [ deconstruct(x) for x in messages ]
-    return pickle.dumps(msg_ser)
+# Not probably the best wayy to do this!
+# But the underlying serialize module only handles one message at a time
+
+def serialize_batch(messages: list) -> str: 
+    """ Takes a list of messages and returns a string representation of a list of pickle objects """
+    msg_ser = [ serialize_message(x) for x in messages ]
+    return str(msg_ser)
 
 def deserialize_batch(message_set: str) -> list:
-    msg_cps = pickle.loads(message_set)
-    messages = [ reconstruct(m) for m in msg_cps ] 
+    """ Takes a string representation of a list of pickle objects and returns a list of messages """
+    x = ast.literal_eval(message_set)
+    messages = [ deserialize_message(m) for m in x ] 
     return messages
